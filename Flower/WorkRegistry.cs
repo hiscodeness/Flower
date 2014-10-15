@@ -65,6 +65,14 @@ namespace Flower
 
         public void Unregister(IWork work)
         {
+            if (work == null) throw new ArgumentNullException("work");
+
+            if (!_works.Contains(work))
+            {
+                throw new InvalidOperationException(
+                    "Cannot unregister work that is not contained in this work registry.");
+            }
+
             Remove(work);
         }
 
@@ -87,9 +95,8 @@ namespace Flower
 
         private TWork Add<TWork>(TWork work) where TWork : IWork
         {
-            if(work == null) throw new ArgumentNullException("work");
-
-            if(_works.TryAdd(work) && ActivateWorkWhenRegistered)
+            _works.Add(work);
+            if(ActivateWorkWhenRegistered)
             {
                 work.Activate();
             }
@@ -97,23 +104,10 @@ namespace Flower
             return work;
         }
 
-        private TWork Remove<TWork>(TWork work) where TWork : IWork
+        private void Remove(IWork work)
         {
-            if(work == null) throw new ArgumentNullException("work");
-
-            if(!_works.Contains(work))
-            {
-                throw new InvalidOperationException(
-                    "Cannot unregister work that is not contained in this work registry.");
-            }
-
-            IWork removedWork;
-            if(_works.TryTake(out removedWork))
-            {
-                work.Suspend();
-            }
-
-            return work;
+            _works.TryTake(out work);
+            work.Suspend();
         }
     }
 }
