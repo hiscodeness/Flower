@@ -57,6 +57,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestDoubles\TestWorkerResolvers.cs" />
     <Compile Include="WorkRegistryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestDoubles\TestWorkers.cs" />
