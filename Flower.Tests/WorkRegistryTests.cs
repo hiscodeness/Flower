@@ -17,15 +17,14 @@ namespace Flower.Tests
             IList<int> expected = Enumerable.Range(0, 3).ToList();
             IList<int> result = new List<int>();
             var workRegistry = new WorkRegistry();
-            var trigger = expected.ToObservable().Publish();
 
             // Act
-            var output = workRegistry.Register(trigger, TestWorkers.Int2StringWorker)
+            var output = workRegistry.Register(expected.ToObservable(), TestWorkers.Int2StringWorker)
                                     .Pipe(TestWorkers.String2IntWorker)
                                     .Output
                                     .ToList();
             output.Subscribe(r => result = r);
-            trigger.Connect();
+            workRegistry.ActivateAllWorks();
 
             // Assert
             Assert.Equal(expected, result);
@@ -36,7 +35,7 @@ namespace Flower.Tests
         {
             // Arrange
             var subject = new Subject<int>();
-            var workRegistry = new WorkRegistry();
+            var workRegistry = new WorkRegistry(true);
             var work = workRegistry.Register(subject, TestWorkers.IntSquaredWorker);
             var result = 0;
             work.Output.SingleOrDefaultAsync().Subscribe(i => result = i);

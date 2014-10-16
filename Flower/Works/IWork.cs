@@ -24,5 +24,6 @@ namespace Flower.Works
         new IWorkerResolver<TInput, TOutput> WorkerResolver { get; }
         new IObservable<ITriggeredWork<TInput, TOutput>> Executed { get; }
         IObservable<TOutput> Output { get; }
+        IObservable<ITriggeredWork<TInput,TOutput>> Triggered { get; }
     }
 }

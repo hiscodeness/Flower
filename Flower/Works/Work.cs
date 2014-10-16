@@ -18,6 +18,15 @@ namespace Flower.Works
             Trigger = trigger;
             WorkerResolver = workerResolver;
 
+            Triggered = Observable.Create<ITriggeredWork<TInput, TOutput>>(obs =>
+            {
+                WorkTriggered += obs.OnNext;
+                return Disposable.Create(() =>
+                {
+                    WorkTriggered -= obs.OnNext;
+                });
+            });
+
             Executed = Observable.Create<ITriggeredWork<TInput, TOutput>>(obs =>
                 {
                     if(State == WorkState.Completed ||
@@ -73,6 +82,7 @@ namespace Flower.Works
 
         public IObservable<TInput> Trigger { get; private set; }
         public IWorkerResolver<TInput, TOutput> WorkerResolver { get; private set; }
+        public IObservable<ITriggeredWork<TInput, TOutput>> Triggered { get; private set; }
         public IObservable<ITriggeredWork<TInput, TOutput>> Executed { get; private set; }
         public IObservable<TOutput> Output { get; private set; }
 
@@ -113,6 +123,10 @@ namespace Flower.Works
             }
         }
 
+        internal void TriggeredWorkCreated(ITriggeredWork<TInput, TOutput> triggeredWork)
+        {
+            OnTriggeredWorkCreated(triggeredWork);
+        }
         internal void TriggeredWorkExecuted(ITriggeredWork<TInput, TOutput> triggeredWork)
         {
             OnWorkExecuted(triggeredWork);
@@ -124,6 +138,15 @@ namespace Flower.Works
             if(handler != null)
             {
                 handler();
+            }
+        }
+
+        private void OnTriggeredWorkCreated(ITriggeredWork<TInput, TOutput> triggeredWork)
+        {
+            var handler = WorkTriggered;
+            if (handler != null)
+            {
+                handler(triggeredWork);
             }
         }
 
@@ -154,6 +177,7 @@ namespace Flower.Works
             ((WorkRegistry)WorkRegistry).Triggered(this, input);
         }
 
+        private event Action<ITriggeredWork<TInput, TOutput>> WorkTriggered; 
         private event Action<ITriggeredWork<TInput, TOutput>> WorkExecuted;
         private event Action TriggerCompleted;
         private event Action<Exception> TriggerErrored;

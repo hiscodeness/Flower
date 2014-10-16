@@ -20,7 +20,7 @@ namespace Flower
         private readonly BlockingCollection<IWork> works = new BlockingCollection<IWork>();
 
         public WorkRegistry(
-            bool activateWorkWhenRegistered = true,
+            bool activateWorkWhenRegistered = false,
             WorkerErrorBehavior workerErrorBehavior = WorkerErrorBehavior.Throw)
         {
             ActivateWorkWhenRegistered = activateWorkWhenRegistered;
@@ -101,7 +101,8 @@ namespace Flower
         {
             var workRunner = ResolveWorkRunner(work) ?? FallbackWorkRunner;
             var triggeredWork = new TriggeredWork<TInput, TResult>(workRunner, work, input);
-            workRunner.Submit(triggeredWork);
+            work.TriggeredWorkCreated(triggeredWork);
+            triggeredWork.Submit();            
         }
 
         private TWork Add<TWork>(TWork work) where TWork : IWork

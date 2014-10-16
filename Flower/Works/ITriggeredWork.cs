@@ -14,6 +14,7 @@ namespace Flower.Works
 
         IWork Work { get; }
         IWorkRunner WorkRunner { get; }
+        void Submit();
         void Execute();
     }
 

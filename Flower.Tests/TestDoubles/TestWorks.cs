@@ -51,6 +51,7 @@ namespace Flower.Tests.TestDoubles
         IObservable<int> IWork<int>.Trigger { get { return trigger; } }
         IWorkerResolver IWork.WorkerResolver { get { return null; } }
         IObservable<object> IWork.Trigger { get { return trigger.Select(input => input as object); } }
+        IObservable<ITriggeredWork<int, int>> IWork<int, int>.Triggered { get { return null; } }
         IObservable<ITriggeredWorkBase> IWork.Executed { get { return null; } }
     }
 }
