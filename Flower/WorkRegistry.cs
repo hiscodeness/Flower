@@ -2,7 +2,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
 using Flower.WorkRunners;
 using Flower.Workers;
 using Flower.Works;
@@ -20,7 +19,9 @@ namespace Flower
     {
         private readonly BlockingCollection<IWork> _works = new BlockingCollection<IWork>();
 
-        public WorkRegistry(bool activateWorkWhenRegistered = true, WorkerErrorBehavior workerErrorBehavior = WorkerErrorBehavior.Throw)
+        public WorkRegistry(
+            bool activateWorkWhenRegistered = true,
+            WorkerErrorBehavior workerErrorBehavior = WorkerErrorBehavior.Throw)
         {
             ActivateWorkWhenRegistered = activateWorkWhenRegistered;
             WorkerErrorBehavior = workerErrorBehavior;
@@ -65,9 +66,9 @@ namespace Flower
 
         public void Unregister(IWork work)
         {
-            if (work == null) throw new ArgumentNullException("work");
+            if(work == null) throw new ArgumentNullException("work");
 
-            if (!_works.Contains(work))
+            if(!_works.Contains(work))
             {
                 throw new InvalidOperationException(
                     "Cannot unregister work that is not contained in this work registry.");

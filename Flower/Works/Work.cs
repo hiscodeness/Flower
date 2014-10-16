@@ -31,7 +31,7 @@ namespace Flower.Works
                     _executed += obs.OnNext;
                     _triggerCompleted += obs.OnCompleted;
                     _triggerErrored += obs.OnError;
-                    
+
                     return Disposable.Create(() =>
                         {
                             _executed -= obs.OnNext;
@@ -79,7 +79,9 @@ namespace Flower.Works
         public void Activate()
         {
             State = WorkState.Active;
-            _triggerSubscription = Trigger.Subscribe(TriggerOnNext, TriggerOnError, TriggerOnCompleted);
+            _triggerSubscription = Trigger.Subscribe(TriggerOnNext,
+                                                     TriggerOnError,
+                                                     TriggerOnCompleted);
         }
 
         public void Suspend()
@@ -91,21 +93,16 @@ namespace Flower.Works
             _triggerSubscription = null;
         }
 
-        internal void TriggeredWorkExecuted(ITriggeredWork<TInput, TOutput> triggeredWork)
-        {
-            OnWorkExecuted(triggeredWork);
-        }
-
         internal void TriggeredWorkErrored(
             ITriggeredWork<TInput, TOutput> triggeredWork, Exception error)
         {
-            switch (WorkRegistry.WorkerErrorBehavior)
+            switch(WorkRegistry.WorkerErrorBehavior)
             {
                 case WorkerErrorBehavior.Ignore:
                     // Eats exception
                     //Log.Warning("Continue on worker error: {0}.", error);
                     break;
-                case WorkerErrorBehavior.Complete:                    
+                case WorkerErrorBehavior.Complete:
                     ((WorkRegistry)WorkRegistry).Unregister(this);
                     State = WorkState.WorkerError;
                     break;
@@ -116,22 +113,9 @@ namespace Flower.Works
             }
         }
 
-        private void TriggerOnNext(TInput input)
+        internal void TriggeredWorkExecuted(ITriggeredWork<TInput, TOutput> triggeredWork)
         {
-            ((WorkRegistry)WorkRegistry).Triggered(this, input);
-        }
-
-        private void TriggerOnCompleted()
-        {
-            ((WorkRegistry)WorkRegistry).TriggerCompleted(this);
-            State = WorkState.Completed;
-            OnWorkCompleted();
-        }
-
-        private void TriggerOnError(Exception exception)
-        {
-            ((WorkRegistry)WorkRegistry).TriggerErrored(this, exception);
-            State = WorkState.TriggerError;
+            OnWorkExecuted(triggeredWork);
         }
 
         private void OnWorkCompleted()
@@ -150,6 +134,24 @@ namespace Flower.Works
             {
                 handler(triggeredWork);
             }
+        }
+
+        private void TriggerOnCompleted()
+        {
+            ((WorkRegistry)WorkRegistry).TriggerCompleted(this);
+            State = WorkState.Completed;
+            OnWorkCompleted();
+        }
+
+        private void TriggerOnError(Exception exception)
+        {
+            ((WorkRegistry)WorkRegistry).TriggerErrored(this, exception);
+            State = WorkState.TriggerError;
+        }
+
+        private void TriggerOnNext(TInput input)
+        {
+            ((WorkRegistry)WorkRegistry).Triggered(this, input);
         }
 
         private event Action<ITriggeredWork<TInput, TOutput>> _executed;

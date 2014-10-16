@@ -38,7 +38,7 @@ namespace Flower.Works
     public interface ITriggeredWork<TInput, TOutput> : ITriggeredWorkBase
     {
         new IWork<TInput, TOutput> Work { get; }
-         IWorker<TInput, TOutput> Worker { get; }
+        IWorker<TInput, TOutput> Worker { get; }
         TInput Input { get; }
         TOutput Output { get; }
     }

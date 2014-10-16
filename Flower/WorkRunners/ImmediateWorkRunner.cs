@@ -5,7 +5,7 @@ using Flower.Works;
 namespace Flower.WorkRunners
 {
     /// <summary>
-    ///     A work runner that runs the work immediately after triggering when it is appended.
+    /// A work runner that runs the work immediately after triggering when it is appended.
     /// </summary>
     public class ImmediateWorkRunner : IWorkRunner
     {
@@ -13,7 +13,7 @@ namespace Flower.WorkRunners
             new BlockingCollection<ITriggeredWorkBase>();
 
         /// <summary>
-        ///     Gets the works still pending with the work runner.
+        /// Gets the works still pending with the work runner.
         /// </summary>
         public IEnumerable<ITriggeredWorkBase> PendingWorks
         {
@@ -21,7 +21,7 @@ namespace Flower.WorkRunners
         }
 
         /// <summary>
-        ///     Gets the currently running active works.
+        /// Gets the currently running active works.
         /// </summary>
         public IEnumerable<ITriggeredWorkBase> RunningWorks
         {

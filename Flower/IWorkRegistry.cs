@@ -10,11 +10,12 @@ namespace Flower
         IEnumerable<IWork> Works { get; }
         bool ActivateWorkWhenRegistered { get; }
 
+        WorkerErrorBehavior WorkerErrorBehavior { get; }
+        void ActivateAllWorks();
+
         IWork<TInput, TOutput> Register<TInput, TOutput>(
             IObservable<TInput> trigger, IWorkerResolver<TInput, TOutput> workerResolver);
 
-        WorkerErrorBehavior WorkerErrorBehavior { get; }
-        void ActivateAllWorks();
         void SuspendAllWorks();
     }
 }
