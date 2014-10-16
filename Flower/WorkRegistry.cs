@@ -15,9 +15,9 @@ namespace Flower
         Complete
     }
 
-    public class WorkRegistry : IWorkRegistry
+    public sealed class WorkRegistry : IWorkRegistry, IDisposable
     {
-        private readonly BlockingCollection<IWork> _works = new BlockingCollection<IWork>();
+        private readonly BlockingCollection<IWork> works = new BlockingCollection<IWork>();
 
         public WorkRegistry(
             bool activateWorkWhenRegistered = true,
@@ -34,7 +34,7 @@ namespace Flower
 
         public IEnumerable<IWork> Works
         {
-            get { return _works; }
+            get { return works; }
         }
 
         public WorkerErrorBehavior WorkerErrorBehavior { get; private set; }
@@ -43,10 +43,20 @@ namespace Flower
 
         public void ActivateAllWorks()
         {
-            foreach(var work in _works.Reverse())
+            foreach(var work in works.Reverse())
             {
                 work.Activate();
             }
+        }
+
+        public void Dispose()
+        {
+            foreach(var work in works.ToList())
+            {
+                Unregister(work);
+            }
+
+            works.Dispose();
         }
 
         public IWork<TInput, TOutput> Register<TInput, TOutput>(
@@ -58,7 +68,7 @@ namespace Flower
 
         public void SuspendAllWorks()
         {
-            foreach(var work in _works)
+            foreach(var work in works)
             {
                 work.Suspend();
             }
@@ -68,7 +78,7 @@ namespace Flower
         {
             if(work == null) throw new ArgumentNullException("work");
 
-            if(!_works.Contains(work))
+            if(!works.Contains(work))
             {
                 throw new InvalidOperationException(
                     "Cannot unregister work that is not contained in this work registry.");
@@ -96,7 +106,7 @@ namespace Flower
 
         private TWork Add<TWork>(TWork work) where TWork : IWork
         {
-            _works.Add(work);
+            works.Add(work);
             if(ActivateWorkWhenRegistered)
             {
                 work.Activate();
@@ -107,8 +117,8 @@ namespace Flower
 
         private void Remove(IWork work)
         {
-            _works.TryTake(out work);
             work.Suspend();
+            works.TryTake(out work);
         }
     }
 }

@@ -7,7 +7,7 @@ namespace Flower.Works
 {
     internal class Work<TInput, TOutput> : IWork<TInput, TOutput>
     {
-        private IDisposable _triggerSubscription;
+        private IDisposable triggerSubscription;
 
         public Work(
             IWorkRegistry workRegistry,
@@ -28,15 +28,15 @@ namespace Flower.Works
                         return Disposable.Empty;
                     }
 
-                    _executed += obs.OnNext;
-                    _triggerCompleted += obs.OnCompleted;
-                    _triggerErrored += obs.OnError;
+                    WorkExecuted += obs.OnNext;
+                    TriggerCompleted += obs.OnCompleted;
+                    TriggerErrored += obs.OnError;
 
                     return Disposable.Create(() =>
                         {
-                            _executed -= obs.OnNext;
-                            _triggerCompleted -= obs.OnCompleted;
-                            _triggerErrored -= obs.OnError;
+                            WorkExecuted -= obs.OnNext;
+                            TriggerCompleted -= obs.OnCompleted;
+                            TriggerErrored -= obs.OnError;
                         });
                 });
 
@@ -79,18 +79,18 @@ namespace Flower.Works
         public void Activate()
         {
             State = WorkState.Active;
-            _triggerSubscription = Trigger.Subscribe(TriggerOnNext,
-                                                     TriggerOnError,
-                                                     TriggerOnCompleted);
+            triggerSubscription = Trigger.Subscribe(TriggerOnNext,
+                                                    TriggerOnError,
+                                                    TriggerOnCompleted);
         }
 
         public void Suspend()
         {
-            if(_triggerSubscription == null) return;
+            if(triggerSubscription == null) return;
 
             State = WorkState.Suspended;
-            _triggerSubscription.Dispose();
-            _triggerSubscription = null;
+            triggerSubscription.Dispose();
+            triggerSubscription = null;
         }
 
         internal void TriggeredWorkErrored(
@@ -120,7 +120,7 @@ namespace Flower.Works
 
         private void OnWorkCompleted()
         {
-            var handler = _triggerCompleted;
+            var handler = TriggerCompleted;
             if(handler != null)
             {
                 handler();
@@ -129,7 +129,7 @@ namespace Flower.Works
 
         private void OnWorkExecuted(ITriggeredWork<TInput, TOutput> triggeredWork)
         {
-            var handler = _executed;
+            var handler = WorkExecuted;
             if(handler != null)
             {
                 handler(triggeredWork);
@@ -154,8 +154,8 @@ namespace Flower.Works
             ((WorkRegistry)WorkRegistry).Triggered(this, input);
         }
 
-        private event Action<ITriggeredWork<TInput, TOutput>> _executed;
-        private event Action _triggerCompleted;
-        private event Action<Exception> _triggerErrored;
+        private event Action<ITriggeredWork<TInput, TOutput>> WorkExecuted;
+        private event Action TriggerCompleted;
+        private event Action<Exception> TriggerErrored;
     }
 }

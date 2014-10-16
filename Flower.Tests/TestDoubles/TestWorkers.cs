@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Flower.Tests
+namespace Flower.Tests.TestDoubles
 {
     internal static class TestWorkers
     {
@@ -16,7 +12,7 @@ namespace Flower.Tests
 
     internal class TestWorkerIntSquared : IWorker<int, int>
     {
-        public static Func<int, int> WorkerFunc = i => i * i;
+        public static readonly Func<int, int> WorkerFunc = i => i * i;
 
         public int Execute(int input)
         {

@@ -10,11 +10,11 @@
 
         private class InstanceWorkerResolver<TInput, TOutput> : IWorkerResolver<TInput, TOutput>
         {
-            private readonly IWorker<TInput, TOutput> _instance;
+            private readonly IWorker<TInput, TOutput> instance;
 
             public InstanceWorkerResolver(IWorker<TInput, TOutput> instance)
             {
-                _instance = instance;
+                this.instance = instance;
             }
 
             public void Release(IWorker<TInput, TOutput> worker)
@@ -24,7 +24,7 @@
 
             public IWorker<TInput, TOutput> Resolve(TInput input)
             {
-                return _instance;
+                return instance;
             }
         }
     }

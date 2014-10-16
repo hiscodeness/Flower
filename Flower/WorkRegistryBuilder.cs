@@ -5,26 +5,36 @@ namespace Flower
 {
     public class WorkRegistryBuilder
     {
-        private readonly IWorkRegistry _workRegistry = new WorkRegistry(false);
-        private bool _isBuilt;
+        private readonly IWorkRegistry workRegistry;
+        private bool isBuilt;
+
+        public static WorkRegistryBuilder Create()
+        {
+            return new WorkRegistryBuilder(new WorkRegistry(false));
+        }
+
+        private WorkRegistryBuilder(IWorkRegistry workRegistry)
+        {
+            this.workRegistry = workRegistry;
+        }
 
         public IWorkRegistry Build()
         {
-            if(_isBuilt)
+            if(isBuilt)
             {
                 throw new InvalidOperationException("Can build only once.");
             }
 
-            _isBuilt = true;
+            isBuilt = true;
 
-            _workRegistry.ActivateAllWorks();
-            return _workRegistry;
+            workRegistry.ActivateAllWorks();
+            return workRegistry;
         }
 
         public IWork<TInput, TOutput> Register<TInput, TOutput>(
             IObservable<TInput> trigger, IWorker<TInput, TOutput> worker)
         {
-            return _workRegistry.Register(trigger, worker);
+            return workRegistry.Register(trigger, worker);
         }
     }
 }

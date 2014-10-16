@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using Flower.Tests.TestDoubles;
 using Flower.Works;
 using Xunit;
 
@@ -15,11 +16,11 @@ namespace Flower.Tests
         {
             // Arrange
             IList<int> result = new List<int>();
-            var workRegistryBuilder = new WorkRegistryBuilder();
+            var workRegistryBuilder = WorkRegistryBuilder.Create();
             var expected = Enumerable.Range(0, 3).ToList();
             var output =
-                workRegistryBuilder.Register(expected.ToObservable(), new TestWorkerInt2String())
-                                   .Pipe(new TestWorkerString2Int())
+                workRegistryBuilder.Register(expected.ToObservable(), TestWorkers.Int2StringWorker)
+                                   .Pipe(TestWorkers.String2IntWorker)
                                    .Output.ToList();
 
             output.Subscribe(r => result = r);
@@ -36,16 +37,16 @@ namespace Flower.Tests
         {
             // Arrange
             var subject = new Subject<int>();
-            var workflowBuilder = new WorkRegistryBuilder();
-            workflowBuilder.Register(subject, TestWorkers.Int2StringWorker);
-            workflowBuilder.Register(subject, TestWorkers.IntSquaredWorker);
-            workflowBuilder.Register(subject, TestWorkers.Int2StringWorker);
+            var workRegistryBuilder = WorkRegistryBuilder.Create();
+            workRegistryBuilder.Register(subject, TestWorkers.Int2StringWorker);
+            workRegistryBuilder.Register(subject, TestWorkers.IntSquaredWorker);
+            workRegistryBuilder.Register(subject, TestWorkers.Int2StringWorker);
 
             // Act
-            var workflow = workflowBuilder.Build();
+            var workRegistry = workRegistryBuilder.Build();
 
             // Assert
-            Assert.True(workflow.Works.All(IsActive));
+            Assert.True(workRegistry.Works.All(IsActive));
         }
 
         [Fact]
@@ -53,16 +54,16 @@ namespace Flower.Tests
         {
             // Arrange
             var subject = new Subject<int>();
-            var workflowBuilder = new WorkRegistryBuilder();
-            workflowBuilder.Register(subject, TestWorkers.Int2StringWorker);
-            workflowBuilder.Register(subject, TestWorkers.IntSquaredWorker);
-            workflowBuilder.Register(subject, TestWorkers.Int2StringWorker);
+            var workRegistryBuilder = WorkRegistryBuilder.Create();
+            workRegistryBuilder.Register(subject, TestWorkers.Int2StringWorker);
+            workRegistryBuilder.Register(subject, TestWorkers.IntSquaredWorker);
+            workRegistryBuilder.Register(subject, TestWorkers.Int2StringWorker);
 
             // Act
-            var workflow = workflowBuilder.Build();
+            var workRegistry = workRegistryBuilder.Build();
 
             // Assert
-            Assert.Equal(3, workflow.Works.Count());
+            Assert.Equal(3, workRegistry.Works.Count());
         }
 
         private static bool IsActive(IWork work)

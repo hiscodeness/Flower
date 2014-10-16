@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using Flower.Tests.TestDoubles;
 using Xunit;
 
 namespace Flower.Tests
@@ -15,12 +16,12 @@ namespace Flower.Tests
             // Arrange
             IList<int> expected = Enumerable.Range(0, 3).ToList();
             IList<int> result = new List<int>();
-            var workPlanner = new WorkRegistry();
+            var workRegistry = new WorkRegistry();
             var trigger = expected.ToObservable().Publish();
 
             // Act
-            var output = workPlanner.Register(trigger, new TestWorkerInt2String())
-                                    .Pipe(new TestWorkerString2Int())
+            var output = workRegistry.Register(trigger, TestWorkers.Int2StringWorker)
+                                    .Pipe(TestWorkers.String2IntWorker)
                                     .Output
                                     .ToList();
             output.Subscribe(r => result = r);
@@ -35,8 +36,8 @@ namespace Flower.Tests
         {
             // Arrange
             var subject = new Subject<int>();
-            var workPlanner = new WorkRegistry();
-            var plannedWork = workPlanner.Register(subject, new TestWorkerIntSquared());
+            var workRegistry = new WorkRegistry();
+            var plannedWork = workRegistry.Register(subject, TestWorkers.IntSquaredWorker);
             var result = 0;
             plannedWork.Output.SingleOrDefaultAsync().Subscribe(i => result = i);
 
