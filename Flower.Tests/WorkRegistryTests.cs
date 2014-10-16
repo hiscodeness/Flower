@@ -37,9 +37,9 @@ namespace Flower.Tests
             // Arrange
             var subject = new Subject<int>();
             var workRegistry = new WorkRegistry();
-            var plannedWork = workRegistry.Register(subject, TestWorkers.IntSquaredWorker);
+            var work = workRegistry.Register(subject, TestWorkers.IntSquaredWorker);
             var result = 0;
-            plannedWork.Output.SingleOrDefaultAsync().Subscribe(i => result = i);
+            work.Output.SingleOrDefaultAsync().Subscribe(i => result = i);
 
             // Act
             subject.OnNext(42);

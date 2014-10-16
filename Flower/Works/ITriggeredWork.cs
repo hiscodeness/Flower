@@ -3,7 +3,7 @@
 namespace Flower.Works
 {
     /// <summary>
-    /// Planned work that has been triggered and submitted to a <see cref="IWorkRunner" />.
+    /// Work that has been triggered and submitted to a <see cref="IWorkRunner" />.
     /// </summary>
     public interface ITriggeredWorkBase
     {
@@ -23,7 +23,7 @@ namespace Flower.Works
     }
 
     /// <summary>
-    /// Planned work that has been triggered and submitted to a <see cref="IWorkRunner" />.
+    /// Work that has been triggered and submitted to a <see cref="IWorkRunner" />.
     /// </summary>
     public interface ITriggeredWork<TInput> : ITriggeredWorkBase
     {
@@ -33,7 +33,7 @@ namespace Flower.Works
     }
 
     /// <summary>
-    /// Planned work that has been triggered and submitted to a <see cref="IWorkRunner" />.
+    /// Work that has been triggered and submitted to a <see cref="IWorkRunner" />.
     /// </summary>
     public interface ITriggeredWork<TInput, TOutput> : ITriggeredWorkBase
     {
