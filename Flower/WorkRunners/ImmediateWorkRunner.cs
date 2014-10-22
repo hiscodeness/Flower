@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Flower.Works;
@@ -5,15 +6,15 @@ using Flower.Works;
 namespace Flower.WorkRunners
 {
     /// <summary>
-    ///     A work runner that runs the work immediately after triggering when it is appended.
+    /// A work runner that runs the work immediately after triggering when it is appended.
     /// </summary>
-    public class ImmediateWorkRunner : IWorkRunner
+    public sealed class ImmediateWorkRunner : IWorkRunner, IDisposable
     {
-        private readonly BlockingCollection<ITriggeredWorkBase> _runningWorks =
+        private readonly BlockingCollection<ITriggeredWorkBase> runningWorks =
             new BlockingCollection<ITriggeredWorkBase>();
 
         /// <summary>
-        ///     Gets the works still pending with the work runner.
+        /// Gets the works still pending with the work runner.
         /// </summary>
         public IEnumerable<ITriggeredWorkBase> PendingWorks
         {
@@ -21,18 +22,23 @@ namespace Flower.WorkRunners
         }
 
         /// <summary>
-        ///     Gets the currently running active works.
+        /// Gets the currently running active works.
         /// </summary>
         public IEnumerable<ITriggeredWorkBase> RunningWorks
         {
-            get { return _runningWorks; }
+            get { return runningWorks; }
+        }
+
+        public void Dispose()
+        {
+            runningWorks.Dispose();
         }
 
         public void Submit(ITriggeredWorkBase triggeredWork)
         {
-            _runningWorks.Add(triggeredWork);
+            runningWorks.Add(triggeredWork);
             triggeredWork.Execute();
-            _runningWorks.TryTake(out triggeredWork);
+            runningWorks.TryTake(out triggeredWork);
         }
     }
 }

@@ -3,13 +3,18 @@ using Flower.Workers;
 
 namespace Flower.Works
 {
-    public interface IWork : IActivatable, ISuspendable
+    public interface IWork : IActivatable, ISuspendable, IUnregistrable
     {
         IWorkRegistry WorkRegistry { get; }
         WorkState State { get; }
         IWorkerResolver WorkerResolver { get; }
         IObservable<object> Trigger { get; }
         IObservable<ITriggeredWorkBase> Executed { get; }
+    }
+
+    public interface IUnregistrable
+    {
+        void Unregister();
     }
 
     public interface IWork<TInput> : IWork
@@ -24,5 +29,6 @@ namespace Flower.Works
         new IWorkerResolver<TInput, TOutput> WorkerResolver { get; }
         new IObservable<ITriggeredWork<TInput, TOutput>> Executed { get; }
         IObservable<TOutput> Output { get; }
+        IObservable<ITriggeredWork<TInput,TOutput>> Triggered { get; }
     }
 }

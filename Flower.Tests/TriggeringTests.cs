@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using Flower.Tests.TestDoubles;
 using Xunit;
 
 namespace Flower.Tests
@@ -13,8 +14,8 @@ namespace Flower.Tests
         {
             // Arrange
             var trigger = new Subject<int>();
-            var registry = new WorkRegistry();
-            var work = registry.Register(trigger, new TestWorkerIntSquared());
+            var registry = new WorkRegistry(true);
+            var work = registry.Register(trigger, TestWorkers.IntSquaredWorker);
             int? result = null;
             work.Output.Subscribe(i => result = i);
 
@@ -30,8 +31,8 @@ namespace Flower.Tests
         {
             // Arrange
             var trigger = new Subject<int>();
-            var registry = new WorkRegistry();
-            var work = registry.Register(trigger, new TestWorkerIntSquared());
+            var registry = new WorkRegistry(true);
+            var work = registry.Register(trigger, TestWorkers.IntSquaredWorker);
             var result = 0;
             work.Output.Subscribe(i => result = i);
 
@@ -48,8 +49,8 @@ namespace Flower.Tests
         {
             // Arrange
             var trigger = new Subject<int>();
-            var registry = new WorkRegistry();
-            var work = registry.Register(trigger, new TestWorkerIntSquared());
+            var registry = new WorkRegistry(true);
+            var work = registry.Register(trigger, TestWorkers.IntSquaredWorker);
             work.Output.SingleOrDefaultAsync().Subscribe(i => { });
 
             // Act
@@ -64,8 +65,8 @@ namespace Flower.Tests
         {
             // Arrange
             var trigger = new Subject<int>();
-            var registry = new WorkRegistry();
-            var work = registry.Register(trigger, new TestWorkerIntSquared());
+            var registry = new WorkRegistry(true);
+            var work = registry.Register(trigger, TestWorkers.IntSquaredWorker);
             work.Output.SingleOrDefaultAsync().Subscribe(i => { });
 
             // Act
@@ -80,8 +81,8 @@ namespace Flower.Tests
         {
             // Arrange
             var trigger = new Subject<int>();
-            var registry = new WorkRegistry();
-            var work = registry.Register(trigger, new TestWorkerIntSquared());
+            var registry = new WorkRegistry(true);
+            var work = registry.Register(trigger, TestWorkers.IntSquaredWorker);
             var result = 0;
             work.Output.Subscribe(i => result = i);
 
@@ -98,8 +99,8 @@ namespace Flower.Tests
         {
             // Arrange
             var trigger = new Subject<int>();
-            var registry = new WorkRegistry();
-            var work = registry.Register(trigger, new TestWorkerIntSquared());
+            var registry = new WorkRegistry(true);
+            var work = registry.Register(trigger, TestWorkers.IntSquaredWorker);
             int? result = null;
             work.Output.Subscribe(i => result = i);
 
@@ -115,8 +116,8 @@ namespace Flower.Tests
         {
             // Arrange
             var trigger = new Subject<int>();
-            var registry = new WorkRegistry();
-            var work = registry.Register(trigger, new TestWorkerIntSquared());
+            var registry = new WorkRegistry(true);
+            var work = registry.Register(trigger, TestWorkers.IntSquaredWorker);
             work.Output.Subscribe(i => { });
 
             // Act
@@ -131,8 +132,8 @@ namespace Flower.Tests
         {
             // Arrange
             var trigger = new Subject<int>();
-            var registry = new WorkRegistry();
-            var work = registry.Register(trigger, new TestWorkerIntSquared());
+            var registry = new WorkRegistry(true);
+            var work = registry.Register(trigger, TestWorkers.IntSquaredWorker);
             work.Output.Subscribe(i => { });
 
             // Act

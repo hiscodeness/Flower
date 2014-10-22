@@ -2,19 +2,19 @@
 {
     public interface IWorkerResolver
     {
-        IWorker Resolve();
         void Release(IWorker worker);
+        IWorker Resolve();
     }
 
     public interface IWorkerResolver<TInput>
     {
-        IWorker<TInput> Resolve(TInput input);
         void Release(IWorker<TInput> input);
+        IWorker<TInput> Resolve(TInput input);
     }
 
     public interface IWorkerResolver<TInput, TOutput>
     {
-        IWorker<TInput, TOutput> Resolve(TInput input);
         void Release(IWorker<TInput, TOutput> worker);
+        IWorker<TInput, TOutput> Resolve(TInput input);
     }
 }

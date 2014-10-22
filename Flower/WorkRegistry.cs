@@ -2,7 +2,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
 using Flower.WorkRunners;
 using Flower.Workers;
 using Flower.Works;
@@ -16,11 +15,14 @@ namespace Flower
         Complete
     }
 
-    public class WorkRegistry : IWorkRegistry
+    public sealed class WorkRegistry : IWorkRegistry, IDisposable
     {
-        private readonly BlockingCollection<IWork> _works = new BlockingCollection<IWork>();
+        private readonly BlockingCollection<IWork> works = new BlockingCollection<IWork>();
+        private bool isDisposed;
 
-        public WorkRegistry(bool activateWorkWhenRegistered = true, WorkerErrorBehavior workerErrorBehavior = WorkerErrorBehavior.Throw)
+        public WorkRegistry(
+            bool activateWorkWhenRegistered = false,
+            WorkerErrorBehavior workerErrorBehavior = WorkerErrorBehavior.Throw)
         {
             ActivateWorkWhenRegistered = activateWorkWhenRegistered;
             WorkerErrorBehavior = workerErrorBehavior;
@@ -33,7 +35,7 @@ namespace Flower
 
         public IEnumerable<IWork> Works
         {
-            get { return _works; }
+            get { return isDisposed ? Enumerable.Empty<IWork>() : works; }
         }
 
         public WorkerErrorBehavior WorkerErrorBehavior { get; private set; }
@@ -42,10 +44,23 @@ namespace Flower
 
         public void ActivateAllWorks()
         {
-            foreach(var work in _works.Reverse())
+            foreach(var work in works.Reverse())
             {
                 work.Activate();
             }
+        }
+
+        public void Dispose()
+        {
+            if (isDisposed) return;
+
+            isDisposed = true;
+            foreach (var work in works.ToList())
+            {
+                Unregister(work);
+            }
+
+            works.Dispose();
         }
 
         public IWork<TInput, TOutput> Register<TInput, TOutput>(
@@ -57,7 +72,7 @@ namespace Flower
 
         public void SuspendAllWorks()
         {
-            foreach(var work in _works)
+            foreach(var work in works)
             {
                 work.Suspend();
             }
@@ -65,7 +80,17 @@ namespace Flower
 
         public void Unregister(IWork work)
         {
-            Remove(work);
+            if(work == null) throw new ArgumentNullException("work");
+
+            if(!works.Contains(work))
+            {
+                throw new InvalidOperationException(
+                    "Cannot unregister work that is not contained in this work registry.");
+            }
+
+            work.Suspend();
+            works.TryTake(out work);
+            work.Unregister();
         }
 
         internal void TriggerCompleted(IWork work)
@@ -82,35 +107,16 @@ namespace Flower
         {
             var workRunner = ResolveWorkRunner(work) ?? FallbackWorkRunner;
             var triggeredWork = new TriggeredWork<TInput, TResult>(workRunner, work, input);
-            workRunner.Submit(triggeredWork);
+            work.TriggeredWorkCreated(triggeredWork);
+            triggeredWork.Submit();            
         }
 
         private TWork Add<TWork>(TWork work) where TWork : IWork
         {
-            if(work == null) throw new ArgumentNullException("work");
-
-            if(_works.TryAdd(work) && ActivateWorkWhenRegistered)
+            works.Add(work);
+            if(ActivateWorkWhenRegistered)
             {
                 work.Activate();
-            }
-
-            return work;
-        }
-
-        private TWork Remove<TWork>(TWork work) where TWork : IWork
-        {
-            if(work == null) throw new ArgumentNullException("work");
-
-            if(!_works.Contains(work))
-            {
-                throw new InvalidOperationException(
-                    "Cannot unregister work that is not contained in this work registry.");
-            }
-
-            IWork removedWork;
-            if(_works.TryTake(out removedWork))
-            {
-                work.Suspend();
             }
 
             return work;

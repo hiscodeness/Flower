@@ -6,28 +6,38 @@ namespace Flower
     public enum WorkState
     {
         /// <summary>
-        /// The work is registered in a <see cref="IWorkRegistry"/> and will respond to triggering.
-        /// </summary>
-        Active,
-
-        /// <summary>
-        /// The work is registered in a <see cref="IWorkRegistry"/> but suspended, i.e. ignoring triggering.
+        /// The work is registered in a <see cref="IWorkRegistry" /> but suspended, i.e. ignoring
+        /// triggering.
         /// </summary>
         Suspended,
 
         /// <summary>
-        /// The work has been unregistered from the <see cref="IWorkRegistry" /> because the trigger observable ended in error.
+        /// The work is registered in a <see cref="IWorkRegistry" /> and will respond to triggering.
+        /// </summary>
+        Active,
+
+        /// <summary>
+        /// The work has been unregistered from the <see cref="IWorkRegistry" /> because the trigger
+        /// observable ended in error.
         /// </summary>
         TriggerError,
 
         /// <summary>
-        /// The work has been unregistered from the <see cref="IWorkRegistry" /> because the worker errored.
+        /// The work has been unregistered from the <see cref="IWorkRegistry" /> because the worker
+        /// errored.
         /// </summary>
         WorkerError,
 
         /// <summary>
-        /// The work has been unregistered from the <see cref="WorkRegistry" /> because the trigger completed.
+        /// The work has been unregistered from the <see cref="WorkRegistry" /> because the trigger
+        /// completed.
         /// </summary>
-        Completed
+        Completed,
+
+        /// <summary>
+        /// The work has been unregistered from the <see cref="WorkRegistry" /> manually. The
+        /// work has also unsubscribed from the trigger.
+        /// </summary>
+        Unregistered
     }
 }

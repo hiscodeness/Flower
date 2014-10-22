@@ -63,7 +63,6 @@
     <Compile Include="Works\TriggeredWorkState.cs" />
     <Compile Include="Works\Work.cs" />
     <Compile Include="Workers\WorkerResolver.cs" />
-    <Compile Include="WorkRegistryBuilder.cs" />
     <Compile Include="WorkRegistryExtensionMethods.cs" />
     <Compile Include="WorkExtensionMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

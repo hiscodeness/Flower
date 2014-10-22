@@ -1,12 +1,12 @@
 namespace Flower.Works
 {
     /// <summary>
-    ///     Interface for activatable components.
+    /// Interface for activatable components.
     /// </summary>
     public interface IActivatable
     {
         /// <summary>
-        ///     Activates the component.
+        /// Activates the component.
         /// </summary>
         void Activate();
     }

@@ -8,13 +8,18 @@ namespace Flower
     public interface IWorkRegistry
     {
         IEnumerable<IWork> Works { get; }
+        
         bool ActivateWorkWhenRegistered { get; }
 
         IWork<TInput, TOutput> Register<TInput, TOutput>(
             IObservable<TInput> trigger, IWorkerResolver<TInput, TOutput> workerResolver);
 
+        void Unregister(IWork work);
+
         WorkerErrorBehavior WorkerErrorBehavior { get; }
+        
         void ActivateAllWorks();
+
         void SuspendAllWorks();
     }
 }
