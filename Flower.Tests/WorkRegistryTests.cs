@@ -47,5 +47,90 @@ namespace Flower.Tests
             // Assert
             Assert.Equal(TestWorkerIntSquared.WorkerFunc(42), result);
         }
+
+        [Fact]
+        public void WorkCanBeUnregistered()
+        {
+            // Arrange
+            var subject = new Subject<int>();
+            var workRegistry = new WorkRegistry(true);
+            var work = workRegistry.Register(subject, TestWorkers.IntSquaredWorker);
+
+            // Act
+            workRegistry.Unregister(work);
+
+            // Assert
+            Assert.False(subject.HasObservers);
+            Assert.Equal(WorkState.Unregistered, work.State);
+            Assert.False(workRegistry.Works.Any());
+        }
+
+        [Fact]
+        public void WorkCanBeUnregisteredOnce()
+        {
+            // Arrange
+            var subject = new Subject<int>();
+            var workRegistry = new WorkRegistry(true);
+            var work = workRegistry.Register(subject, TestWorkers.IntSquaredWorker);
+            workRegistry.Unregister(work);
+
+            // Act / Assert
+            Assert.Throws<InvalidOperationException>(() => workRegistry.Unregister(work));
+        }
+
+        [Fact]
+        public void AllWorksCanBeSuspended()
+        {
+            // Arrange
+            var subject = new Subject<int>();
+            var workRegistry = new WorkRegistry(true);
+            workRegistry.Register(subject, TestWorkers.IntSquaredWorker)
+                        .Pipe(TestWorkers.Int2StringWorker)
+                        .Pipe(TestWorkers.String2IntWorker);
+
+            // Act 
+            workRegistry.SuspendAllWorks();
+
+            // Assert
+            Assert.Equal(3, workRegistry.Works.Count());
+            Assert.True(workRegistry.Works.All(work => work.State == WorkState.Suspended));
+        }
+        
+        [Fact]
+        public void AllWorksCanBeActivated()
+        {
+            // Arrange
+            var subject = new Subject<int>();
+            var workRegistry = new WorkRegistry();
+            workRegistry.Register(subject, TestWorkers.IntSquaredWorker)
+                        .Pipe(TestWorkers.Int2StringWorker)
+                        .Pipe(TestWorkers.String2IntWorker);
+
+            // Act 
+            workRegistry.ActivateAllWorks();
+
+            // Assert
+            Assert.Equal(3, workRegistry.Works.Count());
+            Assert.True(workRegistry.Works.All(work => work.State == WorkState.Active));
+        }
+
+        [Fact]
+        public void DisposeUnregistersAllWorks()
+        {
+            // Arrange
+            var subject = new Subject<int>();
+            var workRegistry = new WorkRegistry(true);
+            workRegistry.Register(subject, TestWorkers.IntSquaredWorker)
+                        .Pipe(TestWorkers.Int2StringWorker)
+                        .Pipe(TestWorkers.String2IntWorker);
+            var works = workRegistry.Works.ToList();
+
+            // Act 
+            workRegistry.Dispose();
+
+            // Assert
+            Assert.Equal(0, workRegistry.Works.Count());
+            Assert.True(works.All(work => work.State == WorkState.Unregistered));
+        }
     }
 }

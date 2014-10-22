@@ -6,15 +6,15 @@ namespace Flower
     public enum WorkState
     {
         /// <summary>
-        /// The work is registered in a <see cref="IWorkRegistry" /> and will respond to triggering.
-        /// </summary>
-        Active,
-
-        /// <summary>
         /// The work is registered in a <see cref="IWorkRegistry" /> but suspended, i.e. ignoring
         /// triggering.
         /// </summary>
         Suspended,
+
+        /// <summary>
+        /// The work is registered in a <see cref="IWorkRegistry" /> and will respond to triggering.
+        /// </summary>
+        Active,
 
         /// <summary>
         /// The work has been unregistered from the <see cref="IWorkRegistry" /> because the trigger
@@ -32,6 +32,12 @@ namespace Flower
         /// The work has been unregistered from the <see cref="WorkRegistry" /> because the trigger
         /// completed.
         /// </summary>
-        Completed
+        Completed,
+
+        /// <summary>
+        /// The work has been unregistered from the <see cref="WorkRegistry" /> manually. The
+        /// work has also unsubscribed from the trigger.
+        /// </summary>
+        Unregistered
     }
 }

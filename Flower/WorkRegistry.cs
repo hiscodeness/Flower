@@ -18,6 +18,7 @@ namespace Flower
     public sealed class WorkRegistry : IWorkRegistry, IDisposable
     {
         private readonly BlockingCollection<IWork> works = new BlockingCollection<IWork>();
+        private bool isDisposed;
 
         public WorkRegistry(
             bool activateWorkWhenRegistered = false,
@@ -34,7 +35,7 @@ namespace Flower
 
         public IEnumerable<IWork> Works
         {
-            get { return works; }
+            get { return isDisposed ? Enumerable.Empty<IWork>() : works; }
         }
 
         public WorkerErrorBehavior WorkerErrorBehavior { get; private set; }
@@ -51,7 +52,10 @@ namespace Flower
 
         public void Dispose()
         {
-            foreach(var work in works.ToList())
+            if (isDisposed) return;
+
+            isDisposed = true;
+            foreach (var work in works.ToList())
             {
                 Unregister(work);
             }
@@ -84,7 +88,9 @@ namespace Flower
                     "Cannot unregister work that is not contained in this work registry.");
             }
 
-            Remove(work);
+            work.Suspend();
+            works.TryTake(out work);
+            work.Unregister();
         }
 
         internal void TriggerCompleted(IWork work)
@@ -114,12 +120,6 @@ namespace Flower
             }
 
             return work;
-        }
-
-        private void Remove(IWork work)
-        {
-            work.Suspend();
-            works.TryTake(out work);
         }
     }
 }

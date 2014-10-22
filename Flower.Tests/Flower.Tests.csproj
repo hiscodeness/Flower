@@ -68,6 +68,7 @@
     <Compile Include="TriggeringTests.cs" />
     <Compile Include="WorkRunners\ImmediateWorkRunnerTests.cs" />
     <Compile Include="Works\TriggeredWorkTests.cs" />
+    <Compile Include="Works\WorkTests.cs" />
     <Compile Include="WorkTests.cs" />
   </ItemGroup>
   <ItemGroup>

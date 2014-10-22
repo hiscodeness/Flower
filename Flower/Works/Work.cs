@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Flower.Workers;
@@ -21,33 +22,30 @@ namespace Flower.Works
             Triggered = Observable.Create<ITriggeredWork<TInput, TOutput>>(obs =>
             {
                 WorkTriggered += obs.OnNext;
-                return Disposable.Create(() =>
-                {
-                    WorkTriggered -= obs.OnNext;
-                });
+                return Disposable.Create(() => { WorkTriggered -= obs.OnNext; });
             });
 
             Executed = Observable.Create<ITriggeredWork<TInput, TOutput>>(obs =>
+            {
+                if (State == WorkState.Completed ||
+                    State == WorkState.WorkerError ||
+                    State == WorkState.TriggerError)
                 {
-                    if(State == WorkState.Completed ||
-                       State == WorkState.WorkerError ||
-                       State == WorkState.TriggerError)
-                    {
-                        obs.OnCompleted();
-                        return Disposable.Empty;
-                    }
+                    obs.OnCompleted();
+                    return Disposable.Empty;
+                }
 
-                    WorkExecuted += obs.OnNext;
-                    TriggerCompleted += obs.OnCompleted;
-                    TriggerErrored += obs.OnError;
+                WorkExecuted += obs.OnNext;
+                TriggerCompleted += obs.OnCompleted;
+                TriggerErrored += obs.OnError;
 
-                    return Disposable.Create(() =>
-                        {
-                            WorkExecuted -= obs.OnNext;
-                            TriggerCompleted -= obs.OnCompleted;
-                            TriggerErrored -= obs.OnError;
-                        });
+                return Disposable.Create(() =>
+                {
+                    WorkExecuted -= obs.OnNext;
+                    TriggerCompleted -= obs.OnCompleted;
+                    TriggerErrored -= obs.OnError;
                 });
+            });
 
             Output = Executed.Select(executedWork => executedWork.Output);
         }
@@ -88,36 +86,51 @@ namespace Flower.Works
 
         public void Activate()
         {
+            if (State != WorkState.Suspended)
+            {
+                throw new InvalidOperationException("Only suspended work can be activated.");
+            }
+
             State = WorkState.Active;
             triggerSubscription = Trigger.Subscribe(TriggerOnNext,
-                                                    TriggerOnError,
-                                                    TriggerOnCompleted);
+                TriggerOnError,
+                TriggerOnCompleted);
         }
 
         public void Suspend()
         {
-            if(triggerSubscription == null) return;
+            if (triggerSubscription == null) return;
 
             State = WorkState.Suspended;
             triggerSubscription.Dispose();
             triggerSubscription = null;
         }
 
+        public void Unregister()
+        {
+            if (WorkRegistry.Works.Contains(this))
+            {
+                WorkRegistry.Unregister(this);
+            }
+
+            State = WorkState.Unregistered;
+        }
+
         internal void TriggeredWorkErrored(
             ITriggeredWork<TInput, TOutput> triggeredWork, Exception error)
         {
-            switch(WorkRegistry.WorkerErrorBehavior)
+            switch (WorkRegistry.WorkerErrorBehavior)
             {
                 case WorkerErrorBehavior.Ignore:
                     // Eats exception
                     //Log.Warning("Continue on worker error: {0}.", error);
                     break;
                 case WorkerErrorBehavior.Complete:
-                    ((WorkRegistry)WorkRegistry).Unregister(this);
+                    ((WorkRegistry) WorkRegistry).Unregister(this);
                     State = WorkState.WorkerError;
                     break;
                 case WorkerErrorBehavior.Throw:
-                    ((WorkRegistry)WorkRegistry).Unregister(this);
+                    ((WorkRegistry) WorkRegistry).Unregister(this);
                     State = WorkState.WorkerError;
                     throw error;
             }
@@ -127,6 +140,7 @@ namespace Flower.Works
         {
             OnTriggeredWorkCreated(triggeredWork);
         }
+
         internal void TriggeredWorkExecuted(ITriggeredWork<TInput, TOutput> triggeredWork)
         {
             OnWorkExecuted(triggeredWork);
@@ -135,7 +149,7 @@ namespace Flower.Works
         private void OnWorkCompleted()
         {
             var handler = TriggerCompleted;
-            if(handler != null)
+            if (handler != null)
             {
                 handler();
             }
@@ -153,7 +167,7 @@ namespace Flower.Works
         private void OnWorkExecuted(ITriggeredWork<TInput, TOutput> triggeredWork)
         {
             var handler = WorkExecuted;
-            if(handler != null)
+            if (handler != null)
             {
                 handler(triggeredWork);
             }
@@ -161,23 +175,23 @@ namespace Flower.Works
 
         private void TriggerOnCompleted()
         {
-            ((WorkRegistry)WorkRegistry).TriggerCompleted(this);
+            ((WorkRegistry) WorkRegistry).TriggerCompleted(this);
             State = WorkState.Completed;
             OnWorkCompleted();
         }
 
         private void TriggerOnError(Exception exception)
         {
-            ((WorkRegistry)WorkRegistry).TriggerErrored(this, exception);
+            ((WorkRegistry) WorkRegistry).TriggerErrored(this, exception);
             State = WorkState.TriggerError;
         }
 
         private void TriggerOnNext(TInput input)
         {
-            ((WorkRegistry)WorkRegistry).Triggered(this, input);
+            ((WorkRegistry) WorkRegistry).Triggered(this, input);
         }
 
-        private event Action<ITriggeredWork<TInput, TOutput>> WorkTriggered; 
+        private event Action<ITriggeredWork<TInput, TOutput>> WorkTriggered;
         private event Action<ITriggeredWork<TInput, TOutput>> WorkExecuted;
         private event Action TriggerCompleted;
         private event Action<Exception> TriggerErrored;
