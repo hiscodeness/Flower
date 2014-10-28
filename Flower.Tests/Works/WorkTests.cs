@@ -31,8 +31,8 @@ namespace Flower.Tests.Works
             var pipedWork = work.Pipe(worker);
 
             // Assert
-            Assert.NotNull(pipedWork.Trigger);
-            Assert.Equal(work.Output, pipedWork.Trigger);
+            Assert.NotNull(pipedWork.Registration.Trigger);
+            Assert.Equal(work.Output, pipedWork.Registration.Trigger);
         }
 
         [Fact]
@@ -46,8 +46,8 @@ namespace Flower.Tests.Works
             var pipedWork = work.Pipe(workerResolver);
 
             // Assert
-            Assert.NotNull(pipedWork.Trigger);
-            Assert.Equal(work.Output, pipedWork.Trigger);
+            Assert.NotNull(pipedWork.Registration.Trigger);
+            Assert.Equal(work.Output, pipedWork.Registration.Trigger);
         }
     }
 }

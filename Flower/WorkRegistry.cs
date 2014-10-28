@@ -7,37 +7,37 @@ using Flower.Works;
 
 namespace Flower
 {
-    public sealed class WorkRegistry : IWorkRegistry, IDisposable
+    public sealed class WorkRegistry : IWorkRegistry
     {
         private bool isDisposed;
-        private readonly BlockingCollection<IWork> works = new BlockingCollection<IWork>();
+        private readonly BlockingCollection<IWorkBase> works = new BlockingCollection<IWorkBase>();
 
         public WorkRegistry(WorkRegistryOptions options = null)
         {
             Options = options ?? WorkRegistryOptions.Default;
         }
 
-        public IEnumerable<IWork> Works
+        public IEnumerable<IWorkBase> Works
         {
-            get { return isDisposed ? Enumerable.Empty<IWork>() : works; }
+            get { return isDisposed ? Enumerable.Empty<IWorkBase>() : works; }
         }
 
-        public WorkRegistryOptions Options { get; set; }
+        public WorkRegistryOptions Options { get; private set; }
 
         public IWork<TInput, TOutput> Register<TInput, TOutput>(
             IObservable<TInput> trigger,
             IWorkerResolver<TInput, TOutput> workerResolver)
         {
-            var work = new Work<TInput, TOutput>(this, trigger, workerResolver);
+            var work = new Work<TInput, TOutput>(new WorkRegistration<TInput, TOutput>(this, trigger, workerResolver));
             Add(work);
-            if(Options.WorkActivationBehavior == WorkActivationBehavior.RegisterActivated)
+            if(Options.RegisterWorkBehavior == RegisterWorkBehavior.RegisterActivated)
             {
                 work.Activate();
             }
             return work;
         }
 
-        public void Unregister(IWork work)
+        public void Unregister(IWorkBase work)
         {
             if (work == null) throw new ArgumentNullException("work");
 
@@ -81,12 +81,12 @@ namespace Flower
             works.Dispose();
         }
 
-        internal void TriggerCompleted(IWork work)
+        internal void TriggerCompleted(IWorkBase work)
         {
             Unregister(work);
         }
 
-        internal void TriggerErrored(IWork work, Exception exception)
+        internal void TriggerErrored(IWorkBase work, Exception exception)
         {
             Unregister(work);
         }
@@ -99,12 +99,12 @@ namespace Flower
             triggeredWork.Submit();            
         }
 
-        private void Add<TWork>(TWork work) where TWork : IWork
+        private void Add<TWork>(TWork work) where TWork : IWorkBase
         {
             works.Add(work);
         }
 
-        private void Remove(IWork work)
+        private void Remove(IWorkBase work)
         {
             works.TryTake(out work);
         }

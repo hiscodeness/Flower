@@ -2,17 +2,23 @@ using Flower.WorkRunners;
 
 namespace Flower
 {
-    public enum WorkActivationBehavior
+    public enum RegisterWorkBehavior
     {
         RegisterSuspended,
         RegisterActivated
     }
 
+    public enum TriggerErrorBehavior
+    {
+        CompleteWorkAndForwardError,
+        CompleteWork
+    }
+
     public enum WorkerErrorBehavior
     {
-        Throw,
+        CompleteWorkAndThrow,
         Ignore,
-        Complete
+        CompleteWork
     }
 
     public class WorkRegistryOptions
@@ -20,36 +26,50 @@ namespace Flower
         public static readonly WorkRegistryOptions Default = new WorkRegistryOptions();
 
         public WorkRegistryOptions(
-            WorkActivationBehavior workActivationBehavior = WorkActivationBehavior.RegisterSuspended,
+            RegisterWorkBehavior registerWorkBehavior = RegisterWorkBehavior.RegisterSuspended,
+            TriggerErrorBehavior triggerErrorBehavior = TriggerErrorBehavior.CompleteWorkAndForwardError,
             IWorkRunnerResolver workRunnerResolver = null,
-            WorkerErrorBehavior workerErrorBehavior = WorkerErrorBehavior.Throw)
+            WorkerErrorBehavior workerErrorBehavior = WorkerErrorBehavior.CompleteWorkAndThrow)
         {
-            WorkActivationBehavior = workActivationBehavior;
+            RegisterWorkBehavior = registerWorkBehavior;
+            TriggerErrorBehavior = triggerErrorBehavior;
             WorkRunnerResolver = workRunnerResolver ?? new DefaultWorkRunnerResolver();
             WorkerErrorBehavior = workerErrorBehavior;
         }
 
-        public WorkActivationBehavior WorkActivationBehavior { get; private set; }
+        public RegisterWorkBehavior RegisterWorkBehavior { get; private set; }
+        public TriggerErrorBehavior TriggerErrorBehavior { get; private set; }
         public IWorkRunnerResolver WorkRunnerResolver { get; private set; }
         public WorkerErrorBehavior WorkerErrorBehavior { get; private set; }
 
-        public WorkRegistryOptions With(WorkActivationBehavior workActivationBehavior)
+        public WorkRegistryOptions With(RegisterWorkBehavior registerWorkBehavior)
         {
-            return new WorkRegistryOptions(workActivationBehavior,
+            return new WorkRegistryOptions(registerWorkBehavior,
+                                           TriggerErrorBehavior,
+                                           WorkRunnerResolver,
+                                           WorkerErrorBehavior);
+        }
+
+        public WorkRegistryOptions With(TriggerErrorBehavior triggerErrorBehavior)
+        {
+            return new WorkRegistryOptions(RegisterWorkBehavior,
+                                           triggerErrorBehavior,
                                            WorkRunnerResolver,
                                            WorkerErrorBehavior);
         }
 
         public WorkRegistryOptions With(IWorkRunnerResolver workRunnerResolver)
         {
-            return new WorkRegistryOptions(WorkActivationBehavior,
+            return new WorkRegistryOptions(RegisterWorkBehavior,
+                                           TriggerErrorBehavior,
                                            workRunnerResolver,
                                            WorkerErrorBehavior);
         }
 
         public WorkRegistryOptions With(WorkerErrorBehavior workerErrorBehavior)
         {
-            return new WorkRegistryOptions(WorkActivationBehavior,
+            return new WorkRegistryOptions(RegisterWorkBehavior,
+                                           TriggerErrorBehavior,
                                            WorkRunnerResolver,
                                            workerErrorBehavior);
         }

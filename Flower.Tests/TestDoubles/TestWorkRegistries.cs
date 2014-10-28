@@ -10,8 +10,9 @@ namespace Flower.Tests.TestDoubles
     {
         public static WorkRegistry CreateAutoActivating()
         {
-            return
-                new WorkRegistry(WorkRegistryOptions.Default.With(WorkActivationBehavior.RegisterActivated));
+            var options = new WorkRegistryOptions(RegisterWorkBehavior.RegisterActivated,
+                                                  TriggerErrorBehavior.CompleteWork);
+            return new WorkRegistry(options);
         }
     }
 }

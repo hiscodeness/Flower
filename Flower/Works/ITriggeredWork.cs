@@ -12,7 +12,7 @@ namespace Flower.Works
         /// </summary>
         TriggeredWorkState State { get; }
 
-        IWork Work { get; }
+        IWorkBase Work { get; }
         IWorkRunner WorkRunner { get; }
         void Submit();
         void Execute();

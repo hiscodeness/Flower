@@ -95,6 +95,58 @@ namespace Flower.Tests
         }
 
         [Fact]
+        public void TriggerErrorsThrowIfSubscribersDoNotHandleThem()
+        {
+            // Arrange
+            var options = new WorkRegistryOptions(RegisterWorkBehavior.RegisterActivated);
+            var registry = new WorkRegistry(options);
+            var trigger = new Subject<int>();
+            var work = registry.Register(trigger, TestWorkers.IntSquaredWorker);
+            // * Output subscription uses an overload that does not specify a delegate for the OnError notification
+            work.Output.Subscribe(_ => { });
+
+            // Act / Assert
+            // Should throw here because of * described above
+            Assert.Throws<Exception>(() => trigger.OnError(new Exception()));
+        }
+        
+        [Fact]
+        public void TriggerErrorsAreForwardedToOutputSubscribers()
+        {
+            // Arrange
+            var trigger = new Subject<int>();
+            var options = new WorkRegistryOptions(RegisterWorkBehavior.RegisterActivated);
+            var registry = new WorkRegistry(options); 
+            var work = registry.Register(trigger, TestWorkers.IntSquaredWorker);
+            Exception exception = null;
+            work.Output.Subscribe(_ => { }, ex => exception = ex);
+
+            // Act
+            var expected = new Exception();
+            trigger.OnError(expected);
+
+            // Assert
+            Assert.Equal(expected, exception);
+        }
+
+        [Fact]
+        public void TriggerErrorsAreNotForwardedToOutputSubscribers()
+        {
+            // Arrange
+            var trigger = new Subject<int>();
+            var registry = WorkRegistryFactory.CreateAutoActivating();
+            var work = registry.Register(trigger, TestWorkers.IntSquaredWorker);
+            Exception exception = null;
+            work.Output.Subscribe(_ => { }, ex => exception = ex);
+
+            // Act
+            trigger.OnError(new Exception());
+
+            // Assert
+            Assert.Null(exception);
+        }
+
+        [Fact]
         public void TriggerErrorDoesntExecuteWork()
         {
             // Arrange
