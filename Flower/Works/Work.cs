@@ -24,34 +24,8 @@ namespace Flower.Works
             Trigger = trigger;
             WorkerResolver = workerResolver;
 
-            Triggered = Observable.Create<ITriggeredWork<TInput, TOutput>>(obs =>
-            {
-                WorkTriggered += obs.OnNext;
-                return Disposable.Create(() => { WorkTriggered -= obs.OnNext; });
-            });
-
-            Executed = Observable.Create<ITriggeredWork<TInput, TOutput>>(obs =>
-            {
-                if (State == WorkState.Completed ||
-                    State == WorkState.WorkerError ||
-                    State == WorkState.TriggerError)
-                {
-                    obs.OnCompleted();
-                    return Disposable.Empty;
-                }
-
-                WorkExecuted += obs.OnNext;
-                TriggerCompleted += obs.OnCompleted;
-                TriggerErrored += obs.OnError;
-
-                return Disposable.Create(() =>
-                {
-                    WorkExecuted -= obs.OnNext;
-                    TriggerCompleted -= obs.OnCompleted;
-                    TriggerErrored -= obs.OnError;
-                });
-            });
-
+            Triggered = Observable.Create(CreateTriggeredSubscription());
+            Executed = Observable.Create(CreateExecutedSubscription());
             Output = Executed.Select(executedWork => executedWork.Output);
         }
 
@@ -148,6 +122,44 @@ namespace Flower.Works
                     State = WorkState.WorkerError;
                     throw error;
             }
+        }
+
+        private Func<IObserver<ITriggeredWork<TInput, TOutput>>, IDisposable> CreateTriggeredSubscription()
+        {
+            return CreateTriggeredSubscription;
+        }
+
+        private IDisposable CreateTriggeredSubscription(IObserver<ITriggeredWork<TInput, TOutput>> observer)
+        {
+            WorkTriggered += observer.OnNext;
+            return Disposable.Create(() => { WorkTriggered -= observer.OnNext; });
+        }
+
+        private Func<IObserver<ITriggeredWork<TInput, TOutput>>, IDisposable> CreateExecutedSubscription()
+        {
+            return CreateExecutedSubscription;
+        }
+
+        private IDisposable CreateExecutedSubscription(IObserver<ITriggeredWork<TInput, TOutput>> observer)
+        {
+            if (State == WorkState.Completed ||
+               State == WorkState.WorkerError ||
+               State == WorkState.TriggerError)
+            {
+                observer.OnCompleted();
+                return Disposable.Empty;
+            }
+
+            WorkExecuted += observer.OnNext;
+            TriggerCompleted += observer.OnCompleted;
+            TriggerErrored += observer.OnError;
+
+            return Disposable.Create(() =>
+            {
+                WorkExecuted -= observer.OnNext;
+                TriggerCompleted -= observer.OnCompleted;
+                TriggerErrored -= observer.OnError;
+            });
         }
 
         private void OnTriggeredWorkCreated(ITriggeredWork<TInput, TOutput> triggeredWork)
