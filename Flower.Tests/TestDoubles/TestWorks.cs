@@ -13,7 +13,7 @@ namespace Flower.Tests.TestDoubles
 
     internal class TestWorkIntSquared : IWork<int, int>, IDisposable
     {        
-        private readonly WorkRegistry workRegistry = new WorkRegistry(false);
+        private readonly WorkRegistry workRegistry = new WorkRegistry();
         private readonly Subject<int> trigger = new Subject<int>();
         private readonly Subject<int> output =new Subject<int>(); 
         private readonly IWorkerResolver<int, int> workerResolver =
@@ -41,6 +41,7 @@ namespace Flower.Tests.TestDoubles
             output.Dispose();
         }
 
+        public WorkRegistryOptions Options { get { return new WorkRegistryOptions(); } }
         public IWorkRegistry WorkRegistry { get { return workRegistry; } }
         public WorkState State { get; private set; }
         IWorkerResolver<int, int> IWork<int, int>.WorkerResolver { get { return workerResolver; } }

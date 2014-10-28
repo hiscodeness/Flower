@@ -15,7 +15,7 @@ namespace Flower.Tests.Works
         public void WhenTriggeredHasCorrectOutputValue()
         {
             // Arrange
-            var workRegistry = new WorkRegistry(true);
+            var workRegistry = WorkRegistryFactory.CreateAutoActivating();
             var trigger = new Subject<int>();
             var work = workRegistry.Register(trigger, TestWorkers.IntSquaredWorker);
             var outputs = new List<int>();
@@ -33,7 +33,7 @@ namespace Flower.Tests.Works
         public void WhenExecutedHasCorrectOutputValue()
         {
             // Arrange
-            var workRegistry = new WorkRegistry(true);
+            var workRegistry = WorkRegistryFactory.CreateAutoActivating();
             var trigger = new Subject<int>();
             var work = workRegistry.Register(trigger, TestWorkers.IntSquaredWorker);
             var outputs = new List<int>();

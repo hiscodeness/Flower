@@ -51,6 +51,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="WorkRegistryOptions.cs" />
+    <Compile Include="WorkRunners\IWorkRunnerResolver.cs" />
+    <Compile Include="WorkRunners\WorkRunnerResolver.cs" />
     <Compile Include="Works\IActivatable.cs" />
     <Compile Include="WorkRunners\ImmediateWorkRunner.cs" />
     <Compile Include="Works\IWork.cs" />

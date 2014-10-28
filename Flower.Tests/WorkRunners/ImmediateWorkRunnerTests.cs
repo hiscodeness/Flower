@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using FakeItEasy;
-using FakeItEasy.ExtensionSyntax.Full;
 using Flower.WorkRunners;
 using Flower.Works;
 using Xunit;

@@ -10,6 +10,11 @@ namespace Flower.Works
     {
         private IDisposable triggerSubscription;
 
+        private event Action<ITriggeredWork<TInput, TOutput>> WorkTriggered;
+        private event Action<ITriggeredWork<TInput, TOutput>> WorkExecuted;
+        private event Action TriggerCompleted;
+        private event Action<Exception> TriggerErrored;
+
         public Work(
             IWorkRegistry workRegistry,
             IObservable<TInput> trigger,
@@ -52,20 +57,15 @@ namespace Flower.Works
 
         public IWorkRegistry WorkRegistry { get; private set; }
         public WorkState State { get; private set; }
-
-        IWorkerResolver<TInput> IWork<TInput>.WorkerResolver
-        {
-            get { throw new InvalidOperationException(); }
-        }
+        public IObservable<TInput> Trigger { get; private set; }
+        public IWorkerResolver<TInput, TOutput> WorkerResolver { get; private set; }
+        public IObservable<ITriggeredWork<TInput, TOutput>> Triggered { get; private set; }
+        public IObservable<ITriggeredWork<TInput, TOutput>> Executed { get; private set; }
+        public IObservable<TOutput> Output { get; private set; }
 
         IObservable<object> IWork.Trigger
         {
             get { return Trigger.Select(input => input as object); }
-        }
-
-        IObservable<ITriggeredWork<TInput>> IWork<TInput>.Executed
-        {
-            get { throw new InvalidOperationException(); }
         }
 
         IWorkerResolver IWork.WorkerResolver
@@ -78,11 +78,15 @@ namespace Flower.Works
             get { return Executed; }
         }
 
-        public IObservable<TInput> Trigger { get; private set; }
-        public IWorkerResolver<TInput, TOutput> WorkerResolver { get; private set; }
-        public IObservable<ITriggeredWork<TInput, TOutput>> Triggered { get; private set; }
-        public IObservable<ITriggeredWork<TInput, TOutput>> Executed { get; private set; }
-        public IObservable<TOutput> Output { get; private set; }
+        IWorkerResolver<TInput> IWork<TInput>.WorkerResolver
+        {
+            get { throw new InvalidOperationException(); }
+        }
+
+        IObservable<ITriggeredWork<TInput>> IWork<TInput>.Executed
+        {
+            get { throw new InvalidOperationException(); }
+        }
 
         public void Activate()
         {
@@ -116,26 +120,6 @@ namespace Flower.Works
             State = WorkState.Unregistered;
         }
 
-        internal void TriggeredWorkErrored(
-            ITriggeredWork<TInput, TOutput> triggeredWork, Exception error)
-        {
-            switch (WorkRegistry.WorkerErrorBehavior)
-            {
-                case WorkerErrorBehavior.Ignore:
-                    // Eats exception
-                    //Log.Warning("Continue on worker error: {0}.", error);
-                    break;
-                case WorkerErrorBehavior.Complete:
-                    ((WorkRegistry) WorkRegistry).Unregister(this);
-                    State = WorkState.WorkerError;
-                    break;
-                case WorkerErrorBehavior.Throw:
-                    ((WorkRegistry) WorkRegistry).Unregister(this);
-                    State = WorkState.WorkerError;
-                    throw error;
-            }
-        }
-
         internal void TriggeredWorkCreated(ITriggeredWork<TInput, TOutput> triggeredWork)
         {
             OnTriggeredWorkCreated(triggeredWork);
@@ -146,12 +130,23 @@ namespace Flower.Works
             OnWorkExecuted(triggeredWork);
         }
 
-        private void OnWorkCompleted()
+        internal void TriggeredWorkErrored(
+            ITriggeredWork<TInput, TOutput> triggeredWork, Exception error)
         {
-            var handler = TriggerCompleted;
-            if (handler != null)
+            switch (WorkRegistry.Options.WorkerErrorBehavior)
             {
-                handler();
+                case WorkerErrorBehavior.Ignore:
+                    // Eats exception
+                    //Log.Warning("Continue on worker error: {0}.", error);
+                    break;
+                case WorkerErrorBehavior.Complete:
+                    ((WorkRegistry)WorkRegistry).Unregister(this);
+                    State = WorkState.WorkerError;
+                    break;
+                case WorkerErrorBehavior.Throw:
+                    ((WorkRegistry)WorkRegistry).Unregister(this);
+                    State = WorkState.WorkerError;
+                    throw error;
             }
         }
 
@@ -173,17 +168,13 @@ namespace Flower.Works
             }
         }
 
-        private void TriggerOnCompleted()
+        private void OnWorkCompleted()
         {
-            ((WorkRegistry) WorkRegistry).TriggerCompleted(this);
-            State = WorkState.Completed;
-            OnWorkCompleted();
-        }
-
-        private void TriggerOnError(Exception exception)
-        {
-            ((WorkRegistry) WorkRegistry).TriggerErrored(this, exception);
-            State = WorkState.TriggerError;
+            var handler = TriggerCompleted;
+            if (handler != null)
+            {
+                handler();
+            }
         }
 
         private void TriggerOnNext(TInput input)
@@ -191,9 +182,17 @@ namespace Flower.Works
             ((WorkRegistry) WorkRegistry).Triggered(this, input);
         }
 
-        private event Action<ITriggeredWork<TInput, TOutput>> WorkTriggered;
-        private event Action<ITriggeredWork<TInput, TOutput>> WorkExecuted;
-        private event Action TriggerCompleted;
-        private event Action<Exception> TriggerErrored;
+        private void TriggerOnError(Exception exception)
+        {
+            ((WorkRegistry)WorkRegistry).TriggerErrored(this, exception);
+            State = WorkState.TriggerError;
+        }
+
+        private void TriggerOnCompleted()
+        {
+            ((WorkRegistry)WorkRegistry).TriggerCompleted(this);
+            State = WorkState.Completed;
+            OnWorkCompleted();
+        }
     }
 }

@@ -7,16 +7,15 @@ namespace Flower
 {
     public interface IWorkRegistry
     {
+        WorkRegistryOptions Options { get; }
+
         IEnumerable<IWork> Works { get; }
-        
-        bool ActivateWorkWhenRegistered { get; }
 
         IWork<TInput, TOutput> Register<TInput, TOutput>(
-            IObservable<TInput> trigger, IWorkerResolver<TInput, TOutput> workerResolver);
+            IObservable<TInput> trigger,
+            IWorkerResolver<TInput, TOutput> workerResolver);
 
         void Unregister(IWork work);
-
-        WorkerErrorBehavior WorkerErrorBehavior { get; }
         
         void ActivateAllWorks();
 
