@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using FakeItEasy;
 using Flower.Tests.TestDoubles;
+using Flower.Works;
 using Xunit;
 
 namespace Flower.Tests
@@ -131,6 +133,27 @@ namespace Flower.Tests
             // Assert
             Assert.Equal(0, workRegistry.Works.Count());
             Assert.True(works.All(work => work.State == WorkState.Unregistered));
+        }
+
+        [Fact]
+        public void CannotUnregisterNull()
+        {
+            // Arrange
+            var workRegistry = new WorkRegistry();
+
+            // Act / Assert
+            Assert.Throws<ArgumentNullException>(() => workRegistry.Unregister(null));
+        }
+        
+        [Fact]
+        public void CannotUnregisterIfNotRegistered()
+        {
+            // Arrange
+            var workRegistry = new WorkRegistry();
+            var work = A.Fake<IWorkBase>();
+
+            // Act / Assert
+            Assert.Throws<InvalidOperationException>(() => workRegistry.Unregister(work));
         }
     }
 }

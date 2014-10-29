@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive.Subjects;
 using Flower.Tests.TestDoubles;
+using Flower.Workers;
 using Xunit;
 
 namespace Flower.Tests.Works
@@ -40,7 +41,7 @@ namespace Flower.Tests.Works
         {
             // Arrange
             var work = new TestWorkIntToIntSquared();
-            var workerResolver = new TestWorkerIntToIntSquared();
+            var workerResolver = WorkerResolver.CreateFromInstance(new TestWorkerIntToIntSquared());
 
             // Act
             var pipedWork = work.Pipe(workerResolver);
