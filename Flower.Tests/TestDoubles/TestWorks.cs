@@ -1,62 +1,15 @@
 ﻿using System;
-using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Flower.Works;
 
 namespace Flower.Tests.TestDoubles
 {
-    internal static class TestWorks
-    {
-        internal static readonly TestWorkIntSquared IntSquaredWork = new TestWorkIntSquared();
-    }
-
-    internal class TestWorkInt : IWork<int>, IDisposable
-    {
-        private readonly TestWorkRegistrationInt registration = new TestWorkRegistrationInt();
-        private readonly Subject<int> trigger = new Subject<int>(); 
-        private readonly Subject<ITriggeredWork<int>> executed = new Subject<ITriggeredWork<int>>();
-
-        public void Activate()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Suspend()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Unregister()
-        {
-            throw new NotImplementedException();
-        }
-
-        public WorkState State { get; private set; }
-        public IWorkRegistration<int> Registration { get { return registration; }}
-        public Subject<int> Trigger { get { return trigger; } }
-        public IObservable<ITriggeredWork<int>> Triggered
-        {
-            get { return Trigger.Select(input => new TestTriggeredWork<int>(this, input)); }
-        }
-
-        public IObservable<ITriggeredWork<int>> Executed
-        {
-            get { return Trigger.Select(input => new TestTriggeredWork<int>(this, input)); }
-        }
-
-        public void Dispose()
-        {
-            trigger.Dispose();
-            executed.Dispose();
-        }
-    }
-
-    internal class TestWorkIntSquared : IWork<int, int>, IDisposable
+    internal class TestWorkIntToIntSquared : IWork<int, int>, IDisposable
     {
         private readonly TestWorkRegistration registration = new TestWorkRegistration();
         private readonly Subject<int> output = new Subject<int>(); 
         
-        internal TestWorkIntSquared()
+        internal TestWorkIntToIntSquared()
         {
             State = WorkState.Suspended;
         }

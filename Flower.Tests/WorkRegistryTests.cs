@@ -19,8 +19,8 @@ namespace Flower.Tests
             var workRegistry = new WorkRegistry();
 
             // Act
-            var output = workRegistry.Register(expected.ToObservable(), TestWorkers.Int2StringWorker)
-                                    .Pipe(TestWorkers.String2IntWorker)
+            var output = workRegistry.Register(expected.ToObservable(), new TestWorkerIntToString())
+                                    .Pipe(new TestWorkerStringToInt())
                                     .Output
                                     .ToList();
             output.Subscribe(r => result = r);
@@ -36,7 +36,7 @@ namespace Flower.Tests
             // Arrange
             var subject = new Subject<int>();
             var workRegistry = WorkRegistryFactory.CreateAutoActivating();
-            var work = workRegistry.Register(subject, TestWorkers.IntSquaredWorker);
+            var work = workRegistry.Register(subject, new TestWorkerIntToIntSquared());
             var result = 0;
             work.Output.SingleOrDefaultAsync().Subscribe(i => result = i);
 
@@ -45,7 +45,7 @@ namespace Flower.Tests
             subject.OnCompleted();
 
             // Assert
-            Assert.Equal(TestWorkerIntSquared.WorkerFunc(42), result);
+            Assert.Equal(TestWorkerIntToIntSquared.WorkerFunc(42), result);
         }
 
         [Fact]
@@ -54,7 +54,7 @@ namespace Flower.Tests
             // Arrange
             var subject = new Subject<int>();
             var workRegistry = WorkRegistryFactory.CreateAutoActivating();
-            var work = workRegistry.Register(subject, TestWorkers.IntSquaredWorker);
+            var work = workRegistry.Register(subject, new TestWorkerIntToIntSquared());
 
             // Act
             workRegistry.Unregister(work);
@@ -71,7 +71,7 @@ namespace Flower.Tests
             // Arrange
             var subject = new Subject<int>();
             var workRegistry = WorkRegistryFactory.CreateAutoActivating();
-            var work = workRegistry.Register(subject, TestWorkers.IntSquaredWorker);
+            var work = workRegistry.Register(subject, new TestWorkerIntToIntSquared());
             workRegistry.Unregister(work);
 
             // Act / Assert
@@ -84,9 +84,9 @@ namespace Flower.Tests
             // Arrange
             var subject = new Subject<int>();
             var workRegistry = WorkRegistryFactory.CreateAutoActivating();
-            workRegistry.Register(subject, TestWorkers.IntSquaredWorker)
-                        .Pipe(TestWorkers.Int2StringWorker)
-                        .Pipe(TestWorkers.String2IntWorker);
+            workRegistry.Register(subject, new TestWorkerIntToIntSquared())
+                        .Pipe(new TestWorkerIntToString())
+                        .Pipe(new TestWorkerStringToInt());
 
             // Act 
             workRegistry.SuspendAllWorks();
@@ -102,9 +102,9 @@ namespace Flower.Tests
             // Arrange
             var subject = new Subject<int>();
             var workRegistry = new WorkRegistry();
-            workRegistry.Register(subject, TestWorkers.IntSquaredWorker)
-                        .Pipe(TestWorkers.Int2StringWorker)
-                        .Pipe(TestWorkers.String2IntWorker);
+            workRegistry.Register(subject, new TestWorkerIntToIntSquared())
+                        .Pipe(new TestWorkerIntToString())
+                        .Pipe(new TestWorkerStringToInt());
 
             // Act 
             workRegistry.ActivateAllWorks();
@@ -120,9 +120,9 @@ namespace Flower.Tests
             // Arrange
             var subject = new Subject<int>();
             var workRegistry = WorkRegistryFactory.CreateAutoActivating();
-            workRegistry.Register(subject, TestWorkers.IntSquaredWorker)
-                        .Pipe(TestWorkers.Int2StringWorker)
-                        .Pipe(TestWorkers.String2IntWorker);
+            workRegistry.Register(subject, new TestWorkerIntToIntSquared())
+                        .Pipe(new TestWorkerIntToString())
+                        .Pipe(new TestWorkerStringToInt());
             var works = workRegistry.Works.ToList();
 
             // Act 

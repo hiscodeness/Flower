@@ -13,7 +13,7 @@ namespace Flower.Tests.Works
             // Arrange
             var subject = new Subject<int>();
             var workRegistry = WorkRegistryFactory.CreateAutoActivating();
-            var work = workRegistry.Register(subject, TestWorkers.IntSquaredWorker);
+            var work = workRegistry.Register(subject, new TestWorkerIntToIntSquared());
             workRegistry.Unregister(work);
 
             // Act/Assert
@@ -24,8 +24,8 @@ namespace Flower.Tests.Works
         public void PipingWorkOutputToWorkerInputSucceeds()
         {
             // Arrange
-            var work = TestWorks.IntSquaredWork;
-            var worker = TestWorkers.IntSquaredWorker;
+            var work = new TestWorkIntToIntSquared();
+            var worker = new TestWorkerIntToIntSquared();
 
             // Act
             var pipedWork = work.Pipe(worker);
@@ -39,8 +39,8 @@ namespace Flower.Tests.Works
         public void PipingWorkOutputToWorkerResolverInputSucceeds()
         {
             // Arrange
-            var work = TestWorks.IntSquaredWork;
-            var workerResolver = TestWorkerResolvers.IntSquaredWorkerResolver;
+            var work = new TestWorkIntToIntSquared();
+            var workerResolver = new TestWorkerIntToIntSquared();
 
             // Act
             var pipedWork = work.Pipe(workerResolver);
