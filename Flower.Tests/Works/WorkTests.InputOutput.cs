@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Flower.Tests.Works
 {
-    public class WorkTests
+    public partial class WorkTests
     {
         [Fact]
         public void UnregisteredWorkCannotBeActivated()

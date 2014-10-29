@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using Flower.Workers;
 using Flower.Works;
 
 namespace Flower.Tests.TestDoubles
@@ -10,22 +10,44 @@ namespace Flower.Tests.TestDoubles
         internal static readonly TestWorkIntSquared IntSquaredWork = new TestWorkIntSquared();
     }
 
-    internal class TestWorkRegistration : IWorkRegistration<int, int>
+    internal class TestWorkInt : IWork<int>, IDisposable
     {
-        private readonly WorkRegistry workRegistry = new WorkRegistry();
-        private readonly Subject<int> trigger = new Subject<int>();
+        private readonly TestWorkRegistrationInt registration = new TestWorkRegistrationInt();
+        private readonly Subject<int> trigger = new Subject<int>(); 
+        private readonly Subject<ITriggeredWork<int>> executed = new Subject<ITriggeredWork<int>>();
 
-        private readonly IWorkerResolver<int, int> workerResolver =
-            Workers.WorkerResolver.CreateFromInstance(TestWorkers.IntSquaredWorker);
+        public void Activate()
+        {
+            throw new NotImplementedException();
+        }
 
-        public IWorkRegistry WorkRegistry { get { return workRegistry; } }
-        public IObservable<int> Trigger { get { return trigger; } }
-        public IWorkerResolver<int, int> WorkerResolver { get { return workerResolver; } }
-        
+        public void Suspend()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Unregister()
+        {
+            throw new NotImplementedException();
+        }
+
+        public WorkState State { get; private set; }
+        public IWorkRegistration<int> Registration { get { return registration; }}
+        public Subject<int> Trigger { get { return trigger; } }
+        public IObservable<ITriggeredWork<int>> Triggered
+        {
+            get { return Trigger.Select(input => new TestTriggeredWork<int>(this, input)); }
+        }
+
+        public IObservable<ITriggeredWork<int>> Executed
+        {
+            get { return Trigger.Select(input => new TestTriggeredWork<int>(this, input)); }
+        }
+
         public void Dispose()
         {
-            workRegistry.Dispose();
             trigger.Dispose();
+            executed.Dispose();
         }
     }
 

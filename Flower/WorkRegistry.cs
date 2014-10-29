@@ -24,6 +24,19 @@ namespace Flower
 
         public WorkRegistryOptions Options { get; private set; }
 
+        public IWork<TInput> Register<TInput>(
+           IObservable<TInput> trigger,
+           IWorkerResolver<TInput> workerResolver)
+        {
+            var work = new Work<TInput>(new WorkRegistration<TInput>(this, trigger, workerResolver));
+            Add(work);
+            if (Options.RegisterWorkBehavior == RegisterWorkBehavior.RegisterActivated)
+            {
+                work.Activate();
+            }
+            return work;
+        }
+
         public IWork<TInput, TOutput> Register<TInput, TOutput>(
             IObservable<TInput> trigger,
             IWorkerResolver<TInput, TOutput> workerResolver)
@@ -89,6 +102,13 @@ namespace Flower
         internal void TriggerErrored(IWorkBase work, Exception exception)
         {
             Unregister(work);
+        }
+        internal void Triggered<TInput>(Work<TInput> work, TInput input)
+        {
+            var workRunner = Options.WorkRunnerResolver.Resolve(work);
+            var triggeredWork = new TriggeredWork<TInput>(workRunner, work, input);
+            work.TriggeredWorkCreated(triggeredWork);
+            triggeredWork.Submit();
         }
 
         internal void Triggered<TInput, TResult>(Work<TInput, TResult> work, TInput input)

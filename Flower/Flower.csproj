@@ -65,19 +65,22 @@
     <Compile Include="IWorkRegistry.cs" />
     <Compile Include="WorkRunners\IWorkRunner.cs" />
     <Compile Include="Works\IWorkRegistration.cs" />
+    <Compile Include="Works\TriggeredWork.Input.cs" />
     <Compile Include="Works\TriggeredWorkState.cs" />
-    <Compile Include="Works\Work.cs" />
+    <Compile Include="Works\Work.InputOutput.cs" />
     <Compile Include="Workers\WorkerResolver.cs" />
     <Compile Include="WorkRegistryExtensionMethods.cs" />
     <Compile Include="WorkExtensionMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Works\TriggeredWork.cs" />
+    <Compile Include="Works\TriggeredWork.InputOutput.cs" />
     <Compile Include="WorkRegistry.cs" />
     <Compile Include="WorkState.cs" />
-    <Compile Include="Works\WorkRegistration.cs" />
+    <Compile Include="Works\WorkRegistration.Input.cs" />
+    <Compile Include="Works\WorkRegistration.InputOutput.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <Compile Include="Works\Work.Input.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

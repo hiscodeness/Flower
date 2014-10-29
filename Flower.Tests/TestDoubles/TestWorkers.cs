@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using Flower.Workers;
+using Flower.Works;
 
 namespace Flower.Tests.TestDoubles
 {
@@ -8,6 +11,30 @@ namespace Flower.Tests.TestDoubles
         internal static readonly TestWorkerIntSquared IntSquaredWorker = new TestWorkerIntSquared();
         internal static readonly TestWorkerInt2String Int2StringWorker = new TestWorkerInt2String();
         internal static readonly TestWorkerString2Int String2IntWorker = new TestWorkerString2Int();
+    }
+
+    internal class TestWorkerTriggeredWork : IWorker<ITriggeredWork<int>>
+    {
+        readonly List<ITriggeredWork<int>> inputs = new List<ITriggeredWork<int>>();
+
+        public void Execute(ITriggeredWork<int> input)
+        {
+            inputs.Add(input);
+        }
+
+        public IEnumerable<ITriggeredWork<int>> Inputs { get { return inputs; } }
+    }
+
+    internal class TestWorkerInt : IWorker<int>
+    {
+        readonly List<int> inputs = new List<int>(); 
+
+        public void Execute(int input)
+        {
+            inputs.Add(input);
+        }
+
+        public IEnumerable<int> Inputs { get { return inputs; } } 
     }
 
     internal class TestWorkerIntSquared : IWorker<int, int>

@@ -11,6 +11,10 @@ namespace Flower
 
         IEnumerable<IWorkBase> Works { get; }
 
+        IWork<TInput> Register<TInput>(
+           IObservable<TInput> trigger,
+           IWorkerResolver<TInput> workerResolver);
+
         IWork<TInput, TOutput> Register<TInput, TOutput>(
             IObservable<TInput> trigger,
             IWorkerResolver<TInput, TOutput> workerResolver);
