@@ -17,8 +17,8 @@ namespace Flower
     public enum WorkerErrorBehavior
     {
         CompleteWorkAndThrow,
-        Ignore,
-        CompleteWork
+        CompleteWork,
+        Ignore
     }
 
     public class WorkRegistryOptions
