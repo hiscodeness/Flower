@@ -118,7 +118,7 @@ namespace Flower.Works
             }
 
             WorkExecuted += observer.OnNext;
-            if(Registration.WorkRegistry.Options.TriggerErrorBehavior == TriggerErrorBehavior.CompleteWorkAndForwardError)
+            if(ShouldForwardErrorToSubscribers())
             {
                 TriggerErrored += observer.OnError;                
             }
@@ -130,6 +130,11 @@ namespace Flower.Works
                 TriggerCompleted -= observer.OnCompleted;
                 TriggerErrored -= observer.OnError;
             });
+        }
+
+        private bool ShouldForwardErrorToSubscribers()
+        {
+            return Registration.WorkRegistry.Options.TriggerErrorBehavior == TriggerErrorBehavior.CompleteWorkAndForwardError;
         }
 
         private void OnTriggeredWorkCreated(ITriggeredWork<TInput, TOutput> triggeredWork)
