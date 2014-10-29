@@ -3,32 +3,30 @@ using Flower.Workers;
 
 namespace Flower.Works
 {
-    public interface IWork : IActivatable, ISuspendable, IUnregistrable
+    public interface IWorkBase: IActivatable, ISuspendable, IUnregistrable
     {
-        IWorkRegistry WorkRegistry { get; }
-        WorkState State { get; }
-        IWorkerResolver WorkerResolver { get; }
-        IObservable<object> Trigger { get; }
-        IObservable<ITriggeredWorkBase> Executed { get; }
+        WorkState State { get; }        
     }
 
-    public interface IUnregistrable
+    public interface IWork : IWorkBase
     {
-        void Unregister();
+        IWorkRegistration Registration { get; }
+        IObservable<ITriggeredWork> Triggered { get; }
+        IObservable<ITriggeredWork> Executed { get; }
     }
 
-    public interface IWork<TInput> : IWork
+    public interface IWork<TInput> : IWorkBase
     {
-        new IObservable<TInput> Trigger { get; }
-        new IWorkerResolver<TInput> WorkerResolver { get; }
-        new IObservable<ITriggeredWork<TInput>> Executed { get; }
+        IWorkRegistration<TInput> Registration { get; }
+        IObservable<ITriggeredWork<TInput>> Triggered { get; }
+        IObservable<ITriggeredWork<TInput>> Executed { get; }
     }
 
-    public interface IWork<TInput, TOutput> : IWork<TInput>
+    public interface IWork<TInput, TOutput> : IWorkBase
     {
-        new IWorkerResolver<TInput, TOutput> WorkerResolver { get; }
-        new IObservable<ITriggeredWork<TInput, TOutput>> Executed { get; }
+        IWorkRegistration<TInput, TOutput> Registration { get; }
+        IObservable<ITriggeredWork<TInput, TOutput>> Triggered { get; }
+        IObservable<ITriggeredWork<TInput, TOutput>> Executed { get; }
         IObservable<TOutput> Output { get; }
-        IObservable<ITriggeredWork<TInput,TOutput>> Triggered { get; }
     }
 }

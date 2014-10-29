@@ -5,18 +5,17 @@ using Flower.Works;
 
 namespace Flower
 {
-    public interface IWorkRegistry
+    public interface IWorkRegistry : IDisposable
     {
-        IEnumerable<IWork> Works { get; }
-        
-        bool ActivateWorkWhenRegistered { get; }
+        WorkRegistryOptions Options { get; }
+
+        IEnumerable<IWorkBase> Works { get; }
 
         IWork<TInput, TOutput> Register<TInput, TOutput>(
-            IObservable<TInput> trigger, IWorkerResolver<TInput, TOutput> workerResolver);
+            IObservable<TInput> trigger,
+            IWorkerResolver<TInput, TOutput> workerResolver);
 
-        void Unregister(IWork work);
-
-        WorkerErrorBehavior WorkerErrorBehavior { get; }
+        void Unregister(IWorkBase work);
         
         void ActivateAllWorks();
 

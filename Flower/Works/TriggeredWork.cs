@@ -19,7 +19,7 @@ namespace Flower.Works
         public TInput Input { get; private set; }
         public TOutput Output { get; private set; }
 
-        IWork ITriggeredWorkBase.Work
+        IWorkBase ITriggeredWorkBase.Work
         {
             get { return Work; }
         }
@@ -32,9 +32,9 @@ namespace Flower.Works
             {
                 State = TriggeredWorkState.Executing;
                 var work = (Work<TInput, TOutput>) Work;
-                Worker = work.WorkerResolver.Resolve(Input);
+                Worker = work.Registration.WorkerResolver.Resolve(Input);
                 Output = Worker.Execute(Input);
-                work.WorkerResolver.Release(Worker);
+                work.Registration.WorkerResolver.Release(Worker);
                 State = TriggeredWorkState.Success;
             }
             catch (Exception e)

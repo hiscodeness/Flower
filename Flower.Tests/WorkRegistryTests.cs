@@ -35,7 +35,7 @@ namespace Flower.Tests
         {
             // Arrange
             var subject = new Subject<int>();
-            var workRegistry = new WorkRegistry(true);
+            var workRegistry = WorkRegistryFactory.CreateAutoActivating();
             var work = workRegistry.Register(subject, TestWorkers.IntSquaredWorker);
             var result = 0;
             work.Output.SingleOrDefaultAsync().Subscribe(i => result = i);
@@ -53,7 +53,7 @@ namespace Flower.Tests
         {
             // Arrange
             var subject = new Subject<int>();
-            var workRegistry = new WorkRegistry(true);
+            var workRegistry = WorkRegistryFactory.CreateAutoActivating();
             var work = workRegistry.Register(subject, TestWorkers.IntSquaredWorker);
 
             // Act
@@ -70,7 +70,7 @@ namespace Flower.Tests
         {
             // Arrange
             var subject = new Subject<int>();
-            var workRegistry = new WorkRegistry(true);
+            var workRegistry = WorkRegistryFactory.CreateAutoActivating();
             var work = workRegistry.Register(subject, TestWorkers.IntSquaredWorker);
             workRegistry.Unregister(work);
 
@@ -83,7 +83,7 @@ namespace Flower.Tests
         {
             // Arrange
             var subject = new Subject<int>();
-            var workRegistry = new WorkRegistry(true);
+            var workRegistry = WorkRegistryFactory.CreateAutoActivating();
             workRegistry.Register(subject, TestWorkers.IntSquaredWorker)
                         .Pipe(TestWorkers.Int2StringWorker)
                         .Pipe(TestWorkers.String2IntWorker);
@@ -119,7 +119,7 @@ namespace Flower.Tests
         {
             // Arrange
             var subject = new Subject<int>();
-            var workRegistry = new WorkRegistry(true);
+            var workRegistry = WorkRegistryFactory.CreateAutoActivating();
             workRegistry.Register(subject, TestWorkers.IntSquaredWorker)
                         .Pipe(TestWorkers.Int2StringWorker)
                         .Pipe(TestWorkers.String2IntWorker);

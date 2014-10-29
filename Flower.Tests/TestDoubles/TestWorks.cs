@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Flower.Workers;
 using Flower.Works;
@@ -11,14 +10,30 @@ namespace Flower.Tests.TestDoubles
         internal static readonly TestWorkIntSquared IntSquaredWork = new TestWorkIntSquared();
     }
 
-    internal class TestWorkIntSquared : IWork<int, int>, IDisposable
-    {        
-        private readonly WorkRegistry workRegistry = new WorkRegistry(false);
+    internal class TestWorkRegistration : IWorkRegistration<int, int>
+    {
+        private readonly WorkRegistry workRegistry = new WorkRegistry();
         private readonly Subject<int> trigger = new Subject<int>();
-        private readonly Subject<int> output =new Subject<int>(); 
-        private readonly IWorkerResolver<int, int> workerResolver =
-            WorkerResolver.CreateFromInstance(TestWorkers.IntSquaredWorker);
 
+        private readonly IWorkerResolver<int, int> workerResolver =
+            Workers.WorkerResolver.CreateFromInstance(TestWorkers.IntSquaredWorker);
+
+        public IWorkRegistry WorkRegistry { get { return workRegistry; } }
+        public IObservable<int> Trigger { get { return trigger; } }
+        public IWorkerResolver<int, int> WorkerResolver { get { return workerResolver; } }
+        
+        public void Dispose()
+        {
+            workRegistry.Dispose();
+            trigger.Dispose();
+        }
+    }
+
+    internal class TestWorkIntSquared : IWork<int, int>, IDisposable
+    {
+        private readonly TestWorkRegistration registration = new TestWorkRegistration();
+        private readonly Subject<int> output = new Subject<int>(); 
+        
         internal TestWorkIntSquared()
         {
             State = WorkState.Suspended;
@@ -36,23 +51,15 @@ namespace Flower.Tests.TestDoubles
 
         public void Dispose()
         {
-            workRegistry.Dispose();
-            trigger.Dispose();
+            registration.Dispose();
             output.Dispose();
         }
 
-        public IWorkRegistry WorkRegistry { get { return workRegistry; } }
+        public IWorkRegistration<int, int> Registration { get { return registration; } }
         public WorkState State { get; private set; }
-        IWorkerResolver<int, int> IWork<int, int>.WorkerResolver { get { return workerResolver; } }
         IObservable<ITriggeredWork<int, int>> IWork<int, int>.Executed { get { return null; } }
         public IObservable<int> Output { get { return output; } }
-        IWorkerResolver<int> IWork<int>.WorkerResolver { get { return null; } }
-        IObservable<ITriggeredWork<int>> IWork<int>.Executed { get { return null; } }
-        IObservable<int> IWork<int>.Trigger { get { return trigger; } }
-        IWorkerResolver IWork.WorkerResolver { get { return null; } }
-        IObservable<object> IWork.Trigger { get { return trigger.Select(input => input as object); } }
         IObservable<ITriggeredWork<int, int>> IWork<int, int>.Triggered { get { return null; } }
-        IObservable<ITriggeredWorkBase> IWork.Executed { get { return null; } }
         public void Unregister()
         {
             throw new NotImplementedException();
