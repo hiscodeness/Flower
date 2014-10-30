@@ -18,10 +18,5 @@ namespace Flower.Works
         public IWorkRegistry WorkRegistry { get; private set; }
         public IObservable<TInput> Trigger { get; private set; }
         public IWorkerResolver<TInput, TOutput> WorkerResolver { get; private set; }
-        
-        public void Dispose()
-        {
-            WorkRegistry.Dispose();
-        }
     }
 }

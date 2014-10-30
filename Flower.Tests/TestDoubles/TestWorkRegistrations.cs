@@ -5,7 +5,7 @@ using Flower.Works;
 
 namespace Flower.Tests.TestDoubles
 {
-    internal class TestWorkRegistration : IWorkRegistration<int, int>
+    internal class TestWorkRegistration : IWorkRegistration<int, int>, IDisposable
     {
         private readonly WorkRegistry workRegistry = new WorkRegistry();
         private readonly Subject<int> trigger = new Subject<int>();

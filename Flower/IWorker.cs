@@ -7,10 +7,6 @@ namespace Flower
     /// <summary>
     /// A work that can be registered to run when triggered.
     /// </summary>
-    /// <remarks>
-    /// If the <see cref="IWorker" /> implements <see cref="IDisposable" />, it will be disposed
-    /// after it has been run.
-    /// </remarks>
     public interface IWorker
     {
         /// <summary>

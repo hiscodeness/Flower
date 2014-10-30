@@ -65,8 +65,10 @@
     <Compile Include="IWorkRegistry.cs" />
     <Compile Include="WorkRunners\IWorkRunner.cs" />
     <Compile Include="Works\IWorkRegistration.cs" />
+    <Compile Include="Works\TriggeredWork.cs" />
     <Compile Include="Works\TriggeredWork.Input.cs" />
     <Compile Include="Works\TriggeredWorkState.cs" />
+    <Compile Include="Works\Work.cs" />
     <Compile Include="Works\Work.InputOutput.cs" />
     <Compile Include="Workers\WorkerResolver.cs" />
     <Compile Include="WorkRegistryExtensionMethods.cs" />
@@ -75,6 +77,7 @@
     <Compile Include="Works\TriggeredWork.InputOutput.cs" />
     <Compile Include="WorkRegistry.cs" />
     <Compile Include="WorkState.cs" />
+    <Compile Include="Works\WorkRegistration.cs" />
     <Compile Include="Works\WorkRegistration.Input.cs" />
     <Compile Include="Works\WorkRegistration.InputOutput.cs" />
   </ItemGroup>

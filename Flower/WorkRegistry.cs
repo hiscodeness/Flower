@@ -2,12 +2,13 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using Flower.Workers;
 using Flower.Works;
 
 namespace Flower
 {
-    public sealed class WorkRegistry : IWorkRegistry
+    public sealed class WorkRegistry : IWorkRegistry, IDisposable
     {
         private bool isDisposed;
         private readonly BlockingCollection<IWorkBase> works = new BlockingCollection<IWorkBase>();
@@ -24,13 +25,22 @@ namespace Flower
 
         public WorkRegistryOptions Options { get; private set; }
 
-        public IWork<TInput> Register<TInput>(
-           IObservable<TInput> trigger,
-           IWorkerResolver<TInput> workerResolver)
+        public IWork Register<TInput>(IObservable<TInput> trigger, IWorkerResolver workerResolver)
+        {
+            var work = new Work(new WorkRegistration(this, trigger.Select(input => (object)input), workerResolver));
+            Add(work);
+            if (Options.RegisterWorkBehavior == RegisterWorkBehavior.RegisterActivated)
+            {
+                work.Activate();
+            }
+            return work;
+        }
+
+        public IWork<TInput> Register<TInput>(IObservable<TInput> trigger, IWorkerResolver<TInput> workerResolver)
         {
             var work = new Work<TInput>(new WorkRegistration<TInput>(this, trigger, workerResolver));
             Add(work);
-            if (Options.RegisterWorkBehavior == RegisterWorkBehavior.RegisterActivated)
+            if(Options.RegisterWorkBehavior == RegisterWorkBehavior.RegisterActivated)
             {
                 work.Activate();
             }
@@ -103,6 +113,15 @@ namespace Flower
         {
             Unregister(work);
         }
+        
+        internal void Triggered(Work  work, object input)
+        {
+            var workRunner = Options.WorkRunnerResolver.Resolve(work);
+            var triggeredWork = new TriggeredWork(workRunner, work, input);
+            work.TriggeredWorkCreated(triggeredWork);
+            triggeredWork.Submit();
+        }
+        
         internal void Triggered<TInput>(Work<TInput> work, TInput input)
         {
             var workRunner = Options.WorkRunnerResolver.Resolve(work);

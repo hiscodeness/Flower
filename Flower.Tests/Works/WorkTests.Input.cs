@@ -15,7 +15,7 @@ namespace Flower.Tests.Works
             var workRegistry = WorkRegistryFactory.CreateAutoActivating();
             var trigger = new Subject<int>();
             var worker = new TestWorkerInt();
-            var work = workRegistry.Register(trigger, worker);
+            workRegistry.Register(trigger, worker);
 
             // Act
             trigger.OnNext(42);

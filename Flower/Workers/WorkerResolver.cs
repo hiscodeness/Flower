@@ -2,6 +2,12 @@
 {
     public static class WorkerResolver
     {
+        public static IWorkerResolver CreateFromInstance(
+            IWorker worker)
+        {
+            return new InstanceWorkerResolver(worker);
+        }
+
         public static IWorkerResolver<TInput> CreateFromInstance<TInput>(
             IWorker<TInput> worker)
         {
@@ -12,6 +18,26 @@
             IWorker<TInput, TOutput> worker)
         {
             return new InstanceWorkerResolver<TInput, TOutput>(worker);
+        }
+
+        private class InstanceWorkerResolver : IWorkerResolver
+        {
+            private readonly IWorker instance;
+
+            public InstanceWorkerResolver(IWorker instance)
+            {
+                this.instance = instance;
+            }
+
+            public void Release(IWorker worker)
+            {
+                // Do nothing, instance is reused every time
+            }
+
+            public IWorker Resolve()
+            {
+                return instance;
+            }
         }
 
         private class InstanceWorkerResolver<TInput> : IWorkerResolver<TInput>

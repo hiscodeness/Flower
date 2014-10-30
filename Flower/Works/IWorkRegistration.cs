@@ -3,7 +3,7 @@ using Flower.Workers;
 
 namespace Flower.Works
 {
-    public interface IWorkRegistrationBase : IDisposable
+    public interface IWorkRegistrationBase
     {
         IWorkRegistry WorkRegistry { get; }
     }
