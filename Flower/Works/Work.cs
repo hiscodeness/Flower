@@ -1,30 +1,33 @@
 ﻿using System;
 using System.Linq;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
+using Flower.WorkRunners;
 
 namespace Flower.Works
 {
-    internal class Work : IWork
+    internal class Work : IWork, IRegisteredWork<object>
     {
         private IDisposable triggerSubscription;
 
-        private event Action<ITriggeredWork> WorkTriggered;
-        private event Action<ITriggeredWork> WorkExecuted;
-        private event Action TriggerCompleted;
-        private event Action<Exception> TriggerErrored;
-
         public Work(IWorkRegistration registration)
         {
+            State = WorkState.Suspended;
             Registration = registration;
-            Triggered = Observable.Create(CreateTriggeredSubscription());
-            Executed = Observable.Create(CreateExecutedSubscription());
+            Observables = new WorkObservables<IWork, ITriggeredWork>(this);
         }
 
         public WorkState State { get; private set; }
+        IWorkRegistrationBase IWorkBase.Registration { get { return Registration; } }
         public IWorkRegistration Registration { get; private set; }
-        public IObservable<ITriggeredWork> Triggered { get; private set; }
-        public IObservable<ITriggeredWork> Executed { get; private set; }
+        public IObservable<ITriggeredWork> Triggered { get { return Observables.Triggered; } }
+        public IObservable<ITriggeredWork> Executed { get { return Observables.Executed; } }
+        internal WorkObservables<IWork, ITriggeredWork> Observables { get; private set; }
+
+        public ITriggeredWorkBase CreateTriggeredWork(IWorkRunner workRunner, object input)
+        {
+            var triggeredWork = new TriggeredWork(workRunner, this, input);
+            Observables.TriggeredWorkCreated(triggeredWork);
+            return triggeredWork;
+        }
 
         public void Activate()
         {
@@ -56,16 +59,6 @@ namespace Flower.Works
             State = WorkState.Unregistered;
         }
 
-        internal void TriggeredWorkCreated(ITriggeredWork triggeredWork)
-        {
-            OnTriggeredWorkCreated(triggeredWork);
-        }
-
-        internal void TriggeredWorkExecuted(ITriggeredWork triggeredWork)
-        {
-            OnWorkExecuted(triggeredWork);
-        }
-
         internal void TriggeredWorkErrored(ITriggeredWork triggeredWork, Exception error)
         {
             switch (Registration.WorkRegistry.Options.WorkerErrorBehavior)
@@ -85,88 +78,6 @@ namespace Flower.Works
             }
         }
 
-        private Func<IObserver<ITriggeredWork>, IDisposable> CreateTriggeredSubscription()
-        {
-            return CreateTriggeredSubscription;
-        }
-
-        private IDisposable CreateTriggeredSubscription(IObserver<ITriggeredWork> observer)
-        {
-            WorkTriggered += observer.OnNext;
-            return Disposable.Create(() => { WorkTriggered -= observer.OnNext; });
-        }
-
-        private Func<IObserver<ITriggeredWork>, IDisposable> CreateExecutedSubscription()
-        {
-            return CreateExecutedSubscription;
-        }
-
-        private IDisposable CreateExecutedSubscription(IObserver<ITriggeredWork> observer)
-        {
-            if (State == WorkState.Completed ||
-               State == WorkState.WorkerError ||
-               State == WorkState.TriggerError)
-            {
-                observer.OnCompleted();
-                return Disposable.Empty;
-            }
-
-            WorkExecuted += observer.OnNext;
-            if (ShouldForwardErrorToSubscribers())
-            {
-                TriggerErrored += observer.OnError;
-            }
-            TriggerCompleted += observer.OnCompleted;
-
-            return Disposable.Create(() =>
-            {
-                WorkExecuted -= observer.OnNext;
-                TriggerCompleted -= observer.OnCompleted;
-                TriggerErrored -= observer.OnError;
-            });
-        }
-
-        private bool ShouldForwardErrorToSubscribers()
-        {
-            return Registration.WorkRegistry.Options.TriggerErrorBehavior == TriggerErrorBehavior.CompleteWorkAndForwardError;
-        }
-
-        private void OnTriggeredWorkCreated(ITriggeredWork triggeredWork)
-        {
-            var handler = WorkTriggered;
-            if (handler != null)
-            {
-                handler(triggeredWork);
-            }
-        }
-
-        private void OnWorkExecuted(ITriggeredWork triggeredWork)
-        {
-            var handler = WorkExecuted;
-            if (handler != null)
-            {
-                handler(triggeredWork);
-            }
-        }
-
-        private void OnTriggerErrored(Exception exception)
-        {
-            var handler = TriggerErrored;
-            if (handler != null)
-            {
-                handler(exception);
-            }
-        }
-
-        private void OnWorkCompleted()
-        {
-            var handler = TriggerCompleted;
-            if (handler != null)
-            {
-                handler();
-            }
-        }
-
         private void TriggerOnNext(object input)
         {
             ((WorkRegistry)Registration.WorkRegistry).Triggered(this, input);
@@ -176,14 +87,14 @@ namespace Flower.Works
         {
             ((WorkRegistry)Registration.WorkRegistry).TriggerErrored(this, exception);
             State = WorkState.TriggerError;
-            OnTriggerErrored(exception);
+            Observables.OnTriggerErrored(exception);
         }
 
         private void TriggerOnCompleted()
         {
             ((WorkRegistry)Registration.WorkRegistry).TriggerCompleted(this);
             State = WorkState.Completed;
-            OnWorkCompleted();
+            Observables.OnWorkCompleted();
         }
     }
 }

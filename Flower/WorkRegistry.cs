@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using Flower.Workers;
+using Flower.WorkRunners;
 using Flower.Works;
 
 namespace Flower
 {
-    public sealed class WorkRegistry : IWorkRegistry, IDisposable
+    public sealed class WorkRegistry : IWorkRegistry, IActivatable, ISuspendable, IDisposable
     {
         private bool isDisposed;
         private readonly BlockingCollection<IWorkBase> works = new BlockingCollection<IWorkBase>();
@@ -75,7 +76,7 @@ namespace Flower
             work.Unregister();
         }
 
-        public void ActivateAllWorks()
+        public void Activate()
         {
             foreach (var work in works.Reverse())
             {
@@ -83,7 +84,7 @@ namespace Flower
             }
         }
 
-        public void SuspendAllWorks()
+        public void Suspend()
         {
             foreach(var work in works)
             {
@@ -114,11 +115,10 @@ namespace Flower
             Unregister(work);
         }
         
-        internal void Triggered(Work  work, object input)
+        internal void Triggered<TWork, TInput>(TWork work, TInput input) where TWork : IRegisteredWork<TInput>
         {
             var workRunner = Options.WorkRunnerResolver.Resolve(work);
-            var triggeredWork = new TriggeredWork(workRunner, work, input);
-            work.TriggeredWorkCreated(triggeredWork);
+            var triggeredWork = work.CreateTriggeredWork(workRunner, input);
             triggeredWork.Submit();
         }
         
@@ -147,5 +147,10 @@ namespace Flower
         {
             works.TryTake(out work);
         }
+    }
+
+    internal interface IRegisteredWork<in TInput> : IWorkBase
+    {
+        ITriggeredWorkBase CreateTriggeredWork(IWorkRunner workRunner, TInput input);
     }
 }

@@ -23,6 +23,7 @@ namespace Flower.Works
         }
 
         public WorkState State { get; private set; }
+        IWorkRegistrationBase IWorkBase.Registration { get { return Registration; } }
         public IWorkRegistration<TInput, TOutput> Registration { get; private set; } 
         public IObservable<ITriggeredWork<TInput, TOutput>> Triggered { get; private set; }
         public IObservable<ITriggeredWork<TInput, TOutput>> Executed { get; private set; }

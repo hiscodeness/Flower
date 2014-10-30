@@ -32,6 +32,7 @@ namespace Flower.Tests.TestDoubles
 
         public IWorkRegistration<int, int> Registration { get { return registration; } }
         public WorkState State { get; private set; }
+        IWorkRegistrationBase IWorkBase.Registration { get { return Registration; } }
         IObservable<ITriggeredWork<int, int>> IWork<int, int>.Executed { get { return null; } }
         public IObservable<int> Output { get { return output; } }
         IObservable<ITriggeredWork<int, int>> IWork<int, int>.Triggered { get { return null; } }

@@ -26,7 +26,7 @@ namespace Flower.Tests
                                     .Output
                                     .ToList();
             output.Subscribe(r => result = r);
-            workRegistry.ActivateAllWorks();
+            workRegistry.Activate();
 
             // Assert
             Assert.Equal(expected, result);
@@ -91,7 +91,7 @@ namespace Flower.Tests
                         .Pipe(new TestWorkerStringToInt());
 
             // Act 
-            workRegistry.SuspendAllWorks();
+            workRegistry.Suspend();
 
             // Assert
             Assert.Equal(3, workRegistry.Works.Count());
@@ -109,7 +109,7 @@ namespace Flower.Tests
                         .Pipe(new TestWorkerStringToInt());
 
             // Act 
-            workRegistry.ActivateAllWorks();
+            workRegistry.Activate();
 
             // Assert
             Assert.Equal(3, workRegistry.Works.Count());
