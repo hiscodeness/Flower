@@ -121,14 +121,6 @@ namespace Flower
             var triggeredWork = work.CreateTriggeredWork(workRunner, input);
             triggeredWork.Submit();
         }
-        
-        internal void Triggered<TInput>(Work<TInput> work, TInput input)
-        {
-            var workRunner = Options.WorkRunnerResolver.Resolve(work);
-            var triggeredWork = new TriggeredWork<TInput>(workRunner, work, input);
-            work.TriggeredWorkCreated(triggeredWork);
-            triggeredWork.Submit();
-        }
 
         internal void Triggered<TInput, TResult>(Work<TInput, TResult> work, TInput input)
         {

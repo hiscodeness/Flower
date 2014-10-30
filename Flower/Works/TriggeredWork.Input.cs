@@ -46,7 +46,7 @@ namespace Flower.Works
             {
                 if (State == TriggeredWorkState.Success)
                 {
-                    ((Work<TInput>)Work).TriggeredWorkExecuted(this);
+                    ((Work<TInput>)Work).Observables.TriggeredWorkExecuted(this);
                 }
             }
         }
