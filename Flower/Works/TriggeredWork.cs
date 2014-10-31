@@ -16,7 +16,7 @@ namespace Flower.Works
         }
 
         public TriggeredWorkState State { get; private set; }
-        public IWork Work { get { return work; } }
+        public IWorkBase<object> Work { get { return work; } }
         public IWorker Worker { get; private set; }
         public object Input { get; private set; }
 

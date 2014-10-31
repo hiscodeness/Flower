@@ -16,15 +16,11 @@ namespace Flower.Works
         }
 
         public TriggeredWorkState State { get; private set; }
+        IWorkBase ITriggeredWorkBase.Work { get { return Work; } }
+        IWorkBase<TInput> ITriggeredWorkBase<TInput>.Work { get { return Work; } }
         public IWork<TInput> Work { get { return work; } }
         public IWorker<TInput> Worker { get; private set; }
         public TInput Input { get; private set; }
-
-        IWorkBase ITriggeredWorkBase.Work
-        {
-            get { return Work; }
-        }
-
         public IWorkRunner WorkRunner { get; private set; }
 
         public void Execute()

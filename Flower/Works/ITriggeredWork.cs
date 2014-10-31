@@ -14,8 +14,10 @@ namespace Flower.Works
         void Execute();
     }
 
-    public interface ITriggeredWorkBase<TInput> : ITriggeredWorkBase
+    public interface ITriggeredWorkBase<out TInput> : ITriggeredWorkBase
     {
+        TInput Input { get; }
+        new IWorkBase<TInput> Work { get; }
     }
 
     public interface ITriggeredWork : ITriggeredWorkBase<object>
@@ -30,7 +32,6 @@ namespace Flower.Works
     {
         new IWork<TInput> Work { get; }
         IWorker<TInput> Worker { get; }
-        TInput Input { get; }
     }
 
     /// <summary>
@@ -40,7 +41,6 @@ namespace Flower.Works
     {
         new IWork<TInput, TOutput> Work { get; }
         IWorker<TInput, TOutput> Worker { get; }
-        TInput Input { get; }
         TOutput Output { get; }
     }
 }
