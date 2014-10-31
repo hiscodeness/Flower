@@ -26,7 +26,9 @@ namespace Flower.Works
 
         public ITriggeredWorkBase CreateTriggeredWork(IWorkRunner workRunner, TInput input)
         {
-            return new TriggeredWork<TInput>(workRunner, this, input);
+            var triggeredWork = new TriggeredWork<TInput>(workRunner, this, input);
+            Observables.TriggeredWorkCreated(triggeredWork);
+            return triggeredWork;
         }
 
         public void Activate()

@@ -4,6 +4,16 @@ using System.Globalization;
 
 namespace Flower.Tests.TestDoubles
 {
+    internal class TestWorker : IWorker
+    {
+        public void Execute()
+        {
+            ExecuteCount++;
+        }
+
+        public int ExecuteCount { get; private set; }
+    }
+
     internal class TestWorkerInt : IWorker<int>
     {
         readonly List<int> inputs = new List<int>(); 

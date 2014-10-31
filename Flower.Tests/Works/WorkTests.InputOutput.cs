@@ -2,6 +2,7 @@
 using System.Reactive.Subjects;
 using Flower.Tests.TestDoubles;
 using Flower.Workers;
+using Flower.Works;
 using Xunit;
 
 namespace Flower.Tests.Works
@@ -49,6 +50,23 @@ namespace Flower.Tests.Works
             // Assert
             Assert.NotNull(pipedWork.Registration.Trigger);
             Assert.Equal(work.Output, pipedWork.Registration.Trigger);
+        }
+
+        [Fact]
+        public void WorkWithInputAndOutputTriggered()
+        {
+            // Arrange
+            var trigger = new Subject<int>();
+            var registry = WorkRegistryFactory.CreateAutoActivating();
+            var work = registry.Register(trigger, new TestWorkerIntToIntSquared());
+            ITriggeredWork<int, int> triggeredWork = null;
+
+            // Act
+            work.Triggered.Subscribe(tw => triggeredWork = tw);
+            trigger.OnNext(42);
+
+            // Assert
+            Assert.NotNull(triggeredWork);
         }
     }
 }
