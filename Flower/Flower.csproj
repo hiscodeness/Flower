@@ -51,7 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IRegisteredWork.cs" />
+    <Compile Include="Works\IRegisteredWork.cs" />
     <Compile Include="WorkRegistryOptions.cs" />
     <Compile Include="WorkRunners\IWorkRunnerResolver.cs" />
     <Compile Include="WorkRunners\WorkRunnerResolver.cs" />
@@ -83,6 +83,7 @@
     <Compile Include="Works\WorkRegistration.cs" />
     <Compile Include="Works\WorkRegistration.Input.cs" />
     <Compile Include="Works\WorkRegistration.InputOutput.cs" />
+    <Compile Include="Works\WorkRegistrationBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

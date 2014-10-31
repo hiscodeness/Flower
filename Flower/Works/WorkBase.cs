@@ -4,17 +4,17 @@ using Flower.WorkRunners;
 
 namespace Flower.Works
 {
-    internal abstract class WorkBase<TInput> : IRegisteredWork<TInput>
+    internal abstract class WorkBase<TInput> : IRegisteredWorkBase<TInput>, IWorkBase<TInput>
     {
         private IDisposable triggerSubscription;
 
         protected WorkBase(IWorkRegistrationBase<TInput> registration)
         {
-            this.Registration = registration;
+            Registration = registration;
         }
 
         public WorkState State { get; private set; }
-        IWorkRegistrationBase IWorkBase.Registration { get { return this.Registration; } }
+        IWorkRegistrationBase IWorkBase.Registration { get { return Registration; } }
         public IWorkRegistrationBase<TInput> Registration { get; private set; }
 
         public ITriggeredWorkBase Trigger(IWorkRunner workRunner, TInput input)
@@ -26,32 +26,32 @@ namespace Flower.Works
 
         public void Activate()
         {
-            if (this.State != WorkState.Suspended)
+            if (State != WorkState.Suspended)
             {
                 throw new InvalidOperationException("Only suspended work can be activated.");
             }
 
             State = WorkState.Active;
-            triggerSubscription = this.Registration.Trigger.Subscribe(TriggerOnNext, TriggerOnError, TriggerOnCompleted);
+            triggerSubscription = Registration.Trigger.Subscribe(TriggerOnNext, TriggerOnError, TriggerOnCompleted);
         }
 
         public void Suspend()
         {
-            if (this.triggerSubscription == null) return;
+            if (triggerSubscription == null) return;
 
-            this.State = WorkState.Suspended;
-            this.triggerSubscription.Dispose();
-            this.triggerSubscription = null;
+            State = WorkState.Suspended;
+            triggerSubscription.Dispose();
+            triggerSubscription = null;
         }
 
         public void Unregister()
         {
-            if (this.Registration.WorkRegistry.Works.Contains(this))
+            if (Registration.WorkRegistry.Works.Contains(this))
             {
-                this.Registration.WorkRegistry.Unregister(this);
+                Registration.WorkRegistry.Unregister(this);
             }
 
-            this.State = WorkState.Unregistered;
+            State = WorkState.Unregistered;
         }
 
         protected abstract void TriggeredWorkCreated(ITriggeredWorkBase triggeredWork);
@@ -59,42 +59,44 @@ namespace Flower.Works
         protected abstract void TriggerErrored(Exception exception);
         protected abstract void TriggerCompleted();
         
-        internal void WorkerErrored(ITriggeredWorkBase triggeredWork, Exception error)
+        protected void WorkerErrored(Exception error)
         {
-            switch (this.Registration.WorkRegistry.Options.WorkerErrorBehavior)
+            switch (Registration.WorkRegistry.Options.WorkerErrorBehavior)
             {
                 case WorkerErrorBehavior.Ignore:
                     // Eats exception
                     //Log.Warning("Continue on worker error: {0}.", error);
                     break;
                 case WorkerErrorBehavior.CompleteWork:
-                    this.Registration.WorkRegistry.Unregister(this);
-                    this.State = WorkState.WorkerError;
+                    Registration.WorkRegistry.Unregister(this);
+                    State = WorkState.WorkerError;
                     break;
                 case WorkerErrorBehavior.CompleteWorkAndThrow:
-                    this.Registration.WorkRegistry.Unregister(this);
-                    this.State = WorkState.WorkerError;
+                    Registration.WorkRegistry.Unregister(this);
+                    State = WorkState.WorkerError;
                     throw error;
             }
         }
 
         private void TriggerOnNext(TInput input)
         {
-            ((WorkRegistry)this.Registration.WorkRegistry).Triggered(this, input);
+            var workRunner = Registration.Options.WorkRunnerResolver.Resolve(this);
+            var triggeredWork = Trigger(workRunner, input);
+            triggeredWork.Submit();        
         }
 
         private void TriggerOnError(Exception exception)
         {
-            ((WorkRegistry)this.Registration.WorkRegistry).TriggerErrored(this, exception);
-            this.State = WorkState.TriggerError;
-            this.TriggerErrored(exception);
+            Registration.WorkRegistry.Unregister(this);
+            State = WorkState.TriggerError;
+            TriggerErrored(exception);
         }
 
         private void TriggerOnCompleted()
         {
-            ((WorkRegistry)this.Registration.WorkRegistry).TriggerCompleted(this);
-            this.State = WorkState.Completed;
-            this.TriggerCompleted();
+            Registration.WorkRegistry.Unregister(this);
+            State = WorkState.Completed;
+            TriggerCompleted();
         }
     }
 }

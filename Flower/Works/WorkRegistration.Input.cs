@@ -3,20 +3,15 @@ using Flower.Workers;
 
 namespace Flower.Works
 {
-    internal class WorkRegistration<TInput> : IWorkRegistration<TInput>
+    internal class WorkRegistration<TInput> : WorkRegistrationBase<TInput>, IWorkRegistration<TInput>
     {
         public WorkRegistration(
-            IWorkRegistry workRegistry,
-            IObservable<TInput> trigger,
-            IWorkerResolver<TInput> workerResolver)
+            IWorkRegistry workRegistry, IObservable<TInput> trigger, IWorkerResolver<TInput> workerResolver)
+            : base(workRegistry, trigger)
         {
-            WorkRegistry = workRegistry;
-            Trigger = trigger;
             WorkerResolver = workerResolver;
         }
 
-        public IWorkRegistry WorkRegistry { get; private set; }
-        public IObservable<TInput> Trigger { get; private set; }
         public IWorkerResolver<TInput> WorkerResolver { get; private set; }
     }
 }

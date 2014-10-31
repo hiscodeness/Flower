@@ -41,7 +41,7 @@ namespace Flower.Works
             }
         }
 
-        internal void OnWorkCompleted()
+        internal void OnTriggerCompleted()
         {
             var handler = TriggerCompleted;
             if (handler != null)

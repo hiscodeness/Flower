@@ -1,101 +1,52 @@
 ﻿using System;
-using System.Linq;
+using System.Reactive.Linq;
 using Flower.WorkRunners;
 
 namespace Flower.Works
 {
-    internal class Work : IWork, IRegisteredWork<object>
+    internal class Work : WorkBase<object>, IRegisteredWork
     {
-        private IDisposable triggerSubscription;
+        private readonly WorkObservables<IWork, ITriggeredWork> observables;
 
         public Work(IWorkRegistration registration)
+            : base(registration)
         {
-            State = WorkState.Suspended;
             Registration = registration;
-            Observables = new WorkObservables<IWork, ITriggeredWork>(this);
+            observables = new WorkObservables<IWork, ITriggeredWork>(this);
         }
 
-        public WorkState State { get; private set; }
-        IWorkRegistrationBase<object> IWorkBase<object>.Registration { get { return Registration; } }
-        IWorkRegistrationBase IWorkBase.Registration { get { return Registration; } }
-        public IWorkRegistration Registration { get; private set; }
-        public IObservable<ITriggeredWork> Triggered { get { return Observables.Triggered; } }
-        public IObservable<ITriggeredWork> Executed { get { return Observables.Executed; } }
-        internal WorkObservables<IWork, ITriggeredWork> Observables { get; private set; }
+        new public IWorkRegistration Registration { get; private set; }
+        public IObservable<ITriggeredWork> Triggered { get { return observables.Triggered; } }
+        public IObservable<ITriggeredWork> Executed { get { return observables.Executed; } }
 
-        public ITriggeredWorkBase Trigger(IWorkRunner workRunner, object input)
+        protected override void TriggeredWorkCreated(ITriggeredWorkBase triggeredWork)
         {
-            var triggeredWork = new TriggeredWork(workRunner, this, input);
-            Observables.TriggeredWorkCreated(triggeredWork);
-            return triggeredWork;
+            observables.TriggeredWorkCreated(triggeredWork as ITriggeredWork);
         }
 
-        public void Activate()
+        protected override void TriggerErrored(Exception exception)
         {
-            if (State != WorkState.Suspended)
-            {
-                throw new InvalidOperationException("Only suspended work can be activated.");
-            }
-
-            State = WorkState.Active;
-            triggerSubscription = Registration.Trigger.Subscribe(TriggerOnNext, TriggerOnError, TriggerOnCompleted);
+            observables.OnTriggerErrored(exception);
         }
 
-        public void Suspend()
+        protected override void TriggerCompleted()
         {
-            if (triggerSubscription == null) return;
-
-            State = WorkState.Suspended;
-            triggerSubscription.Dispose();
-            triggerSubscription = null;
+            observables.OnTriggerCompleted();
         }
 
-        public void Unregister()
+        protected override ITriggeredWorkBase CreateTriggeredWork(IWorkRunner workRunner, object input)
         {
-            if (Registration.WorkRegistry.Works.Contains(this))
-            {
-                Registration.WorkRegistry.Unregister(this);
-            }
-
-            State = WorkState.Unregistered;
+            return new TriggeredWork(workRunner, this, input);
         }
 
-        internal void TriggeredWorkErrored(ITriggeredWork triggeredWork, Exception error)
+        public void WorkerErrored(ITriggeredWork triggeredWork, Exception error)
         {
-            switch (Registration.WorkRegistry.Options.WorkerErrorBehavior)
-            {
-                case WorkerErrorBehavior.Ignore:
-                    // Eats exception
-                    //Log.Warning("Continue on worker error: {0}.", error);
-                    break;
-                case WorkerErrorBehavior.CompleteWork:
-                    Registration.WorkRegistry.Unregister(this);
-                    State = WorkState.WorkerError;
-                    break;
-                case WorkerErrorBehavior.CompleteWorkAndThrow:
-                    Registration.WorkRegistry.Unregister(this);
-                    State = WorkState.WorkerError;
-                    throw error;
-            }
+            WorkerErrored(error);
         }
 
-        private void TriggerOnNext(object input)
+        public void WorkerExecuted(ITriggeredWork triggeredWork)
         {
-            ((WorkRegistry)Registration.WorkRegistry).Triggered(this, input);
-        }
-
-        private void TriggerOnError(Exception exception)
-        {
-            ((WorkRegistry)Registration.WorkRegistry).TriggerErrored(this, exception);
-            State = WorkState.TriggerError;
-            Observables.OnTriggerErrored(exception);
-        }
-
-        private void TriggerOnCompleted()
-        {
-            ((WorkRegistry)Registration.WorkRegistry).TriggerCompleted(this);
-            State = WorkState.Completed;
-            Observables.OnWorkCompleted();
+            observables.TriggeredWorkExecuted(triggeredWork);
         }
     }
 }

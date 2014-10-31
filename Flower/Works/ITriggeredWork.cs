@@ -14,7 +14,11 @@ namespace Flower.Works
         void Execute();
     }
 
-    public interface ITriggeredWork : ITriggeredWorkBase
+    public interface ITriggeredWorkBase<TInput> : ITriggeredWorkBase
+    {
+    }
+
+    public interface ITriggeredWork : ITriggeredWorkBase<object>
     {
         IWorker Worker { get; }
     }
@@ -22,7 +26,7 @@ namespace Flower.Works
     /// <summary>
     /// Work that has been triggered and submitted to a <see cref="IWorkRunner" />.
     /// </summary>
-    public interface ITriggeredWork<TInput> : ITriggeredWorkBase
+    public interface ITriggeredWork<TInput> : ITriggeredWorkBase<TInput>
     {
         new IWork<TInput> Work { get; }
         IWorker<TInput> Worker { get; }
@@ -32,7 +36,7 @@ namespace Flower.Works
     /// <summary>
     /// Work that has been triggered and submitted to a <see cref="IWorkRunner" />.
     /// </summary>
-    public interface ITriggeredWork<TInput, TOutput> : ITriggeredWorkBase
+    public interface ITriggeredWork<TInput, TOutput> : ITriggeredWorkBase<TInput>
     {
         new IWork<TInput, TOutput> Work { get; }
         IWorker<TInput, TOutput> Worker { get; }

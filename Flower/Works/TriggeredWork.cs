@@ -5,16 +5,18 @@ namespace Flower.Works
 {
     internal class TriggeredWork : ITriggeredWork
     {
-        public TriggeredWork(IWorkRunner workRunner, IWork work, object input)
+        private readonly IRegisteredWork work;
+
+        public TriggeredWork(IWorkRunner workRunner, IRegisteredWork work, object input)
         {
             WorkRunner = workRunner;
-            Work = work;
+            this.work = work;
             Input = input;
             State = TriggeredWorkState.Created;
         }
 
         public TriggeredWorkState State { get; private set; }
-        public IWork Work { get; private set; }
+        public IWork Work { get { return work; } }
         public IWorker Worker { get; private set; }
         public object Input { get; private set; }
 
@@ -30,7 +32,6 @@ namespace Flower.Works
             try
             {
                 State = TriggeredWorkState.Executing;
-                var work = (Work)Work;
                 Worker = work.Registration.WorkerResolver.Resolve();
                 Worker.Execute();
                 work.Registration.WorkerResolver.Release(Worker);
@@ -39,14 +40,14 @@ namespace Flower.Works
             catch (Exception e)
             {
                 State = TriggeredWorkState.Failure;
-                ((Work)Work).TriggeredWorkErrored(this, e);
+                work.WorkerErrored(this, e);
                 State = TriggeredWorkState.Success;
             }
             finally
             {
                 if (State == TriggeredWorkState.Success)
                 {
-                    ((Work)Work).Observables.TriggeredWorkExecuted(this);
+                    work.WorkerExecuted(this);
                 }
             }
         }

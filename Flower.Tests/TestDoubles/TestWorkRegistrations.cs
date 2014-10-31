@@ -14,6 +14,7 @@ namespace Flower.Tests.TestDoubles
             Workers.WorkerResolver.CreateFromInstance(new TestWorkerIntToIntSquared());
 
         public IWorkRegistry WorkRegistry { get { return workRegistry; } }
+        public WorkRegistryOptions Options { get { return workRegistry.Options; } }
         public IObservable<int> Trigger { get { return trigger; } }
         public IWorkerResolver<int, int> WorkerResolver { get { return workerResolver; } }
         

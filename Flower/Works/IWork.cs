@@ -10,7 +10,7 @@ namespace Flower.Works
 
     public interface IWorkBase<out TInput> : IWorkBase
     {
-        new IWorkRegistrationBase<TInput> Registration { get; } 
+        new IWorkRegistrationBase<TInput> Registration { get; }
     }
 
     public interface IWork : IWorkBase<object>

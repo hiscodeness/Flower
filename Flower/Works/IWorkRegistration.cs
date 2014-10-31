@@ -6,11 +6,12 @@ namespace Flower.Works
     public interface IWorkRegistrationBase
     {
         IWorkRegistry WorkRegistry { get; }
+        WorkRegistryOptions Options { get; }
     }
 
     public interface IWorkRegistrationBase<out TInput> : IWorkRegistrationBase
     {
-        IObservable<TInput> Trigger { get; } 
+        IObservable<TInput> Trigger { get; }
     }
 
     public interface IWorkRegistration : IWorkRegistrationBase<object>

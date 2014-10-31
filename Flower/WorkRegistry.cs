@@ -104,23 +104,6 @@ namespace Flower
             works.Dispose();
         }
 
-        internal void TriggerCompleted(IWorkBase work)
-        {
-            Unregister(work);
-        }
-
-        internal void TriggerErrored(IWorkBase work, Exception exception)
-        {
-            Unregister(work);
-        }
-        
-        internal void Triggered<TWork, TInput>(TWork work, TInput input) where TWork : IRegisteredWork<TInput>
-        {
-            var workRunner = Options.WorkRunnerResolver.Resolve(work);
-            var triggeredWork = work.Trigger(workRunner, input);
-            triggeredWork.Submit();
-        }
-
         private void Add<TWork>(TWork work) where TWork : IWorkBase
         {
             works.Add(work);
