@@ -9,31 +9,30 @@ namespace Flower.Works
         private readonly TWork work;
         private event Action<TTriggeredWork> WorkTriggered;
         private event Action<TTriggeredWork> WorkExecuted;
-        private event Action TriggerCompleted;
         private event Action<Exception> TriggerErrored;
+        private event Action TriggerCompleted;
 
-        public WorkObservables(TWork work)
+        internal WorkObservables(TWork work)
         {
             this.work = work;
             Triggered = Observable.Create(CreateTriggeredSubscription());
             Executed = Observable.Create(CreateExecutedSubscription());
         }
 
-        public IObservable<TTriggeredWork> Triggered { get; private set; }
-        
-        public IObservable<TTriggeredWork> Executed { get; private set; }
+        internal IObservable<TTriggeredWork> Triggered { get; private set; }
+        internal IObservable<TTriggeredWork> Executed { get; private set; }
 
-        public void TriggeredWorkCreated(TTriggeredWork triggeredWork)
+        internal void TriggeredWorkCreated(TTriggeredWork triggeredWork)
         {
             OnTriggeredWorkCreated(triggeredWork);
         }
 
-        public void TriggeredWorkExecuted(TTriggeredWork triggeredWork)
+        internal void TriggeredWorkExecuted(TTriggeredWork triggeredWork)
         {
             OnWorkExecuted(triggeredWork);
         }
 
-        public void OnTriggerErrored(Exception exception)
+        internal void OnTriggerErrored(Exception exception)
         {
             var handler = TriggerErrored;
             if (handler != null)
@@ -42,7 +41,7 @@ namespace Flower.Works
             }
         }
 
-        public void OnWorkCompleted()
+        internal void OnWorkCompleted()
         {
             var handler = TriggerCompleted;
             if (handler != null)

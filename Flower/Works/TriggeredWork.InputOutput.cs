@@ -40,7 +40,7 @@ namespace Flower.Works
             catch (Exception e)
             {
                 State = TriggeredWorkState.Failure;
-                ((Work<TInput, TOutput>) Work).TriggeredWorkErrored(this, e);
+                ((Work<TInput, TOutput>) Work).WorkerErrored(this, e);
                 State = TriggeredWorkState.Success;
             }
             finally

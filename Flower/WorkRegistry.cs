@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using Flower.Workers;
-using Flower.WorkRunners;
 using Flower.Works;
 
 namespace Flower
@@ -118,7 +117,7 @@ namespace Flower
         internal void Triggered<TWork, TInput>(TWork work, TInput input) where TWork : IRegisteredWork<TInput>
         {
             var workRunner = Options.WorkRunnerResolver.Resolve(work);
-            var triggeredWork = work.CreateTriggeredWork(workRunner, input);
+            var triggeredWork = work.Trigger(workRunner, input);
             triggeredWork.Submit();
         }
 
@@ -131,10 +130,5 @@ namespace Flower
         {
             works.TryTake(out work);
         }
-    }
-
-    internal interface IRegisteredWork<in TInput> : IWorkBase
-    {
-        ITriggeredWorkBase CreateTriggeredWork(IWorkRunner workRunner, TInput input);
     }
 }

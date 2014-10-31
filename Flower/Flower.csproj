@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IRegisteredWork.cs" />
     <Compile Include="WorkRegistryOptions.cs" />
     <Compile Include="WorkRunners\IWorkRunnerResolver.cs" />
     <Compile Include="WorkRunners\WorkRunnerResolver.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="Works\TriggeredWork.InputOutput.cs" />
     <Compile Include="WorkRegistry.cs" />
     <Compile Include="WorkState.cs" />
+    <Compile Include="Works\WorkBase.cs" />
     <Compile Include="Works\WorkObservables.cs" />
     <Compile Include="Works\WorkRegistration.cs" />
     <Compile Include="Works\WorkRegistration.Input.cs" />

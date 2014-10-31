@@ -8,21 +8,23 @@ namespace Flower.Works
         IWorkRegistry WorkRegistry { get; }
     }
 
-    public interface IWorkRegistration : IWorkRegistrationBase
+    public interface IWorkRegistrationBase<out TInput> : IWorkRegistrationBase
     {
-        IObservable<object> Trigger { get; }
+        IObservable<TInput> Trigger { get; } 
+    }
+
+    public interface IWorkRegistration : IWorkRegistrationBase<object>
+    {
         IWorkerResolver WorkerResolver { get; }
     }
 
-    public interface IWorkRegistration<TInput> : IWorkRegistrationBase
+    public interface IWorkRegistration<TInput> : IWorkRegistrationBase<TInput>
     {
-        IObservable<TInput> Trigger { get; }
         IWorkerResolver<TInput> WorkerResolver { get; }
     }
 
-    public interface IWorkRegistration<TInput, TOutput> : IWorkRegistrationBase
+    public interface IWorkRegistration<TInput, TOutput> : IWorkRegistrationBase<TInput>
     {
-        IObservable<TInput> Trigger { get; }
         IWorkerResolver<TInput, TOutput> WorkerResolver { get; }
     }
 }

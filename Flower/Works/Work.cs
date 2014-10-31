@@ -16,13 +16,14 @@ namespace Flower.Works
         }
 
         public WorkState State { get; private set; }
+        IWorkRegistrationBase<object> IWorkBase<object>.Registration { get { return Registration; } }
         IWorkRegistrationBase IWorkBase.Registration { get { return Registration; } }
         public IWorkRegistration Registration { get; private set; }
         public IObservable<ITriggeredWork> Triggered { get { return Observables.Triggered; } }
         public IObservable<ITriggeredWork> Executed { get { return Observables.Executed; } }
         internal WorkObservables<IWork, ITriggeredWork> Observables { get; private set; }
 
-        public ITriggeredWorkBase CreateTriggeredWork(IWorkRunner workRunner, object input)
+        public ITriggeredWorkBase Trigger(IWorkRunner workRunner, object input)
         {
             var triggeredWork = new TriggeredWork(workRunner, this, input);
             Observables.TriggeredWorkCreated(triggeredWork);

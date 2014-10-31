@@ -7,11 +7,7 @@ namespace Flower.Works
     /// </summary>
     public interface ITriggeredWorkBase
     {
-        /// <summary>
-        /// Gets the current status of the triggered work.
-        /// </summary>
         TriggeredWorkState State { get; }
-
         IWorkBase Work { get; }
         IWorkRunner WorkRunner { get; }
         void Submit();

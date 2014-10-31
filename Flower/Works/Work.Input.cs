@@ -19,12 +19,13 @@ namespace Flower.Works
 
         public WorkState State { get; private set; }
         IWorkRegistrationBase IWorkBase.Registration { get { return Registration; } }
+        IWorkRegistrationBase<TInput> IWorkBase<TInput>.Registration { get { return Registration; } }
         public IWorkRegistration<TInput> Registration { get; private set; }
         public IObservable<ITriggeredWork<TInput>> Triggered { get { return Observables.Triggered; } }
         public IObservable<ITriggeredWork<TInput>> Executed { get { return Observables.Executed; } }
         internal WorkObservables<IWork<TInput>, ITriggeredWork<TInput>> Observables { get; private set; }
 
-        public ITriggeredWorkBase CreateTriggeredWork(IWorkRunner workRunner, TInput input)
+        public ITriggeredWorkBase Trigger(IWorkRunner workRunner, TInput input)
         {
             var triggeredWork = new TriggeredWork<TInput>(workRunner, this, input);
             Observables.TriggeredWorkCreated(triggeredWork);
