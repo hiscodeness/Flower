@@ -11,11 +11,13 @@ namespace Flower.Works
         protected WorkBase(IWorkRegistrationBase<TInput> registration)
         {
             Registration = registration;
+            TriggerEvents = new TriggerEvents();
         }
 
         public WorkState State { get; private set; }
         IWorkRegistrationBase IWorkBase.Registration { get { return Registration; } }
         public IWorkRegistrationBase<TInput> Registration { get; private set; }
+        public ITriggerEvents TriggerEvents { get; private set; }
 
         public ITriggeredWorkBase Trigger(IWorkRunner workRunner, TInput input)
         {
@@ -56,8 +58,6 @@ namespace Flower.Works
 
         protected abstract void TriggeredWorkCreated(ITriggeredWorkBase triggeredWork);
         protected abstract ITriggeredWorkBase CreateTriggeredWork(IWorkRunner workRunner, TInput input);
-        protected abstract void TriggerErrored(Exception exception);
-        protected abstract void TriggerCompleted();
         
         protected void WorkerErrored(Exception error)
         {
@@ -89,14 +89,14 @@ namespace Flower.Works
         {
             Registration.WorkRegistry.Unregister(this);
             State = WorkState.TriggerError;
-            TriggerErrored(exception);
+            TriggerEvents.RaiseTriggerErrored(exception);
         }
 
         private void TriggerOnCompleted()
         {
             Registration.WorkRegistry.Unregister(this);
             State = WorkState.Completed;
-            TriggerCompleted();
+            TriggerEvents.RaiseTriggerCompleted();
         }
     }
 }

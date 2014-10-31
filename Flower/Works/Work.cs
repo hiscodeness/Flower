@@ -6,13 +6,13 @@ namespace Flower.Works
 {
     internal class Work : WorkBase<object>, IRegisteredWork
     {
-        private readonly WorkObservables<IWork, ITriggeredWork> observables;
+        private readonly WorkObservables<IRegisteredWork, ITriggeredWork> observables;
 
         public Work(IWorkRegistration registration)
             : base(registration)
         {
             Registration = registration;
-            observables = new WorkObservables<IWork, ITriggeredWork>(this);
+            observables = new WorkObservables<IRegisteredWork, ITriggeredWork>(this);
         }
 
         new public IWorkRegistration Registration { get; private set; }
@@ -22,16 +22,6 @@ namespace Flower.Works
         protected override void TriggeredWorkCreated(ITriggeredWorkBase triggeredWork)
         {
             observables.TriggeredWorkCreated(triggeredWork as ITriggeredWork);
-        }
-
-        protected override void TriggerErrored(Exception exception)
-        {
-            observables.OnTriggerErrored(exception);
-        }
-
-        protected override void TriggerCompleted()
-        {
-            observables.OnTriggerCompleted();
         }
 
         protected override ITriggeredWorkBase CreateTriggeredWork(IWorkRunner workRunner, object input)

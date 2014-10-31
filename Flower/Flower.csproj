@@ -57,6 +57,7 @@
     <Compile Include="WorkRunners\WorkRunnerResolver.cs" />
     <Compile Include="Works\IActivatable.cs" />
     <Compile Include="WorkRunners\ImmediateWorkRunner.cs" />
+    <Compile Include="Works\ITriggerEvents.cs" />
     <Compile Include="Works\IUnregistrable.cs" />
     <Compile Include="Works\IWork.cs" />
     <Compile Include="Works\ISuspendable.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="Works\TriggeredWork.cs" />
     <Compile Include="Works\TriggeredWork.Input.cs" />
     <Compile Include="Works\TriggeredWorkState.cs" />
+    <Compile Include="Works\TriggerEvents.cs" />
     <Compile Include="Works\Work.cs" />
     <Compile Include="Works\Work.InputOutput.cs" />
     <Compile Include="Workers\WorkerResolver.cs" />

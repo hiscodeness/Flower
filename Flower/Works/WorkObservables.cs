@@ -4,13 +4,11 @@ using System.Reactive.Linq;
 
 namespace Flower.Works
 {
-    internal class WorkObservables<TWork, TTriggeredWork> where TWork : IWorkBase where TTriggeredWork : ITriggeredWorkBase
+    internal class WorkObservables<TWork, TTriggeredWork> where TWork : IRegisteredWorkBase where TTriggeredWork : ITriggeredWorkBase
     {
         private readonly TWork work;
         private event Action<TTriggeredWork> WorkTriggered;
         private event Action<TTriggeredWork> WorkExecuted;
-        private event Action<Exception> TriggerErrored;
-        private event Action TriggerCompleted;
 
         internal WorkObservables(TWork work)
         {
@@ -32,24 +30,6 @@ namespace Flower.Works
             OnWorkExecuted(triggeredWork);
         }
 
-        internal void OnTriggerErrored(Exception exception)
-        {
-            var handler = TriggerErrored;
-            if (handler != null)
-            {
-                handler(exception);
-            }
-        }
-
-        internal void OnTriggerCompleted()
-        {
-            var handler = TriggerCompleted;
-            if (handler != null)
-            {
-                handler();
-            }
-        }
-
         private Func<IObserver<TTriggeredWork>, IDisposable> CreateTriggeredSubscription()
         {
             return CreateTriggeredSubscription;
@@ -68,9 +48,7 @@ namespace Flower.Works
 
         private IDisposable CreateExecutedSubscription(IObserver<TTriggeredWork> observer)
         {
-            if (work.State == WorkState.Completed ||
-                work.State == WorkState.WorkerError ||
-                work.State == WorkState.TriggerError)
+            if (IsWorkCompleted)
             {
                 observer.OnCompleted();
                 return Disposable.Empty;
@@ -79,16 +57,24 @@ namespace Flower.Works
             WorkExecuted += observer.OnNext;
             if (ShouldForwardErrorToSubscribers())
             {
-                TriggerErrored += observer.OnError;
+                work.TriggerEvents.TriggerErrored += observer.OnError;
             }
-            TriggerCompleted += observer.OnCompleted;
+            work.TriggerEvents.TriggerCompleted += observer.OnCompleted;
 
             return Disposable.Create(() =>
             {
                 WorkExecuted -= observer.OnNext;
-                TriggerCompleted -= observer.OnCompleted;
-                TriggerErrored -= observer.OnError;
+                work.TriggerEvents.TriggerCompleted -= observer.OnCompleted;
+                work.TriggerEvents.TriggerErrored -= observer.OnError;
             });
+        }
+
+        private bool IsWorkCompleted { get
+        {
+            return work.State == WorkState.Completed ||
+                   work.State == WorkState.WorkerError ||
+                   work.State == WorkState.TriggerError;
+        }
         }
 
         private bool ShouldForwardErrorToSubscribers()

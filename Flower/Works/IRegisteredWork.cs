@@ -3,7 +3,12 @@ using Flower.WorkRunners;
 
 namespace Flower.Works
 {
-    internal interface IRegisteredWorkBase<in TInput>
+    internal interface IRegisteredWorkBase : IWorkBase
+    {
+        ITriggerEvents TriggerEvents { get; }
+    }
+
+    internal interface IRegisteredWorkBase<TInput> : IRegisteredWorkBase, IWorkBase<TInput>
     {
         ITriggeredWorkBase Trigger(IWorkRunner workRunner, TInput input);
     }
