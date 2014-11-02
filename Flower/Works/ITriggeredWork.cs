@@ -3,14 +3,13 @@
 namespace Flower.Works
 {
     /// <summary>
-    /// Work that has been triggered and submitted to a <see cref="IWorkRunner" />.
+    /// Work that has been triggered and submitted to a <see cref="IWorkRunner" /> for execution.
     /// </summary>
     public interface ITriggeredWorkBase
     {
         TriggeredWorkState State { get; }
         IWorkBase Work { get; }
         IWorkRunner WorkRunner { get; }
-        void Submit();
         void Execute();
     }
 

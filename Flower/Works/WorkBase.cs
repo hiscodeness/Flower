@@ -80,9 +80,14 @@ namespace Flower.Works
 
         private void TriggerOnNext(TInput input)
         {
-            var workRunner = Registration.Options.WorkRunnerResolver.Resolve(this);
+            var workRunner = ResolveWorkRunner();
             var triggeredWork = Trigger(workRunner, input);
-            triggeredWork.Submit();        
+            workRunner.Submit(triggeredWork);        
+        }
+
+        private IWorkRunner ResolveWorkRunner()
+        {
+            return Registration.Options.WorkRunnerResolver.Resolve(this);
         }
 
         private void TriggerOnError(Exception exception)
