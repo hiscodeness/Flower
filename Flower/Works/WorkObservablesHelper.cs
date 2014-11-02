@@ -7,42 +7,42 @@ namespace Flower.Works
     internal class WorkObservablesHelper<TWork, TTriggeredWork>
         where TWork : IRegisteredWork where TTriggeredWork : ITriggeredWork
     {
-        private readonly WorkTriggeringListener workTriggeringListener;
-        private readonly WorkExecutionListener workExecutionListener;
+        private readonly WorkTriggeredHelper workTriggeredHelper;
+        private readonly WorkExecutedHelper workExecutedHelper;
 
         public WorkObservablesHelper(TWork work)
         {
-            workTriggeringListener = new WorkTriggeringListener();
-            workExecutionListener = new WorkExecutionListener(work);
+            workTriggeredHelper = new WorkTriggeredHelper();
+            workExecutedHelper = new WorkExecutedHelper(work);
         }
 
-        public IObservable<TTriggeredWork> Triggered { get { return workTriggeringListener.Triggered; } }
-        public IObservable<TTriggeredWork> Executed { get { return workExecutionListener.Executed; } }
+        public IObservable<TTriggeredWork> WorkTriggered { get { return workTriggeredHelper.WorkTriggered; } }
+        public IObservable<TTriggeredWork> WorkExecuted { get { return workExecutedHelper.WorkExecuted; } }
 
-        public void RaiseTriggered(TTriggeredWork triggeredWork)
+        public void RaiseWorkTriggered(TTriggeredWork triggeredWork)
         {
-            workTriggeringListener.TriggeredWorkCreated(triggeredWork);
+            workTriggeredHelper.RaiseTriggered(triggeredWork);
         }
 
-        public void RaiseExecuted(TTriggeredWork triggeredWork)
+        public void RaiseWorkExecuted(TTriggeredWork triggeredWork)
         {
-            workExecutionListener.TriggeredWorkExecuted(triggeredWork);
+            workExecutedHelper.RaiseWorkExecuted(triggeredWork);
         }
 
-        private class WorkTriggeringListener
+        private class WorkTriggeredHelper
         {
-            private event Action<TTriggeredWork> WorkTriggered;
+            private event Action<TTriggeredWork> workTriggered;
 
-            internal WorkTriggeringListener()
+            public WorkTriggeredHelper()
             {
-                Triggered = Observable.Create(CreateTriggeredSubscription());
+                WorkTriggered = Observable.Create(CreateTriggeredSubscription());
             }
 
-            internal IObservable<TTriggeredWork> Triggered { get; private set; }
+            public IObservable<TTriggeredWork> WorkTriggered { get; private set; }
 
-            internal void TriggeredWorkCreated(TTriggeredWork triggeredWork)
+            public void RaiseTriggered(TTriggeredWork triggeredWork)
             {
-                OnTriggeredWorkCreated(triggeredWork);
+                OnWorkTriggered(triggeredWork);
             }
 
             private Func<IObserver<TTriggeredWork>, IDisposable> CreateTriggeredSubscription()
@@ -52,13 +52,13 @@ namespace Flower.Works
 
             private IDisposable CreateTriggeredSubscription(IObserver<TTriggeredWork> observer)
             {
-                WorkTriggered += observer.OnNext;
-                return Disposable.Create(() => { WorkTriggered -= observer.OnNext; });
+                workTriggered += observer.OnNext;
+                return Disposable.Create(() => { workTriggered -= observer.OnNext; });
             }
 
-            private void OnTriggeredWorkCreated(TTriggeredWork triggeredWork)
+            private void OnWorkTriggered(TTriggeredWork triggeredWork)
             {
-                var handler = WorkTriggered;
+                var handler = workTriggered;
                 if (handler != null)
                 {
                     handler(triggeredWork);
@@ -66,20 +66,20 @@ namespace Flower.Works
             }
         }
 
-        private class WorkExecutionListener
+        private class WorkExecutedHelper
         {
             private readonly TWork work;
-            private event Action<TTriggeredWork> WorkExecuted;
+            private event Action<TTriggeredWork> workExecuted;
 
-            internal WorkExecutionListener(TWork work)
+            public WorkExecutedHelper(TWork work)
             {
                 this.work = work;
-                Executed = Observable.Create(CreateExecutedSubscription());
+                WorkExecuted = Observable.Create(CreateExecutedSubscription());
             }
 
-            internal IObservable<TTriggeredWork> Executed { get; private set; }
+            public IObservable<TTriggeredWork> WorkExecuted { get; private set; }
 
-            internal void TriggeredWorkExecuted(TTriggeredWork triggeredWork)
+            public void RaiseWorkExecuted(TTriggeredWork triggeredWork)
             {
                 OnWorkExecuted(triggeredWork);
             }
@@ -97,7 +97,7 @@ namespace Flower.Works
                     return Disposable.Empty;
                 }
 
-                WorkExecuted += observer.OnNext;
+                workExecuted += observer.OnNext;
                 if (ShouldForwardErrorToSubscribers())
                 {
                     work.TriggerEvents.TriggerErrored += observer.OnError;
@@ -107,7 +107,7 @@ namespace Flower.Works
                 return Disposable.Create(
                     () =>
                         {
-                            WorkExecuted -= observer.OnNext;
+                            workExecuted -= observer.OnNext;
                             work.TriggerEvents.TriggerCompleted -= observer.OnCompleted;
                             work.TriggerEvents.TriggerErrored -= observer.OnError;
                         });
@@ -130,7 +130,7 @@ namespace Flower.Works
 
             private void OnWorkExecuted(TTriggeredWork triggeredWork)
             {
-                var handler = WorkExecuted;
+                var handler = workExecuted;
                 if (handler != null)
                 {
                     handler(triggeredWork);

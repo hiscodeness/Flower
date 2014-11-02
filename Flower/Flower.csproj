@@ -66,7 +66,7 @@
     <Compile Include="Workers\IWorkerResolver.cs" />
     <Compile Include="IWorkRegistry.cs" />
     <Compile Include="WorkRunners\IWorkRunner.cs" />
-    <Compile Include="Works\IActionWorkRegistration.cs" />
+    <Compile Include="Works\IWorkRegistration.cs" />
     <Compile Include="Works\TriggeredWorks.cs" />
     <Compile Include="Works\TriggeredWorkState.cs" />
     <Compile Include="Works\TriggerEvents.cs" />

@@ -118,8 +118,8 @@ namespace Flower.Works
         }
 
         new public IActionWorkRegistration Registration { get; private set; }
-        public IObservable<ITriggeredActionWork> Triggered { get { return observables.Triggered; } }
-        public IObservable<ITriggeredActionWork> Executed { get { return observables.Executed; } }
+        public IObservable<ITriggeredActionWork> Triggered { get { return observables.WorkTriggered; } }
+        public IObservable<ITriggeredActionWork> Executed { get { return observables.WorkExecuted; } }
 
         protected override ITriggeredWork CreateTriggeredWork(IWorkRunner workRunner, object input)
         {
@@ -128,12 +128,12 @@ namespace Flower.Works
 
         protected override void TriggeredWorkCreated(ITriggeredWork triggeredWork)
         {
-            observables.RaiseTriggered(triggeredWork as ITriggeredActionWork);
+            observables.RaiseWorkTriggered(triggeredWork as ITriggeredActionWork);
         }
 
         public void WorkerExecuted(ITriggeredActionWork triggeredWork)
         {
-            observables.RaiseExecuted(triggeredWork);
+            observables.RaiseWorkExecuted(triggeredWork);
         }
     }
 
@@ -149,8 +149,8 @@ namespace Flower.Works
         }
 
         new public IActionWorkRegistration<TInput> Registration { get; private set; }
-        public IObservable<ITriggeredActionWork<TInput>> Triggered { get { return observables.Triggered; } }
-        public IObservable<ITriggeredActionWork<TInput>> Executed { get { return observables.Executed; } }
+        public IObservable<ITriggeredActionWork<TInput>> Triggered { get { return observables.WorkTriggered; } }
+        public IObservable<ITriggeredActionWork<TInput>> Executed { get { return observables.WorkExecuted; } }
 
         protected override ITriggeredWork CreateTriggeredWork(IWorkRunner workRunner, TInput input)
         {
@@ -159,12 +159,12 @@ namespace Flower.Works
 
         protected override void TriggeredWorkCreated(ITriggeredWork triggeredWork)
         {
-            observables.RaiseTriggered(triggeredWork as ITriggeredActionWork<TInput>);
+            observables.RaiseWorkTriggered(triggeredWork as ITriggeredActionWork<TInput>);
         }
 
         public void WorkerExecuted(ITriggeredActionWork<TInput> triggeredWork)
         {
-            observables.RaiseExecuted(triggeredWork);
+            observables.RaiseWorkExecuted(triggeredWork);
         }
     }
 
@@ -181,8 +181,8 @@ namespace Flower.Works
         }
 
         new public IFuncWorkRegistration<TInput, TOutput> Registration { get; private set; }
-        public IObservable<ITriggeredFuncWork<TInput, TOutput>> Triggered { get { return observables.Triggered; } }
-        public IObservable<ITriggeredFuncWork<TInput, TOutput>> Executed { get { return observables.Executed; } }
+        public IObservable<ITriggeredFuncWork<TInput, TOutput>> Triggered { get { return observables.WorkTriggered; } }
+        public IObservable<ITriggeredFuncWork<TInput, TOutput>> Executed { get { return observables.WorkExecuted; } }
         public IObservable<TOutput> Output { get; private set; }
 
         protected override ITriggeredWork CreateTriggeredWork(IWorkRunner workRunner, TInput input)
@@ -192,12 +192,12 @@ namespace Flower.Works
 
         protected override void TriggeredWorkCreated(ITriggeredWork triggeredWork)
         {
-            observables.RaiseTriggered(triggeredWork as ITriggeredFuncWork<TInput, TOutput>);
+            observables.RaiseWorkTriggered(triggeredWork as ITriggeredFuncWork<TInput, TOutput>);
         }
 
         public void WorkerExecuted(ITriggeredFuncWork<TInput, TOutput> triggeredWork)
         {
-            observables.RaiseExecuted(triggeredWork);
+            observables.RaiseWorkExecuted(triggeredWork);
         }
     }
 }
