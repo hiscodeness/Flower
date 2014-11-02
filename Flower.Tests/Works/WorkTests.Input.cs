@@ -67,7 +67,7 @@ namespace Flower.Tests.Works
             var trigger = new Subject<int>();
             var registry = WorkRegistryFactory.CreateAutoActivating();
             var work = registry.Register(trigger, new TestWorkerInt());
-            ITriggeredWork<int> triggeredWork = null;
+            ITriggeredActionWork<int> triggeredWork = null;
 
             // Act
             work.Triggered.Subscribe(tw => triggeredWork = tw);

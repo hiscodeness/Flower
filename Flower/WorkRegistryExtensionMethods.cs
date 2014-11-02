@@ -6,7 +6,7 @@ namespace Flower
 {
     public static class WorkRegistryExtensionMethods
     {
-        public static IWork Register<TInput>(
+        public static IActionWork Register<TInput>(
          this IWorkRegistry workRegistry,
          IObservable<TInput> trigger,
          IWorker worker)
@@ -14,7 +14,7 @@ namespace Flower
             return workRegistry.Register(trigger, WorkerResolver.CreateFromInstance(worker));
         }
 
-        public static IWork<TInput> Register<TInput>(
+        public static IActionWork<TInput> Register<TInput>(
            this IWorkRegistry workRegistry,
            IObservable<TInput> trigger,
            IWorker<TInput> worker)
@@ -22,7 +22,7 @@ namespace Flower
             return workRegistry.Register(trigger, WorkerResolver.CreateFromInstance(worker));
         }
 
-        public static IWork<TInput, TOutput> Register<TInput, TOutput>(
+        public static IFuncWork<TInput, TOutput> Register<TInput, TOutput>(
             this IWorkRegistry workRegistry,
             IObservable<TInput> trigger,
             IWorker<TInput, TOutput> worker)

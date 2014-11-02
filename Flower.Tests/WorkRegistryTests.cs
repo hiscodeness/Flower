@@ -150,7 +150,7 @@ namespace Flower.Tests
         {
             // Arrange
             var workRegistry = new WorkRegistry();
-            var work = A.Fake<IWorkBase>();
+            var work = A.Fake<IWork>();
 
             // Act / Assert
             Assert.Throws<InvalidOperationException>(() => workRegistry.Unregister(work));

@@ -5,21 +5,21 @@ namespace Flower.Works
     /// <summary>
     /// Work that has been triggered and submitted to a <see cref="IWorkRunner" /> for execution.
     /// </summary>
-    public interface ITriggeredWorkBase
+    public interface ITriggeredWork
     {
         TriggeredWorkState State { get; }
-        IWorkBase Work { get; }
+        IWork Work { get; }
         IWorkRunner WorkRunner { get; }
         void Execute();
     }
 
-    public interface ITriggeredWorkBase<out TInput> : ITriggeredWorkBase
+    public interface ITriggeredWork<out TInput> : ITriggeredWork
     {
         TInput Input { get; }
-        new IWorkBase<TInput> Work { get; }
+        new IWork<TInput> Work { get; }
     }
 
-    public interface ITriggeredWork : ITriggeredWorkBase<object>
+    public interface ITriggeredActionWork : ITriggeredWork<object>
     {
         IWorker Worker { get; }
     }
@@ -27,18 +27,18 @@ namespace Flower.Works
     /// <summary>
     /// Work that has been triggered and submitted to a <see cref="IWorkRunner" />.
     /// </summary>
-    public interface ITriggeredWork<TInput> : ITriggeredWorkBase<TInput>
+    public interface ITriggeredActionWork<TInput> : ITriggeredWork<TInput>
     {
-        new IWork<TInput> Work { get; }
+        new IActionWork<TInput> Work { get; }
         IWorker<TInput> Worker { get; }
     }
 
     /// <summary>
     /// Work that has been triggered and submitted to a <see cref="IWorkRunner" />.
     /// </summary>
-    public interface ITriggeredWork<TInput, TOutput> : ITriggeredWorkBase<TInput>
+    public interface ITriggeredFuncWork<TInput, TOutput> : ITriggeredWork<TInput>
     {
-        new IWork<TInput, TOutput> Work { get; }
+        new IFuncWork<TInput, TOutput> Work { get; }
         IWorker<TInput, TOutput> Worker { get; }
         TOutput Output { get; }
     }

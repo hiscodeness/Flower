@@ -9,20 +9,20 @@ namespace Flower
     {
         WorkRegistryOptions Options { get; }
 
-        IEnumerable<IWorkBase> Works { get; }   
+        IEnumerable<IWork> Works { get; }   
     
-        IWork Register<TInput>(
+        IActionWork Register<TInput>(
            IObservable<TInput> trigger,
            IWorkerResolver workerResolver);
 
-        IWork<TInput> Register<TInput>(
+        IActionWork<TInput> Register<TInput>(
            IObservable<TInput> trigger,
            IWorkerResolver<TInput> workerResolver);
 
-        IWork<TInput, TOutput> Register<TInput, TOutput>(
+        IFuncWork<TInput, TOutput> Register<TInput, TOutput>(
             IObservable<TInput> trigger,
             IWorkerResolver<TInput, TOutput> workerResolver);
         
-        void Unregister(IWorkBase work);
+        void Unregister(IWork work);
     }
 }

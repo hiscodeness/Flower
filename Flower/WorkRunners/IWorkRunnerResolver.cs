@@ -4,6 +4,6 @@ namespace Flower.WorkRunners
 {
     public interface IWorkRunnerResolver
     {
-        IWorkRunner Resolve(IWorkBase work);
+        IWorkRunner Resolve(IWork work);
     }
 }

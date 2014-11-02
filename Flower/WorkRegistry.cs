@@ -11,23 +11,23 @@ namespace Flower
     public sealed class WorkRegistry : IWorkRegistry, IActivatable, ISuspendable, IDisposable
     {
         private bool isDisposed;
-        private readonly BlockingCollection<IWorkBase> works = new BlockingCollection<IWorkBase>();
+        private readonly BlockingCollection<IWork> works = new BlockingCollection<IWork>();
 
         public WorkRegistry(WorkRegistryOptions options = null)
         {
             Options = options ?? WorkRegistryOptions.Default;
         }
 
-        public IEnumerable<IWorkBase> Works
+        public IEnumerable<IWork> Works
         {
-            get { return isDisposed ? Enumerable.Empty<IWorkBase>() : works; }
+            get { return isDisposed ? Enumerable.Empty<IWork>() : works; }
         }
 
         public WorkRegistryOptions Options { get; private set; }
 
-        public IWork Register<TInput>(IObservable<TInput> trigger, IWorkerResolver workerResolver)
+        public IActionWork Register<TInput>(IObservable<TInput> trigger, IWorkerResolver workerResolver)
         {
-            var work = new Work(new WorkRegistration(this, trigger.Select(input => (object)input), workerResolver));
+            var work = new ActionWork(new ActionWorkRegistration(this, trigger.Select(input => (object)input), workerResolver));
             Add(work);
             if (Options.RegisterWorkBehavior == RegisterWorkBehavior.RegisterActivated)
             {
@@ -36,9 +36,9 @@ namespace Flower
             return work;
         }
 
-        public IWork<TInput> Register<TInput>(IObservable<TInput> trigger, IWorkerResolver<TInput> workerResolver)
+        public IActionWork<TInput> Register<TInput>(IObservable<TInput> trigger, IWorkerResolver<TInput> workerResolver)
         {
-            var work = new Work<TInput>(new WorkRegistration<TInput>(this, trigger, workerResolver));
+            var work = new ActionWork<TInput>(new ActionWorkRegistration<TInput>(this, trigger, workerResolver));
             Add(work);
             if(Options.RegisterWorkBehavior == RegisterWorkBehavior.RegisterActivated)
             {
@@ -47,11 +47,11 @@ namespace Flower
             return work;
         }
 
-        public IWork<TInput, TOutput> Register<TInput, TOutput>(
+        public IFuncWork<TInput, TOutput> Register<TInput, TOutput>(
             IObservable<TInput> trigger,
             IWorkerResolver<TInput, TOutput> workerResolver)
         {
-            var work = new Work<TInput, TOutput>(new WorkRegistration<TInput, TOutput>(this, trigger, workerResolver));
+            var work = new FuncWork<TInput, TOutput>(new FuncWorkRegistration<TInput, TOutput>(this, trigger, workerResolver));
             Add(work);
             if(Options.RegisterWorkBehavior == RegisterWorkBehavior.RegisterActivated)
             {
@@ -60,7 +60,7 @@ namespace Flower
             return work;
         }
 
-        public void Unregister(IWorkBase work)
+        public void Unregister(IWork work)
         {
             if (work == null) throw new ArgumentNullException("work");
 
@@ -104,12 +104,12 @@ namespace Flower
             works.Dispose();
         }
 
-        private void Add<TWork>(TWork work) where TWork : IWorkBase
+        private void Add<TWork>(TWork work) where TWork : IWork
         {
             works.Add(work);
         }
 
-        private void Remove(IWorkBase work)
+        private void Remove(IWork work)
         {
             works.TryTake(out work);
         }

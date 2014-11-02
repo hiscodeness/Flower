@@ -2,36 +2,36 @@ using System;
 
 namespace Flower.Works
 {
-    public interface IWorkBase: IActivatable, ISuspendable, IUnregistrable
+    public interface IWork: IActivatable, ISuspendable, IUnregistrable
     {
         WorkState State { get; }
-        IWorkRegistrationBase Registration { get; }
+        IWorkRegistration Registration { get; }
     }
 
-    public interface IWorkBase<out TInput> : IWorkBase
-    {
-        new IWorkRegistrationBase<TInput> Registration { get; }
-    }
-
-    public interface IWork : IWorkBase<object>
-    {
-        new IWorkRegistration Registration { get; }
-        IObservable<ITriggeredWork> Triggered { get; }
-        IObservable<ITriggeredWork> Executed { get; }
-    }
-
-    public interface IWork<TInput> : IWorkBase<TInput>
+    public interface IWork<out TInput> : IWork
     {
         new IWorkRegistration<TInput> Registration { get; }
-        IObservable<ITriggeredWork<TInput>> Triggered { get; }
-        IObservable<ITriggeredWork<TInput>> Executed { get; }
     }
 
-    public interface IWork<TInput, TOutput> : IWorkBase<TInput>
+    public interface IActionWork : IWork<object>
     {
-        new IWorkRegistration<TInput, TOutput> Registration { get; }
-        IObservable<ITriggeredWork<TInput, TOutput>> Triggered { get; }
-        IObservable<ITriggeredWork<TInput, TOutput>> Executed { get; }
+        new IActionWorkRegistration Registration { get; }
+        IObservable<ITriggeredActionWork> Triggered { get; }
+        IObservable<ITriggeredActionWork> Executed { get; }
+    }
+
+    public interface IActionWork<TInput> : IWork<TInput>
+    {
+        new IActionWorkRegistration<TInput> Registration { get; }
+        IObservable<ITriggeredActionWork<TInput>> Triggered { get; }
+        IObservable<ITriggeredActionWork<TInput>> Executed { get; }
+    }
+
+    public interface IFuncWork<TInput, TOutput> : IWork<TInput>
+    {
+        new IFuncWorkRegistration<TInput, TOutput> Registration { get; }
+        IObservable<ITriggeredFuncWork<TInput, TOutput>> Triggered { get; }
+        IObservable<ITriggeredFuncWork<TInput, TOutput>> Executed { get; }
         IObservable<TOutput> Output { get; }
     }
 }

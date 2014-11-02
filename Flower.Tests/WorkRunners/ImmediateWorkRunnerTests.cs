@@ -26,7 +26,7 @@ namespace Flower.Tests.WorkRunners
             // Arrange
             var workRunner = new ImmediateWorkRunner();
             var result = workRunner.RunningWorks;
-            var work = A.Fake<ITriggeredWork>();
+            var work = A.Fake<ITriggeredActionWork>();
             A.CallTo(() => work.Execute()).Invokes(_ => result = workRunner.RunningWorks.ToList());
 
             // Act
@@ -41,7 +41,7 @@ namespace Flower.Tests.WorkRunners
         {
             // Arrange
             var workRunner = new ImmediateWorkRunner();
-            var work = A.Fake<ITriggeredWork>();
+            var work = A.Fake<ITriggeredActionWork>();
             A.CallTo(() => work.Execute()).Invokes(_ => workRunner.Dispose());
 
             // Act, Assert

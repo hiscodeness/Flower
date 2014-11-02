@@ -4,7 +4,7 @@ using Flower.Works;
 
 namespace Flower.Tests.TestDoubles
 {
-    internal class TestWorkIntToIntSquared : IWork<int, int>, IDisposable
+    internal class TestWorkIntToIntSquared : IFuncWork<int, int>, IDisposable
     {
         private readonly TestWorkRegistration registration = new TestWorkRegistration();
         private readonly Subject<int> output = new Subject<int>(); 
@@ -30,13 +30,13 @@ namespace Flower.Tests.TestDoubles
             output.Dispose();
         }
 
-        public IWorkRegistration<int, int> Registration { get { return registration; } }
+        public IFuncWorkRegistration<int, int> Registration { get { return registration; } }
         public WorkState State { get; private set; }
-        IWorkRegistrationBase<int> IWorkBase<int>.Registration { get { return Registration; } }
-        IWorkRegistrationBase IWorkBase.Registration { get { return Registration; } }
-        IObservable<ITriggeredWork<int, int>> IWork<int, int>.Executed { get { return null; } }
+        IWorkRegistration<int> IWork<int>.Registration { get { return Registration; } }
+        IWorkRegistration IWork.Registration { get { return Registration; } }
+        IObservable<ITriggeredFuncWork<int, int>> IFuncWork<int, int>.Executed { get { return null; } }
         public IObservable<int> Output { get { return output; } }
-        IObservable<ITriggeredWork<int, int>> IWork<int, int>.Triggered { get { return null; } }
+        IObservable<ITriggeredFuncWork<int, int>> IFuncWork<int, int>.Triggered { get { return null; } }
         public void Unregister()
         {
             throw new NotImplementedException();
