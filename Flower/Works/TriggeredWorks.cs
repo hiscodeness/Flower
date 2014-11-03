@@ -17,7 +17,7 @@ namespace Flower.Works
             WorkRunner = workRunner;
             this.work = work;
             Input = input;
-            State = TriggeredWorkState.Created;
+            State = TriggeredWorkState.Pending;
         }
 
         public void Execute()
@@ -32,7 +32,7 @@ namespace Flower.Works
             }
             catch (Exception e)
             {
-                State = TriggeredWorkState.Failure;
+                State = TriggeredWorkState.Error;
                 work.WorkerErrored(e);
                 State = TriggeredWorkState.Success;
             }
