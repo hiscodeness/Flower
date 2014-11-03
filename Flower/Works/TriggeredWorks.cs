@@ -3,146 +3,156 @@ using Flower.WorkRunners;
 
 namespace Flower.Works
 {
-    internal class TriggeredActionWork : ITriggeredActionWork
+    internal abstract class TriggeredWork<TInput> : ITriggeredWork<TInput>
+    {
+        private readonly IRegisteredWork<TInput> work; 
+        public TriggeredWorkState State { get; private set; }
+        public IWork<TInput> Work { get { return work; } }
+        public TInput Input { get; private set; }
+        IWork ITriggeredWork.Work { get { return Work; } }
+        public IWorkRunner WorkRunner { get; private set; }
+
+        protected TriggeredWork(IWorkRunner workRunner, IRegisteredWork<TInput> work, TInput input)
+        {
+            WorkRunner = workRunner;
+            this.work = work;
+            Input = input;
+            State = TriggeredWorkState.Created;
+        }
+
+        public void Execute()
+        {
+            try
+            {
+                State = TriggeredWorkState.Executing;
+                ResolveWorker();
+                ExecuteWorker();
+                ReleaseWorker();
+                State = TriggeredWorkState.Success;
+            }
+            catch (Exception e)
+            {
+                State = TriggeredWorkState.Failure;
+                work.WorkerErrored(e);
+                State = TriggeredWorkState.Success;
+            }
+            finally
+            {
+                if (State == TriggeredWorkState.Success)
+                {
+                    WorkerExecuted();
+                }
+            }
+        }
+
+        protected abstract void ResolveWorker();
+        protected abstract void ExecuteWorker();
+        protected abstract void ReleaseWorker();
+        protected abstract void WorkerExecuted();
+    }
+
+    internal class TriggeredActionWork : TriggeredWork<object>, ITriggeredActionWork
     {
         private readonly IRegisteredActionWork work;
 
         public TriggeredActionWork(IWorkRunner workRunner, IRegisteredActionWork work, object input)
+            : base(workRunner, work, input)
         {
-            WorkRunner = workRunner;
             this.work = work;
-            Input = input;
-            State = TriggeredWorkState.Created;
         }
 
-        public TriggeredWorkState State { get; private set; }
-        public IWork<object> Work { get { return work; } }
         public IWorker Worker { get; private set; }
-        public object Input { get; private set; }
 
-        IWork ITriggeredWork.Work
+        protected override void ResolveWorker()
         {
-            get { return Work; }
+            Worker = work.Registration.WorkerResolver.Resolve();
         }
 
-        public IWorkRunner WorkRunner { get; private set; }
-
-        public void Execute()
+        protected override void ExecuteWorker()
         {
-            try
-            {
-                State = TriggeredWorkState.Executing;
-                Worker = work.Registration.WorkerResolver.Resolve();
-                Worker.Execute();
-                work.Registration.WorkerResolver.Release(Worker);
-                State = TriggeredWorkState.Success;
-            }
-            catch (Exception e)
-            {
-                State = TriggeredWorkState.Failure;
-                work.WorkerErrored(e);
-                State = TriggeredWorkState.Success;
-            }
-            finally
-            {
-                if (State == TriggeredWorkState.Success)
-                {
-                    work.WorkerExecuted(this);
-                }
-            }
+            Worker.Execute();
+        }
+
+        protected override void ReleaseWorker()
+        {
+            work.Registration.WorkerResolver.Release(Worker);
+        }
+
+        protected override void WorkerExecuted()
+        {
+            work.WorkerExecuted(this);
         }
     }
 
-    internal class TriggeredActionWork<TInput> : ITriggeredActionWork<TInput>
+    internal class TriggeredActionWork<TInput> : TriggeredWork<TInput>, ITriggeredActionWork<TInput>
     {
         private readonly IRegisteredActionWork<TInput> work;
 
         public TriggeredActionWork(IWorkRunner workRunner, IRegisteredActionWork<TInput> work, TInput input)
+            : base(workRunner, work, input)
         {
-            WorkRunner = workRunner;
             this.work = work;
-            Input = input;
-            State = TriggeredWorkState.Created;
         }
 
-        public TriggeredWorkState State { get; private set; }
         IWork ITriggeredWork.Work { get { return Work; } }
         IWork<TInput> ITriggeredWork<TInput>.Work { get { return Work; } }
-        public IActionWork<TInput> Work { get { return work; } }
+        public new IActionWork<TInput> Work { get { return work; } }
         public IWorker<TInput> Worker { get; private set; }
-        public TInput Input { get; private set; }
-        public IWorkRunner WorkRunner { get; private set; }
 
-        public void Execute()
+        protected override void ResolveWorker()
         {
-            try
-            {
-                State = TriggeredWorkState.Executing;
-                Worker = work.Registration.WorkerResolver.Resolve(Input);
-                Worker.Execute(Input);
-                work.Registration.WorkerResolver.Release(Worker);
-                State = TriggeredWorkState.Success;
-            }
-            catch (Exception e)
-            {
-                State = TriggeredWorkState.Failure;
-                work.WorkerErrored(e);
-                State = TriggeredWorkState.Success;
-            }
-            finally
-            {
-                if (State == TriggeredWorkState.Success)
-                {
-                    work.WorkerExecuted(this);
-                }
-            }
+            Worker = work.Registration.WorkerResolver.Resolve(Input);
+        }
+
+        protected override void ExecuteWorker()
+        {
+            Worker.Execute(Input);
+        }
+
+        protected override void ReleaseWorker()
+        {
+            work.Registration.WorkerResolver.Release(Worker);
+        }
+
+        protected override void WorkerExecuted()
+        {
+            work.WorkerExecuted(this);
         }
     }
 
-    internal class TriggeredFuncWork<TInput, TOutput> : ITriggeredFuncWork<TInput, TOutput>
+    internal class TriggeredFuncWork<TInput, TOutput> : TriggeredWork<TInput>, ITriggeredFuncWork<TInput, TOutput>
     {
         private readonly IRegisteredFuncWork<TInput, TOutput> work;
 
-        public TriggeredFuncWork(IWorkRunner workRunner, IRegisteredFuncWork<TInput, TOutput> work, TInput input)
+        public TriggeredFuncWork(IWorkRunner workRunner, IRegisteredFuncWork<TInput, TOutput> work, TInput input) : base(workRunner, work, input)
         {
-            WorkRunner = workRunner;
             this.work = work;
-            Input = input;
-            State = TriggeredWorkState.Created;
         }
 
-        public TriggeredWorkState State { get; private set; }
         IWork ITriggeredWork.Work { get { return Work; } }
         IWork<TInput> ITriggeredWork<TInput>.Work { get { return Work; } }
-        public IFuncWork<TInput, TOutput> Work { get { return work; } }
+        public new IFuncWork<TInput, TOutput> Work { get { return work; } }
         public IWorker<TInput, TOutput> Worker { get; private set; }
-        public TInput Input { get; private set; }
         public TOutput Output { get; private set; }
-        public IWorkRunner WorkRunner { get; private set; }
 
-        public void Execute()
+        protected override void ResolveWorker()
         {
-            try
-            {
-                State = TriggeredWorkState.Executing;
-                Worker = work.Registration.WorkerResolver.Resolve(Input);
-                Output = Worker.Execute(Input);
-                work.Registration.WorkerResolver.Release(Worker);
-                State = TriggeredWorkState.Success;
-            }
-            catch (Exception e)
-            {
-                State = TriggeredWorkState.Failure;
-                work.WorkerErrored(e);
-                State = TriggeredWorkState.Success;
-            }
-            finally
-            {
-                if (State == TriggeredWorkState.Success)
-                {
-                    work.WorkerExecuted(this);
-                }
-            }
+            Worker = work.Registration.WorkerResolver.Resolve(Input);
+        }
+
+        protected override void ExecuteWorker()
+        {
+            Output = Worker.Execute(Input);
+        }
+
+        protected override void ReleaseWorker()
+        {
+            work.Registration.WorkerResolver.Release(Worker);
+        }
+
+        protected override void WorkerExecuted()
+        {
+            work.WorkerExecuted(this);
         }
     }
 }
