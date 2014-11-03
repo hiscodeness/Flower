@@ -5,7 +5,7 @@ using Flower.WorkRunners;
 
 namespace Flower.Works
 {
-    internal abstract class Work<TInput> : IRegisteredWork<TInput>, IWork<TInput>
+    internal abstract class Work<TInput> : IRegisteredWork<TInput>
     {
         private IDisposable triggerSubscription;
 
