@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive;
-using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Flower.Tests.TestDoubles;
 using Xunit;
@@ -17,7 +15,7 @@ namespace Flower.Tests.Works
             // Arrange
             var workRegistry = WorkRegistryFactory.CreateAutoActivating();
             var trigger = new Subject<int>();
-            var work = workRegistry.Register(trigger, TestWorkers.IntSquaredWorker);
+            var work = workRegistry.Register(trigger, new TestWorkerIntToIntSquared());
             var outputs = new List<int>();
             work.Triggered.Subscribe(w => outputs.Add(w.Output));
             work.Executed.Subscribe(w => outputs.Add(w.Output));
@@ -35,7 +33,7 @@ namespace Flower.Tests.Works
             // Arrange
             var workRegistry = WorkRegistryFactory.CreateAutoActivating();
             var trigger = new Subject<int>();
-            var work = workRegistry.Register(trigger, TestWorkers.IntSquaredWorker);
+            var work = workRegistry.Register(trigger, new TestWorkerIntToIntSquared());
             var outputs = new List<int>();
             work.Triggered.Subscribe(w => outputs.Add(w.Output));
             work.Executed.Subscribe(w => outputs.Add(w.Output));
@@ -44,7 +42,7 @@ namespace Flower.Tests.Works
             trigger.OnNext(2);
 
             // Assert
-            Assert.Equal(TestWorkerIntSquared.WorkerFunc(2), outputs.Last());
+            Assert.Equal(TestWorkerIntToIntSquared.WorkerFunc(2), outputs.Last());
         }
     }
 }

@@ -10,13 +10,13 @@ namespace Flower.WorkRunners
     /// </summary>
     public sealed class ImmediateWorkRunner : IWorkRunner, IDisposable
     {
-        private readonly BlockingCollection<ITriggeredWorkBase> runningWorks =
-            new BlockingCollection<ITriggeredWorkBase>();
+        private readonly BlockingCollection<ITriggeredWork> runningWorks =
+            new BlockingCollection<ITriggeredWork>();
 
         /// <summary>
         /// Gets the works still pending with the work runner.
         /// </summary>
-        public IEnumerable<ITriggeredWorkBase> PendingWorks
+        public IEnumerable<ITriggeredWork> PendingWorks
         {
             get { yield break; }
         }
@@ -24,7 +24,7 @@ namespace Flower.WorkRunners
         /// <summary>
         /// Gets the currently running active works.
         /// </summary>
-        public IEnumerable<ITriggeredWorkBase> RunningWorks
+        public IEnumerable<ITriggeredWork> RunningWorks
         {
             get { return runningWorks; }
         }
@@ -34,7 +34,7 @@ namespace Flower.WorkRunners
             runningWorks.Dispose();
         }
 
-        public void Submit(ITriggeredWorkBase triggeredWork)
+        public void Submit(ITriggeredWork triggeredWork)
         {
             runningWorks.Add(triggeredWork);
             triggeredWork.Execute();

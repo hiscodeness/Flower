@@ -1,32 +1,37 @@
 using System;
-using Flower.Workers;
 
 namespace Flower.Works
 {
-    public interface IWorkBase: IActivatable, ISuspendable, IUnregistrable
+    public interface IWork: IActivatable, ISuspendable, IUnregistrable
     {
-        WorkState State { get; }        
-    }
-
-    public interface IWork : IWorkBase
-    {
+        WorkState State { get; }
         IWorkRegistration Registration { get; }
-        IObservable<ITriggeredWork> Triggered { get; }
-        IObservable<ITriggeredWork> Executed { get; }
     }
 
-    public interface IWork<TInput> : IWorkBase
+    public interface IWork<out TInput> : IWork
     {
-        IWorkRegistration<TInput> Registration { get; }
-        IObservable<ITriggeredWork<TInput>> Triggered { get; }
-        IObservable<ITriggeredWork<TInput>> Executed { get; }
+        new IWorkRegistration<TInput> Registration { get; }
     }
 
-    public interface IWork<TInput, TOutput> : IWorkBase
+    public interface IActionWork : IWork<object>
     {
-        IWorkRegistration<TInput, TOutput> Registration { get; }
-        IObservable<ITriggeredWork<TInput, TOutput>> Triggered { get; }
-        IObservable<ITriggeredWork<TInput, TOutput>> Executed { get; }
+        new IActionWorkRegistration Registration { get; }
+        IObservable<ITriggeredActionWork> Triggered { get; }
+        IObservable<ITriggeredActionWork> Executed { get; }
+    }
+
+    public interface IActionWork<TInput> : IWork<TInput>
+    {
+        new IActionWorkRegistration<TInput> Registration { get; }
+        IObservable<ITriggeredActionWork<TInput>> Triggered { get; }
+        IObservable<ITriggeredActionWork<TInput>> Executed { get; }
+    }
+
+    public interface IFuncWork<TInput, TOutput> : IWork<TInput>
+    {
+        new IFuncWorkRegistration<TInput, TOutput> Registration { get; }
+        IObservable<ITriggeredFuncWork<TInput, TOutput>> Triggered { get; }
+        IObservable<ITriggeredFuncWork<TInput, TOutput>> Executed { get; }
         IObservable<TOutput> Output { get; }
     }
 }

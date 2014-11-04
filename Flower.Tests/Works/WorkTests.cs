@@ -1,53 +1,44 @@
 ﻿using System;
 using System.Reactive.Subjects;
+using FakeItEasy;
 using Flower.Tests.TestDoubles;
+using Flower.Works;
 using Xunit;
 
 namespace Flower.Tests.Works
 {
-    public class WorkTests
+    public partial class WorkTests
     {
         [Fact]
-        public void UnregisteredWorkCannotBeActivated()
+        public void CanRegisterWorkerWithoutInput()
         {
             // Arrange
-            var subject = new Subject<int>();
-            var workRegistry = WorkRegistryFactory.CreateAutoActivating();
-            var work = workRegistry.Register(subject, TestWorkers.IntSquaredWorker);
-            workRegistry.Unregister(work);
+            var workRegistry = new WorkRegistry();
+            var trigger = A.Fake<IObservable<int>>();
+            var worker = A.Fake<IWorker>();
 
-            // Act/Assert
-            Assert.Throws<InvalidOperationException>(() => work.Activate());
+            // Act
+            var work = workRegistry.Register(trigger, worker);
+
+            // Assert
+            Assert.Equal(worker, work.Registration.WorkerResolver.Resolve());
         }
 
         [Fact]
-        public void PipingWorkOutputToWorkerInputSucceeds()
+        public void WorkTriggered()
         {
             // Arrange
-            var work = TestWorks.IntSquaredWork;
-            var worker = TestWorkers.IntSquaredWorker;
+            var trigger = new Subject<int>();
+            var registry = WorkRegistryFactory.CreateAutoActivating();
+            var work = registry.Register(trigger, new TestWorker());
+            ITriggeredActionWork triggeredWork = null;
 
             // Act
-            var pipedWork = work.Pipe(worker);
+            work.Triggered.Subscribe(tw => triggeredWork = tw);
+            trigger.OnNext(42);
 
             // Assert
-            Assert.NotNull(pipedWork.Registration.Trigger);
-            Assert.Equal(work.Output, pipedWork.Registration.Trigger);
-        }
-
-        [Fact]
-        public void PipingWorkOutputToWorkerResolverInputSucceeds()
-        {
-            // Arrange
-            var work = TestWorks.IntSquaredWork;
-            var workerResolver = TestWorkerResolvers.IntSquaredWorkerResolver;
-
-            // Act
-            var pipedWork = work.Pipe(workerResolver);
-
-            // Assert
-            Assert.NotNull(pipedWork.Registration.Trigger);
-            Assert.Equal(work.Output, pipedWork.Registration.Trigger);
+            Assert.NotNull(triggeredWork);
         }
     }
 }

@@ -3,26 +3,29 @@ using Flower.Workers;
 
 namespace Flower.Works
 {
-    public interface IWorkRegistrationBase : IDisposable
+    public interface IWorkRegistration
     {
         IWorkRegistry WorkRegistry { get; }
+        WorkRegistryOptions Options { get; }
     }
 
-    public interface IWorkRegistration : IWorkRegistrationBase
+    public interface IWorkRegistration<out TInput> : IWorkRegistration
     {
-        IObservable<object> Trigger { get; }
+        IObservable<TInput> Trigger { get; }
+    }
+
+    public interface IActionWorkRegistration : IWorkRegistration<object>
+    {
         IWorkerResolver WorkerResolver { get; }
     }
 
-    public interface IWorkRegistration<TInput> : IWorkRegistrationBase
+    public interface IActionWorkRegistration<TInput> : IWorkRegistration<TInput>
     {
-        IObservable<TInput> Trigger { get; }
         IWorkerResolver<TInput> WorkerResolver { get; }
     }
 
-    public interface IWorkRegistration<TInput, TOutput> : IWorkRegistrationBase
+    public interface IFuncWorkRegistration<TInput, TOutput> : IWorkRegistration<TInput>
     {
-        IObservable<TInput> Trigger { get; }
         IWorkerResolver<TInput, TOutput> WorkerResolver { get; }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using Flower.WorkRunners;
 
 namespace Flower
@@ -60,6 +61,11 @@ namespace Flower
 
         public WorkRegistryOptions With(IWorkRunnerResolver workRunnerResolver)
         {
+            if (workRunnerResolver == null)
+            {
+                throw new ArgumentNullException("workRunnerResolver");
+            }
+
             return new WorkRegistryOptions(RegisterWorkBehavior,
                                            TriggerErrorBehavior,
                                            workRunnerResolver,

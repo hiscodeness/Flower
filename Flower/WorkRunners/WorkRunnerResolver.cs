@@ -4,7 +4,7 @@ namespace Flower.WorkRunners
 {
     internal class DefaultWorkRunnerResolver : IWorkRunnerResolver
     {
-        public IWorkRunner Resolve(IWorkBase work)
+        public IWorkRunner Resolve(IWork work)
         {
             return new ImmediateWorkRunner();
         }

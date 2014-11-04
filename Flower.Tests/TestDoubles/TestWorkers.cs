@@ -1,16 +1,32 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 
 namespace Flower.Tests.TestDoubles
 {
-    internal static class TestWorkers
+    internal class TestWorker : IWorker
     {
-        internal static readonly TestWorkerIntSquared IntSquaredWorker = new TestWorkerIntSquared();
-        internal static readonly TestWorkerInt2String Int2StringWorker = new TestWorkerInt2String();
-        internal static readonly TestWorkerString2Int String2IntWorker = new TestWorkerString2Int();
+        public void Execute()
+        {
+            ExecuteCount++;
+        }
+
+        public int ExecuteCount { get; private set; }
     }
 
-    internal class TestWorkerIntSquared : IWorker<int, int>
+    internal class TestWorkerInt : IWorker<int>
+    {
+        readonly List<int> inputs = new List<int>(); 
+
+        public void Execute(int input)
+        {
+            inputs.Add(input);
+        }
+
+        public IEnumerable<int> Inputs { get { return inputs; } } 
+    }
+
+    internal class TestWorkerIntToIntSquared : IWorker<int, int>
     {
         public static readonly Func<int, int> WorkerFunc = i => i * i;
 
@@ -20,7 +36,7 @@ namespace Flower.Tests.TestDoubles
         }
     }
 
-    internal class TestWorkerInt2String : IWorker<int, string>
+    internal class TestWorkerIntToString : IWorker<int, string>
     {
         public string Execute(int input)
         {
@@ -28,7 +44,7 @@ namespace Flower.Tests.TestDoubles
         }
     }
 
-    internal class TestWorkerString2Int : IWorker<string, int>
+    internal class TestWorkerStringToInt : IWorker<string, int>
     {
         public int Execute(string input)
         {

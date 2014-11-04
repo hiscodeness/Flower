@@ -8,28 +8,23 @@ namespace Flower.Works
     public enum TriggeredWorkState
     {
         /// <summary>
-        /// The triggered work has been created but not yet submitted to be run on a <see cref="IWorkRunner" />.
+        /// The work has been triggered and will be (or has been) submitted on a <see cref="IWorkRunner" />.
         /// </summary>
-        Created,
+        Pending,
 
         /// <summary>
-        /// The work has been triggered and submitted to be run on a <see cref="IWorkRunner" />.
-        /// </summary>
-        Submitted,
-
-        /// <summary>
-        /// The work has been started by a <see cref="IWorkRunner" /> and it is currently running.
+        /// The is being executed by a <see cref="IWorkRunner" />.
         /// </summary>
         Executing,
 
         /// <summary>
-        /// The work was run and finished succesfully.
+        /// The work was executed and finished succesfully.
         /// </summary>
         Success,
 
         /// <summary>
-        /// The work was run and failed (threw an exception).
+        /// The work was executed and errored (threw an exception).
         /// </summary>
-        Failure
+        Error
     }
 }

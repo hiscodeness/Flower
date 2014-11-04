@@ -1,14 +1,16 @@
-﻿namespace Flower.Workers
+﻿using System;
+
+namespace Flower.Workers
 {
     public interface IWorkerResolver
     {
         void Release(IWorker worker);
         IWorker Resolve();
     }
-
+    
     public interface IWorkerResolver<TInput>
     {
-        void Release(IWorker<TInput> input);
+        void Release(IWorker<TInput> worker);
         IWorker<TInput> Resolve(TInput input);
     }
 
