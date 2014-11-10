@@ -27,6 +27,7 @@ namespace Flower.Works
         {
         } 
     }
+
     internal class WorkObservablesHelper<TWork, TTriggeredWork, TExecutableWork>
         where TWork : IRegisteredWork where TTriggeredWork : ITriggeredWork where TExecutableWork : IExecutableWork
     {
