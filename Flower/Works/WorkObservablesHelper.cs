@@ -4,6 +4,29 @@ using System.Reactive.Linq;
 
 namespace Flower.Works
 {
+    internal class ActionWorkObservablesHelper : WorkObservablesHelper<IRegisteredActionWork, ITriggeredActionWork, IExecutableActionWork>
+    {
+        public ActionWorkObservablesHelper(IRegisteredActionWork work)
+            : base(work)
+        {
+        }
+    }
+
+    internal class ActionWorkObservablesHelper<TInput> : WorkObservablesHelper<IRegisteredActionWork<TInput>, ITriggeredActionWork<TInput>, IExecutableActionWork<TInput>>
+    {
+        public ActionWorkObservablesHelper(IRegisteredActionWork<TInput> work)
+            : base(work)
+        {
+        }
+    }
+
+    internal class FuncWorkObservablesHelper<TInput, TOutput> : WorkObservablesHelper<IRegisteredFuncWork<TInput, TOutput>, ITriggeredFuncWork<TInput, TOutput>, IExecutableFuncWork<TInput, TOutput>>
+    {
+        public FuncWorkObservablesHelper(IRegisteredFuncWork<TInput, TOutput> work)
+            : base(work)
+        {
+        } 
+    }
     internal class WorkObservablesHelper<TWork, TTriggeredWork, TExecutableWork>
         where TWork : IRegisteredWork where TTriggeredWork : ITriggeredWork where TExecutableWork : IExecutableWork
     {

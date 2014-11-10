@@ -108,13 +108,13 @@ namespace Flower.Works
 
     internal class ActionWork : Work<object>, IRegisteredActionWork
     {
-        private readonly WorkObservablesHelper<IRegisteredActionWork, ITriggeredActionWork, IExecutableActionWork> observables;
+        private readonly ActionWorkObservablesHelper observables;
 
         public ActionWork(IActionWorkRegistration registration)
             : base(registration)
         {
             Registration = registration;
-            observables = new WorkObservablesHelper<IRegisteredActionWork, ITriggeredActionWork, IExecutableActionWork>(this);
+            observables = new ActionWorkObservablesHelper(this);
         }
 
         new public IActionWorkRegistration Registration { get; private set; }
@@ -139,13 +139,13 @@ namespace Flower.Works
 
     internal class ActionWork<TInput> : Work<TInput>, IRegisteredActionWork<TInput>
     {
-        private readonly WorkObservablesHelper<IRegisteredActionWork<TInput>, ITriggeredActionWork<TInput>, IExecutableActionWork<TInput>> observables;
+        private readonly ActionWorkObservablesHelper<TInput> observables;
 
         public ActionWork(IActionWorkRegistration<TInput> registration)
             : base(registration)
         {
             Registration = registration;
-            observables = new WorkObservablesHelper<IRegisteredActionWork<TInput>, ITriggeredActionWork<TInput>, IExecutableActionWork<TInput>>(this);
+            observables = new ActionWorkObservablesHelper<TInput>(this);
         }
 
         new public IActionWorkRegistration<TInput> Registration { get; private set; }
@@ -170,13 +170,13 @@ namespace Flower.Works
 
     internal class FuncWork<TInput, TOutput> : Work<TInput>, IRegisteredFuncWork<TInput, TOutput>
     {
-        private readonly WorkObservablesHelper<IRegisteredFuncWork<TInput, TOutput>, ITriggeredFuncWork<TInput, TOutput>, IExecutableFuncWork<TInput, TOutput>> observables;
+        private readonly FuncWorkObservablesHelper<TInput, TOutput> observables;
 
         public FuncWork(IFuncWorkRegistration<TInput, TOutput> registration)
             : base(registration)
         {
             Registration = registration;
-            observables = new WorkObservablesHelper<IRegisteredFuncWork<TInput, TOutput>, ITriggeredFuncWork<TInput, TOutput>, IExecutableFuncWork<TInput, TOutput>>(this);
+            observables = new FuncWorkObservablesHelper<TInput, TOutput>(this);
             Output = Executed.Select(executedWork => executedWork.Output);
         }
 
