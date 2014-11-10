@@ -17,7 +17,7 @@ namespace Flower.Tests.WorkRunners
 
             // Assert
             Assert.Empty(workRunner.PendingWorks);
-            Assert.Empty(workRunner.RunningWorks);
+            Assert.Empty(workRunner.ExecutingWorks);
         }
 
         [Fact]
@@ -25,9 +25,9 @@ namespace Flower.Tests.WorkRunners
         {
             // Arrange
             var workRunner = new ImmediateWorkRunner();
-            var result = workRunner.RunningWorks;
-            var work = A.Fake<ITriggeredActionWork>();
-            A.CallTo(() => work.Execute()).Invokes(_ => result = workRunner.RunningWorks.ToList());
+            var result = workRunner.ExecutingWorks;
+            var work = A.Fake<IExecutableActionWork>();
+            A.CallTo(() => work.Execute()).Invokes(_ => result = workRunner.ExecutingWorks.ToList());
 
             // Act
             workRunner.Submit(work);
@@ -41,7 +41,7 @@ namespace Flower.Tests.WorkRunners
         {
             // Arrange
             var workRunner = new ImmediateWorkRunner();
-            var work = A.Fake<ITriggeredActionWork>();
+            var work = A.Fake<IExecutableActionWork>();
             A.CallTo(() => work.Execute()).Invokes(_ => workRunner.Dispose());
 
             // Act, Assert

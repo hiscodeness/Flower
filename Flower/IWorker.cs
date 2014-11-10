@@ -1,15 +1,7 @@
-﻿using Flower.WorkRunners;
-
-namespace Flower
+﻿namespace Flower
 {
-    /// <summary>
-    /// A worker that can be registered to execute on a <see cref="IWorkRunner"/> after having been triggered.
-    /// </summary>
     public interface IWorker
     {
-        /// <summary>
-        /// Executes the work.
-        /// </summary>
         void Execute();
     }
 

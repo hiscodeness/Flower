@@ -4,8 +4,8 @@ using System.Reactive.Linq;
 
 namespace Flower.Works
 {
-    internal class WorkObservablesHelper<TWork, TTriggeredWork>
-        where TWork : IRegisteredWork where TTriggeredWork : ITriggeredWork
+    internal class WorkObservablesHelper<TWork, TTriggeredWork, TExecutableWork>
+        where TWork : IRegisteredWork where TTriggeredWork : ITriggeredWork where TExecutableWork : IExecutableWork
     {
         private readonly WorkTriggeredHelper workTriggeredHelper;
         private readonly WorkExecutedHelper workExecutedHelper;
@@ -17,14 +17,14 @@ namespace Flower.Works
         }
 
         public IObservable<TTriggeredWork> WorkTriggered { get { return workTriggeredHelper.WorkTriggered; } }
-        public IObservable<TTriggeredWork> WorkExecuted { get { return workExecutedHelper.WorkExecuted; } }
+        public IObservable<TExecutableWork> WorkExecuted { get { return workExecutedHelper.WorkExecuted; } }
 
         public void RaiseWorkTriggered(TTriggeredWork triggeredWork)
         {
             workTriggeredHelper.RaiseTriggered(triggeredWork);
         }
 
-        public void RaiseWorkExecuted(TTriggeredWork triggeredWork)
+        public void RaiseWorkExecuted(TExecutableWork triggeredWork)
         {
             workExecutedHelper.RaiseWorkExecuted(triggeredWork);
         }
@@ -69,7 +69,7 @@ namespace Flower.Works
         private class WorkExecutedHelper
         {
             private readonly TWork work;
-            private event Action<TTriggeredWork> workExecuted;
+            private event Action<TExecutableWork> workExecuted;
 
             public WorkExecutedHelper(TWork work)
             {
@@ -77,19 +77,19 @@ namespace Flower.Works
                 WorkExecuted = Observable.Create(CreateExecutedSubscription());
             }
 
-            public IObservable<TTriggeredWork> WorkExecuted { get; private set; }
+            public IObservable<TExecutableWork> WorkExecuted { get; private set; }
 
-            public void RaiseWorkExecuted(TTriggeredWork triggeredWork)
+            public void RaiseWorkExecuted(TExecutableWork triggeredWork)
             {
                 OnWorkExecuted(triggeredWork);
             }
 
-            private Func<IObserver<TTriggeredWork>, IDisposable> CreateExecutedSubscription()
+            private Func<IObserver<TExecutableWork>, IDisposable> CreateExecutedSubscription()
             {
                 return CreateExecutedSubscription;
             }
 
-            private IDisposable CreateExecutedSubscription(IObserver<TTriggeredWork> observer)
+            private IDisposable CreateExecutedSubscription(IObserver<TExecutableWork> observer)
             {
                 if (IsWorkCompleted)
                 {
@@ -128,7 +128,7 @@ namespace Flower.Works
                        == TriggerErrorBehavior.CompleteWorkAndForwardError;
             }
 
-            private void OnWorkExecuted(TTriggeredWork triggeredWork)
+            private void OnWorkExecuted(TExecutableWork triggeredWork)
             {
                 var handler = workExecuted;
                 if (handler != null)

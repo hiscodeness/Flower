@@ -6,25 +6,19 @@ using Flower.Works;
 namespace Flower.WorkRunners
 {
     /// <summary>
-    /// A work runner that runs the work immediately after triggering when it is appended.
+    /// A work runner that executes the work immediately after being submitted.
     /// </summary>
     public sealed class ImmediateWorkRunner : IWorkRunner, IDisposable
     {
-        private readonly BlockingCollection<ITriggeredWork> runningWorks =
-            new BlockingCollection<ITriggeredWork>();
+        private readonly BlockingCollection<IExecutableWork> runningWorks =
+            new BlockingCollection<IExecutableWork>();
 
-        /// <summary>
-        /// Gets the works still pending with the work runner.
-        /// </summary>
-        public IEnumerable<ITriggeredWork> PendingWorks
+        public IEnumerable<IExecutableWork> PendingWorks
         {
             get { yield break; }
         }
 
-        /// <summary>
-        /// Gets the currently running active works.
-        /// </summary>
-        public IEnumerable<ITriggeredWork> RunningWorks
+        public IEnumerable<IExecutableWork> ExecutingWorks
         {
             get { return runningWorks; }
         }
@@ -34,11 +28,11 @@ namespace Flower.WorkRunners
             runningWorks.Dispose();
         }
 
-        public void Submit(ITriggeredWork triggeredWork)
+        public void Submit(IExecutableWork executableWork)
         {
-            runningWorks.Add(triggeredWork);
-            triggeredWork.Execute();
-            runningWorks.TryTake(out triggeredWork);
+            runningWorks.Add(executableWork);
+            executableWork.Execute();
+            runningWorks.TryTake(out executableWork);
         }
     }
 }

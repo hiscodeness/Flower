@@ -11,21 +11,21 @@ namespace Flower.Works
 
     internal interface IRegisteredWork<TInput> : IRegisteredWork, IWork<TInput>
     {
-        ITriggeredWork Trigger(IWorkRunner workRunner, TInput input);
+        IExecutableWork Trigger(IWorkRunner workRunner, TInput input);
     }
 
     internal interface IRegisteredActionWork : IRegisteredWork<object>, IActionWork
     {
-        void WorkerExecuted(ITriggeredActionWork triggeredWork);
+        void WorkerExecuted(IExecutableActionWork triggeredWork);
     }
 
     internal interface IRegisteredActionWork<TInput> : IRegisteredWork<TInput>, IActionWork<TInput>
     {
-        void WorkerExecuted(ITriggeredActionWork<TInput> triggeredWork);
+        void WorkerExecuted(IExecutableActionWork<TInput> triggeredWork);
     }
 
     internal interface IRegisteredFuncWork<TInput, TOutput> : IRegisteredWork<TInput>, IFuncWork<TInput, TOutput>
     {
-        void WorkerExecuted(ITriggeredFuncWork<TInput, TOutput> triggeredWork);
+        void WorkerExecuted(IExecutableFuncWork<TInput, TOutput> triggeredWork);
     }
 }

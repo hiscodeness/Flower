@@ -3,42 +3,42 @@ using Flower.WorkRunners;
 
 namespace Flower.Works
 {
-    internal abstract class TriggeredWork<TInput> : ITriggeredWork<TInput>
+    internal abstract class ExecutableWork<TInput> : IExecutableWork<TInput>
     {
         private readonly IRegisteredWork<TInput> work; 
-        public TriggeredWorkState State { get; private set; }
+        public ExecutableWorkState State { get; private set; }
         public IWork<TInput> Work { get { return work; } }
         public TInput Input { get; private set; }
         IWork ITriggeredWork.Work { get { return Work; } }
         public IWorkRunner WorkRunner { get; private set; }
 
-        protected TriggeredWork(IWorkRunner workRunner, IRegisteredWork<TInput> work, TInput input)
+        protected ExecutableWork(IWorkRunner workRunner, IRegisteredWork<TInput> work, TInput input)
         {
             WorkRunner = workRunner;
             this.work = work;
             Input = input;
-            State = TriggeredWorkState.Pending;
+            State = ExecutableWorkState.Pending;
         }
 
         public void Execute()
         {
             try
             {
-                State = TriggeredWorkState.Executing;
+                State = ExecutableWorkState.Executing;
                 ResolveWorker();
                 ExecuteWorker();
                 ReleaseWorker();
-                State = TriggeredWorkState.Success;
+                State = ExecutableWorkState.Success;
             }
             catch (Exception e)
             {
-                State = TriggeredWorkState.Error;
+                State = ExecutableWorkState.Error;
                 work.WorkerErrored(e);
-                State = TriggeredWorkState.Success;
+                State = ExecutableWorkState.Success;
             }
             finally
             {
-                if (State == TriggeredWorkState.Success)
+                if (State == ExecutableWorkState.Success)
                 {
                     WorkerExecuted();
                 }
@@ -51,11 +51,11 @@ namespace Flower.Works
         protected abstract void WorkerExecuted();
     }
 
-    internal class TriggeredActionWork : TriggeredWork<object>, ITriggeredActionWork
+    internal class ExecutableActionWork : ExecutableWork<object>, IExecutableActionWork
     {
         private readonly IRegisteredActionWork work;
 
-        public TriggeredActionWork(IWorkRunner workRunner, IRegisteredActionWork work, object input)
+        public ExecutableActionWork(IWorkRunner workRunner, IRegisteredActionWork work, object input)
             : base(workRunner, work, input)
         {
             this.work = work;
@@ -84,11 +84,11 @@ namespace Flower.Works
         }
     }
 
-    internal class TriggeredActionWork<TInput> : TriggeredWork<TInput>, ITriggeredActionWork<TInput>
+    internal class ExecutableActionWork<TInput> : ExecutableWork<TInput>, IExecutableActionWork<TInput>
     {
         private readonly IRegisteredActionWork<TInput> work;
 
-        public TriggeredActionWork(IWorkRunner workRunner, IRegisteredActionWork<TInput> work, TInput input)
+        public ExecutableActionWork(IWorkRunner workRunner, IRegisteredActionWork<TInput> work, TInput input)
             : base(workRunner, work, input)
         {
             this.work = work;
@@ -120,11 +120,11 @@ namespace Flower.Works
         }
     }
 
-    internal class TriggeredFuncWork<TInput, TOutput> : TriggeredWork<TInput>, ITriggeredFuncWork<TInput, TOutput>
+    internal class ExecutableFuncWork<TInput, TOutput> : ExecutableWork<TInput>, IExecutableFuncWork<TInput, TOutput>
     {
         private readonly IRegisteredFuncWork<TInput, TOutput> work;
 
-        public TriggeredFuncWork(IWorkRunner workRunner, IRegisteredFuncWork<TInput, TOutput> work, TInput input) : base(workRunner, work, input)
+        public ExecutableFuncWork(IWorkRunner workRunner, IRegisteredFuncWork<TInput, TOutput> work, TInput input) : base(workRunner, work, input)
         {
             this.work = work;
         }

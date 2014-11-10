@@ -17,21 +17,21 @@ namespace Flower.Works
     {
         new IActionWorkRegistration Registration { get; }
         IObservable<ITriggeredActionWork> Triggered { get; }
-        IObservable<ITriggeredActionWork> Executed { get; }
+        IObservable<IExecutableActionWork> Executed { get; }
     }
 
     public interface IActionWork<TInput> : IWork<TInput>
     {
         new IActionWorkRegistration<TInput> Registration { get; }
         IObservable<ITriggeredActionWork<TInput>> Triggered { get; }
-        IObservable<ITriggeredActionWork<TInput>> Executed { get; }
+        IObservable<IExecutableActionWork<TInput>> Executed { get; }
     }
 
     public interface IFuncWork<TInput, TOutput> : IWork<TInput>
     {
         new IFuncWorkRegistration<TInput, TOutput> Registration { get; }
         IObservable<ITriggeredFuncWork<TInput, TOutput>> Triggered { get; }
-        IObservable<ITriggeredFuncWork<TInput, TOutput>> Executed { get; }
+        IObservable<IExecutableFuncWork<TInput, TOutput>> Executed { get; }
         IObservable<TOutput> Output { get; }
     }
 }
