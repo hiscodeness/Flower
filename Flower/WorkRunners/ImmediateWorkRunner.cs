@@ -1,17 +1,17 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using Flower.Works;
 
 namespace Flower.WorkRunners
 {
     /// <summary>
-    /// A work runner that executes the work immediately after being submitted.
+    /// A work runner that executes a single work immediately after being submitted.
     /// </summary>
-    public sealed class ImmediateWorkRunner : IWorkRunner, IDisposable
+    public sealed class ImmediateWorkRunner : IWorkRunner
     {
-        private readonly BlockingCollection<IExecutableWork> runningWorks =
-            new BlockingCollection<IExecutableWork>();
+        private IExecutableWork work;
+        private bool isExecuted;
 
         public IEnumerable<IExecutableWork> PendingWorks
         {
@@ -20,19 +20,19 @@ namespace Flower.WorkRunners
 
         public IEnumerable<IExecutableWork> ExecutingWorks
         {
-            get { return runningWorks; }
-        }
-
-        public void Dispose()
-        {
-            runningWorks.Dispose();
+            get { return !isExecuted && work != null ? new[] { work } : Enumerable.Empty<IExecutableWork>(); }
         }
 
         public void Submit(IExecutableWork executableWork)
         {
-            runningWorks.Add(executableWork);
-            executableWork.Execute();
-            runningWorks.TryTake(out executableWork);
+            if (work != null)
+            {
+                throw new InvalidOperationException("Only one work can be submitted.");
+            }
+
+            work = executableWork;
+            work.Execute();
+            isExecuted = true;
         }
     }
 }

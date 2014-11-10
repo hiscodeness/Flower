@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using FakeItEasy;
 using Flower.WorkRunners;
 using Flower.Works;
@@ -34,18 +33,6 @@ namespace Flower.Tests.WorkRunners
 
             // Assert
             Assert.Equal(work, result.Single());
-        }
-
-        [Fact]
-        public void DisposingDisposesRunningWorks()
-        {
-            // Arrange
-            var workRunner = new ImmediateWorkRunner();
-            var work = A.Fake<IExecutableActionWork>();
-            A.CallTo(() => work.Execute()).Invokes(_ => workRunner.Dispose());
-
-            // Act, Assert
-            Assert.Throws<ObjectDisposedException>(() => workRunner.Submit(work));
         }
     }
 }
