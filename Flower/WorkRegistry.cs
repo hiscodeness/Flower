@@ -28,22 +28,14 @@ namespace Flower
         public IActionWork Register<TInput>(IObservable<TInput> trigger, IWorkerResolver workerResolver)
         {
             var work = new ActionWork(new ActionWorkRegistration(this, trigger.Select(input => (object)input), workerResolver));
-            Add(work);
-            if (Options.RegisterWorkBehavior == RegisterWorkBehavior.RegisterActivated)
-            {
-                work.Activate();
-            }
+            Register(work);
             return work;
         }
-
+        
         public IActionWork<TInput> Register<TInput>(IObservable<TInput> trigger, IWorkerResolver<TInput> workerResolver)
         {
             var work = new ActionWork<TInput>(new ActionWorkRegistration<TInput>(this, trigger, workerResolver));
-            Add(work);
-            if(Options.RegisterWorkBehavior == RegisterWorkBehavior.RegisterActivated)
-            {
-                work.Activate();
-            }
+            Register(work);
             return work;
         }
 
@@ -52,11 +44,7 @@ namespace Flower
             IWorkerResolver<TInput, TOutput> workerResolver)
         {
             var work = new FuncWork<TInput, TOutput>(new FuncWorkRegistration<TInput, TOutput>(this, trigger, workerResolver));
-            Add(work);
-            if(Options.RegisterWorkBehavior == RegisterWorkBehavior.RegisterActivated)
-            {
-                work.Activate();
-            }
+            Register(work);
             return work;
         }
 
@@ -102,6 +90,15 @@ namespace Flower
             }
 
             works.Dispose();
+        }
+
+        private void Register(IWork work)
+        {
+            Add(work);
+            if (Options.RegisterWorkBehavior == RegisterWorkBehavior.RegisterActivated)
+            {
+                work.Activate();
+            }
         }
 
         private void Add<TWork>(TWork work) where TWork : IWork
