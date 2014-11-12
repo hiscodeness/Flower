@@ -189,8 +189,8 @@ namespace Flower.Works
         {
             Registration = registration;
             observables = new FuncWorkObservablesHelper<TInput, TOutput>(this);
-            Output = Executed.Select(executedWork => executedWork.Output);
-        }
+            Output = Executed.Where(WorkSucceeded).Select(executedWork => executedWork.Output);
+        }        
 
         new public IFuncWorkRegistration<TInput, TOutput> Registration { get; private set; }
         public IObservable<ITriggeredFuncWork<TInput, TOutput>> Triggered { get { return observables.WorkTriggered; } }
@@ -215,6 +215,11 @@ namespace Flower.Works
         protected override void WorkCompleted()
         {
             observables.RaiseWorkCompleted();
+        }
+    
+        private static bool WorkSucceeded(IExecutableFuncWork<TInput, TOutput> executedWork)
+        {
+            return executedWork.State == ExecutableWorkState.Success;
         }
     }
 }
