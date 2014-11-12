@@ -23,6 +23,7 @@ namespace Flower
             IObservable<TInput> trigger,
             IWorkerResolver<TInput, TOutput> workerResolver);
         
-        void Unregister(IWork work);
+        void Complete(IWork work);
+        void CompleteAll();
     }
 }

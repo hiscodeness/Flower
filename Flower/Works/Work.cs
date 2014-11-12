@@ -23,7 +23,7 @@ namespace Flower.Works
         public IExecutableWork Trigger(IWorkRunner workRunner, TInput input)
         {
             var triggeredWork = CreateExecutableWork(workRunner, input);
-            TriggeredWorkCreated(triggeredWork);
+            WorkTriggered(triggeredWork);
             return triggeredWork;
         }
 
@@ -47,33 +47,36 @@ namespace Flower.Works
             triggerSubscription = null;
         }
 
-        public void Unregister()
+        public void Complete()
         {
             if (Registration.WorkRegistry.Works.Contains(this))
             {
-                Registration.WorkRegistry.Unregister(this);
+                Registration.WorkRegistry.Complete(this);
+                return;
             }
 
-            State = WorkState.Unregistered;
+            State = WorkState.Completed;
+            WorkCompleted();
         }
 
-        protected abstract void TriggeredWorkCreated(ITriggeredWork triggeredWork);
+        protected abstract void WorkTriggered(ITriggeredWork triggeredWork);
         protected abstract IExecutableWork CreateExecutableWork(IWorkRunner workRunner, TInput input);
+        protected abstract void WorkCompleted();
 
         public void WorkerErrored(Exception error)
         {
             switch (Registration.WorkRegistry.Options.WorkerErrorBehavior)
             {
-                case WorkerErrorBehavior.Ignore:
+                case WorkerErrorBehavior.NotifyExecuted:
                     // Eats exception
                     //Log.Warning("Continue on worker error: {0}.", error);
                     break;
-                case WorkerErrorBehavior.CompleteWork:
-                    Registration.WorkRegistry.Unregister(this);
+                case WorkerErrorBehavior.SwallowErrorAndCompleteWork:
+                    Registration.WorkRegistry.Complete(this);
                     State = WorkState.WorkerError;
                     break;
                 case WorkerErrorBehavior.CompleteWorkAndThrow:
-                    Registration.WorkRegistry.Unregister(this);
+                    Registration.WorkRegistry.Complete(this);
                     State = WorkState.WorkerError;
                     throw error;
             }
@@ -93,16 +96,15 @@ namespace Flower.Works
 
         private void TriggerOnError(Exception exception)
         {
-            Registration.WorkRegistry.Unregister(this);
-            State = WorkState.TriggerError;
             TriggerEvents.RaiseTriggerErrored(exception);
+            Registration.WorkRegistry.Complete(this);
+            State = WorkState.TriggerError;
         }
 
         private void TriggerOnCompleted()
         {
-            Registration.WorkRegistry.Unregister(this);
-            State = WorkState.Completed;
             TriggerEvents.RaiseTriggerCompleted();
+            Registration.WorkRegistry.Complete(this);
         }
     }
 
@@ -126,7 +128,7 @@ namespace Flower.Works
             return new ExecutableActionWork(workRunner, this, input);
         }
 
-        protected override void TriggeredWorkCreated(ITriggeredWork triggeredWork)
+        protected override void WorkTriggered(ITriggeredWork triggeredWork)
         {
             observables.RaiseWorkTriggered(triggeredWork as ITriggeredActionWork);
         }
@@ -134,6 +136,11 @@ namespace Flower.Works
         public void WorkerExecuted(IExecutableActionWork triggeredWork)
         {
             observables.RaiseWorkExecuted(triggeredWork);
+        }
+
+        protected override void WorkCompleted()
+        {
+            observables.RaiseWorkCompleted();
         }
     }
 
@@ -157,7 +164,7 @@ namespace Flower.Works
             return new ExecutableActionWork<TInput>(workRunner, this, input);
         }
 
-        protected override void TriggeredWorkCreated(ITriggeredWork triggeredWork)
+        protected override void WorkTriggered(ITriggeredWork triggeredWork)
         {
             observables.RaiseWorkTriggered(triggeredWork as ITriggeredActionWork<TInput>);
         }
@@ -165,6 +172,11 @@ namespace Flower.Works
         public void WorkerExecuted(IExecutableActionWork<TInput> triggeredWork)
         {
             observables.RaiseWorkExecuted(triggeredWork);
+        }
+        
+        protected override void WorkCompleted()
+        {
+            observables.RaiseWorkCompleted();
         }
     }
 
@@ -190,7 +202,7 @@ namespace Flower.Works
             return new ExecutableFuncWork<TInput, TOutput>(workRunner, this, input);
         }
 
-        protected override void TriggeredWorkCreated(ITriggeredWork triggeredWork)
+        protected override void WorkTriggered(ITriggeredWork triggeredWork)
         {
             observables.RaiseWorkTriggered(triggeredWork as ITriggeredFuncWork<TInput, TOutput>);
         }
@@ -198,6 +210,11 @@ namespace Flower.Works
         public void WorkerExecuted(IExecutableFuncWork<TInput, TOutput> triggeredWork)
         {
             observables.RaiseWorkExecuted(triggeredWork);
+        }
+
+        protected override void WorkCompleted()
+        {
+            observables.RaiseWorkCompleted();
         }
     }
 }

@@ -37,7 +37,7 @@ namespace Flower.Tests.TestDoubles
         IObservable<IExecutableFuncWork<int, int>> IFuncWork<int, int>.Executed { get { return null; } }
         public IObservable<int> Output { get { return output; } }
         IObservable<ITriggeredFuncWork<int, int>> IFuncWork<int, int>.Triggered { get { return null; } }
-        public void Unregister()
+        public void Complete()
         {
             throw new NotImplementedException();
         }

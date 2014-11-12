@@ -4,6 +4,19 @@ using System.Globalization;
 
 namespace Flower.Tests.TestDoubles
 {
+    internal class TestWorkerThrowsException : IWorker
+    {
+        public void Execute()
+        {
+            throw new Exception(ExceptionMessage);
+        }
+
+        public static string ExceptionMessage
+        {
+            get { return "Test worker exception."; }
+        }
+    }
+
     internal class TestWorker : IWorker
     {
         public void Execute()

@@ -11,6 +11,7 @@ namespace Flower.Works
         public TInput Input { get; private set; }
         IWork ITriggeredWork.Work { get { return Work; } }
         public IWorkRunner WorkRunner { get; private set; }
+        public Exception Exception { get; private set; }
 
         protected ExecutableWork(IWorkRunner workRunner, IRegisteredWork<TInput> work, TInput input)
         {
@@ -33,15 +34,28 @@ namespace Flower.Works
             catch (Exception e)
             {
                 State = ExecutableWorkState.Error;
+                Exception = e;
                 work.WorkerErrored(e);
-                State = ExecutableWorkState.Success;
             }
             finally
             {
-                if (State == ExecutableWorkState.Success)
+                if (ShouldNotifyWorkerExecuted())
                 {
                     WorkerExecuted();
                 }
+            }
+        }
+
+        private bool ShouldNotifyWorkerExecuted()
+        {
+            switch (State)
+            {
+                case ExecutableWorkState.Success:
+                    return true;
+                case ExecutableWorkState.Error:
+                    return work.Registration.Options.WorkerErrorBehavior == WorkerErrorBehavior.NotifyExecuted;
+                default:
+                    return false;
             }
         }
 

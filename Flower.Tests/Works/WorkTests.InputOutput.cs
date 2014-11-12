@@ -10,13 +10,13 @@ namespace Flower.Tests.Works
     public partial class WorkTests
     {
         [Fact]
-        public void UnregisteredWorkCannotBeActivated()
+        public void CompletedWorkCannotBeActivated()
         {
             // Arrange
             var subject = new Subject<int>();
             var workRegistry = WorkRegistryFactory.CreateAutoActivating();
             var work = workRegistry.Register(subject, new TestWorkerIntToIntSquared());
-            workRegistry.Unregister(work);
+            workRegistry.Complete(work);
 
             // Act/Assert
             Assert.Throws<InvalidOperationException>(() => work.Activate());

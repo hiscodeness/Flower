@@ -15,7 +15,7 @@ namespace Flower.Tests
 
             // Assert
             Assert.Equal(RegisterWorkBehavior.RegisterSuspended, options.RegisterWorkBehavior);
-            Assert.Equal(TriggerErrorBehavior.CompleteWorkAndForwardError, options.TriggerErrorBehavior);
+            Assert.Equal(TriggerErrorBehavior.CompleteWorkAndThrow, options.TriggerErrorBehavior);
             Assert.NotNull(options.WorkRunnerResolver);
             Assert.Equal(WorkerErrorBehavior.CompleteWorkAndThrow, options.WorkerErrorBehavior);
         }
@@ -51,10 +51,10 @@ namespace Flower.Tests
             var options = new WorkRegistryOptions();
 
             // Act
-            options = options.With(TriggerErrorBehavior.CompleteWork);
+            options = options.With(TriggerErrorBehavior.SwallowErrorAndCompleteWork);
 
             // Assert
-            Assert.Equal(TriggerErrorBehavior.CompleteWork, options.TriggerErrorBehavior);
+            Assert.Equal(TriggerErrorBehavior.SwallowErrorAndCompleteWork, options.TriggerErrorBehavior);
         }
 
         [Fact]
@@ -78,10 +78,10 @@ namespace Flower.Tests
             var options = new WorkRegistryOptions();
 
             // Act
-            options = options.With(WorkerErrorBehavior.Ignore);
+            options = options.With(WorkerErrorBehavior.NotifyExecuted);
 
             // Assert
-            Assert.Equal(WorkerErrorBehavior.Ignore, options.WorkerErrorBehavior);
+            Assert.Equal(WorkerErrorBehavior.NotifyExecuted, options.WorkerErrorBehavior);
         }
     }
 }

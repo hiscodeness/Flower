@@ -11,15 +11,15 @@ namespace Flower
 
     public enum TriggerErrorBehavior
     {
-        CompleteWorkAndForwardError,
-        CompleteWork
+        CompleteWorkAndThrow,
+        SwallowErrorAndCompleteWork
     }
 
     public enum WorkerErrorBehavior
     {
         CompleteWorkAndThrow,
-        CompleteWork,
-        Ignore
+        SwallowErrorAndCompleteWork,
+        NotifyExecuted
     }
 
     public class WorkRegistryOptions
@@ -28,7 +28,7 @@ namespace Flower
 
         public WorkRegistryOptions(
             RegisterWorkBehavior registerWorkBehavior = RegisterWorkBehavior.RegisterSuspended,
-            TriggerErrorBehavior triggerErrorBehavior = TriggerErrorBehavior.CompleteWorkAndForwardError,
+            TriggerErrorBehavior triggerErrorBehavior = TriggerErrorBehavior.CompleteWorkAndThrow,
             IWorkRunnerResolver workRunnerResolver = null,
             WorkerErrorBehavior workerErrorBehavior = WorkerErrorBehavior.CompleteWorkAndThrow)
         {

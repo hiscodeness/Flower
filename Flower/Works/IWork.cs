@@ -2,10 +2,11 @@ using System;
 
 namespace Flower.Works
 {
-    public interface IWork: IActivatable, ISuspendable, IUnregistrable
+    public interface IWork: IActivatable, ISuspendable
     {
         WorkState State { get; }
         IWorkRegistration Registration { get; }
+        void Complete();
     }
 
     public interface IWork<out TInput> : IWork

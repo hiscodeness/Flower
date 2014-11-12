@@ -34,7 +34,7 @@ namespace Flower.Works
         private readonly WorkTriggeredHelper workTriggeredHelper;
         private readonly WorkExecutedHelper workExecutedHelper;
 
-        public WorkObservablesHelper(TWork work)
+        protected WorkObservablesHelper(TWork work)
         {
             workTriggeredHelper = new WorkTriggeredHelper();
             workExecutedHelper = new WorkExecutedHelper(work);
@@ -45,7 +45,7 @@ namespace Flower.Works
 
         public void RaiseWorkTriggered(TTriggeredWork triggeredWork)
         {
-            workTriggeredHelper.RaiseTriggered(triggeredWork);
+            workTriggeredHelper.RaiseWorkTriggered(triggeredWork);
         }
 
         public void RaiseWorkExecuted(TExecutableWork triggeredWork)
@@ -53,7 +53,32 @@ namespace Flower.Works
             workExecutedHelper.RaiseWorkExecuted(triggeredWork);
         }
 
-        private class WorkTriggeredHelper
+        public void RaiseWorkCompleted()
+        {
+            workTriggeredHelper.RaiseWorkCompleted();
+            workExecutedHelper.RaiseWorkCompleted();
+        }
+
+        private class WorkCompletedHelper
+        {
+            protected event Action workCompleted;
+            
+            public void RaiseWorkCompleted()
+            {
+                OnWorkCompleted();
+            }
+
+            private void OnWorkCompleted()
+            {
+                var handler = workCompleted;
+                if (handler != null)
+                {
+                    handler();
+                }
+            }
+        }
+
+        private class WorkTriggeredHelper : WorkCompletedHelper
         {
             private event Action<TTriggeredWork> workTriggered;
 
@@ -64,7 +89,7 @@ namespace Flower.Works
 
             public IObservable<TTriggeredWork> WorkTriggered { get; private set; }
 
-            public void RaiseTriggered(TTriggeredWork triggeredWork)
+            public void RaiseWorkTriggered(TTriggeredWork triggeredWork)
             {
                 OnWorkTriggered(triggeredWork);
             }
@@ -77,7 +102,12 @@ namespace Flower.Works
             private IDisposable CreateTriggeredSubscription(IObserver<TTriggeredWork> observer)
             {
                 workTriggered += observer.OnNext;
-                return Disposable.Create(() => { workTriggered -= observer.OnNext; });
+                workCompleted += observer.OnCompleted;
+                return Disposable.Create(() =>
+                    {
+                        workTriggered -= observer.OnNext;
+                        workCompleted -= observer.OnCompleted;
+                    });
             }
 
             private void OnWorkTriggered(TTriggeredWork triggeredWork)
@@ -90,7 +120,7 @@ namespace Flower.Works
             }
         }
 
-        private class WorkExecutedHelper
+        private class WorkExecutedHelper : WorkCompletedHelper
         {
             private readonly TWork work;
             private event Action<TExecutableWork> workExecuted;
@@ -122,6 +152,7 @@ namespace Flower.Works
                 }
 
                 workExecuted += observer.OnNext;
+                workCompleted += observer.OnCompleted;
                 if (ShouldForwardErrorToSubscribers())
                 {
                     work.TriggerEvents.TriggerErrored += observer.OnError;
@@ -132,6 +163,7 @@ namespace Flower.Works
                     () =>
                         {
                             workExecuted -= observer.OnNext;
+                            workCompleted -= observer.OnCompleted;
                             work.TriggerEvents.TriggerCompleted -= observer.OnCompleted;
                             work.TriggerEvents.TriggerErrored -= observer.OnError;
                         });
@@ -141,15 +173,16 @@ namespace Flower.Works
             {
                 get
                 {
-                    return work.State == WorkState.Completed || work.State == WorkState.WorkerError
-                           || work.State == WorkState.TriggerError;
+                    return work.State == WorkState.Completed ||
+                           work.State == WorkState.WorkerError ||
+                           work.State == WorkState.TriggerError;
                 }
             }
 
             private bool ShouldForwardErrorToSubscribers()
             {
                 return work.Registration.WorkRegistry.Options.TriggerErrorBehavior
-                       == TriggerErrorBehavior.CompleteWorkAndForwardError;
+                       == TriggerErrorBehavior.CompleteWorkAndThrow;
             }
 
             private void OnWorkExecuted(TExecutableWork triggeredWork)

@@ -2,9 +2,6 @@
 
 namespace Flower.Works
 {
-    /// <summary>
-    /// Work that has been triggered and submitted to a <see cref="IWorkRunner" /> for execution.
-    /// </summary>
     public interface ITriggeredWork
     {
         IWork Work { get; }
@@ -21,17 +18,11 @@ namespace Flower.Works
     {
     }
 
-    /// <summary>
-    /// Work that has been triggered and submitted to a <see cref="IWorkRunner" />.
-    /// </summary>
     public interface ITriggeredActionWork<TInput> : ITriggeredWork<TInput>
     {
         new IActionWork<TInput> Work { get; }
     }
 
-    /// <summary>
-    /// Work that has been triggered and submitted to a <see cref="IWorkRunner" />.
-    /// </summary>
     public interface ITriggeredFuncWork<TInput, TOutput> : ITriggeredWork<TInput>
     {
         new IFuncWork<TInput, TOutput> Work { get; }

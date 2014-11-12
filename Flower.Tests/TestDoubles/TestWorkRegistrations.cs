@@ -20,7 +20,7 @@ namespace Flower.Tests.TestDoubles
         
         public void Dispose()
         {
-            workRegistry.Dispose();
+            workRegistry.CompleteAll();
             trigger.Dispose();
         }
     }

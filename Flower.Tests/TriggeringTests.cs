@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Flower.Tests.TestDoubles;
+using Flower.Works;
 using Xunit;
 
 namespace Flower.Tests
@@ -61,7 +62,7 @@ namespace Flower.Tests
         }
 
         [Fact]
-        public void TriggerCompletedUnregistersWork()
+        public void TriggerCompletedCompletesWork()
         {
             // Arrange
             var trigger = new Subject<int>();
@@ -77,6 +78,23 @@ namespace Flower.Tests
         }
 
         [Fact]
+        public void WorkIsNotTriggeredOnTriggerError()
+        {
+            // Arrange
+            var trigger = new Subject<int>();
+            var registry = WorkRegistryFactory.CreateAutoActivating();
+            var work = registry.Register(trigger, new TestWorkerIntToIntSquared());
+            ITriggeredFuncWork<int, int> result = null;
+            work.Triggered.Subscribe(w => result = w, _ => { });
+
+            // Act
+            trigger.OnError(new Exception());
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
         public void TriggerErrorAllowsLastOutputToComeThrough()
         {
             // Arrange
@@ -84,7 +102,7 @@ namespace Flower.Tests
             var registry = WorkRegistryFactory.CreateAutoActivating();
             var work = registry.Register(trigger, new TestWorkerIntToIntSquared());
             var result = 0;
-            work.Output.Subscribe(i => result = i);
+            work.Output.Subscribe(i => result = i, _ => { });
 
             // Act
             trigger.OnNext(42);
@@ -120,9 +138,9 @@ namespace Flower.Tests
             var work = registry.Register(trigger, new TestWorkerIntToIntSquared());
             Exception exception = null;
             work.Output.Subscribe(_ => { }, ex => exception = ex);
+            var expected = new Exception();
 
             // Act
-            var expected = new Exception();
             trigger.OnError(expected);
 
             // Assert
@@ -130,11 +148,14 @@ namespace Flower.Tests
         }
 
         [Fact]
-        public void TriggerErrorsAreNotForwardedToOutputSubscribers()
+        public void TriggerErrorsCanBeSwallowed()
         {
             // Arrange
             var trigger = new Subject<int>();
-            var registry = WorkRegistryFactory.CreateAutoActivating();
+            var registry =
+                new WorkRegistry(
+                    new WorkRegistryOptions(
+                        RegisterWorkBehavior.RegisterActivated, TriggerErrorBehavior.SwallowErrorAndCompleteWork));
             var work = registry.Register(trigger, new TestWorkerIntToIntSquared());
             Exception exception = null;
             work.Output.Subscribe(_ => { }, ex => exception = ex);
@@ -154,7 +175,7 @@ namespace Flower.Tests
             var registry = WorkRegistryFactory.CreateAutoActivating();
             var work = registry.Register(trigger, new TestWorkerIntToIntSquared());
             int? result = null;
-            work.Output.Subscribe(i => result = i);
+            work.Output.Subscribe(i => result = i, _ => {});
 
             // Act
             trigger.OnError(new Exception());
@@ -170,7 +191,7 @@ namespace Flower.Tests
             var trigger = new Subject<int>();
             var registry = WorkRegistryFactory.CreateAutoActivating();
             var work = registry.Register(trigger, new TestWorkerIntToIntSquared());
-            work.Output.Subscribe(i => { });
+            work.Output.Subscribe(i => { }, _ => {});
 
             // Act
             trigger.OnError(new Exception());
@@ -180,13 +201,13 @@ namespace Flower.Tests
         }
 
         [Fact]
-        public void TriggerErrorUnregistersWork()
+        public void TriggerErrorCompletesWork()
         {
             // Arrange
             var trigger = new Subject<int>();
             var registry = WorkRegistryFactory.CreateAutoActivating();
             var work = registry.Register(trigger, new TestWorkerIntToIntSquared());
-            work.Output.Subscribe(i => { });
+            work.Output.Subscribe(i => { }, _ => {});
 
             // Act
             trigger.OnError(new Exception());
