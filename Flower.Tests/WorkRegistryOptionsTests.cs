@@ -78,10 +78,10 @@ namespace Flower.Tests
             var options = new WorkRegistryOptions();
 
             // Act
-            options = options.With(WorkerErrorBehavior.NotifyExecuted);
+            options = options.With(WorkerErrorBehavior.RaiseExecutedAndContinue);
 
             // Assert
-            Assert.Equal(WorkerErrorBehavior.NotifyExecuted, options.WorkerErrorBehavior);
+            Assert.Equal(WorkerErrorBehavior.RaiseExecutedAndContinue, options.WorkerErrorBehavior);
         }
     }
 }

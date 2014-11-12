@@ -67,7 +67,7 @@ namespace Flower.Works
         {
             switch (Registration.WorkRegistry.Options.WorkerErrorBehavior)
             {
-                case WorkerErrorBehavior.NotifyExecuted:
+                case WorkerErrorBehavior.RaiseExecutedAndContinue:
                     // Eats exception
                     //Log.Warning("Continue on worker error: {0}.", error);
                     break;

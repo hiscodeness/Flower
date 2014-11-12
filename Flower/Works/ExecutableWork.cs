@@ -53,7 +53,7 @@ namespace Flower.Works
                 case ExecutableWorkState.Success:
                     return true;
                 case ExecutableWorkState.Error:
-                    return work.Registration.Options.WorkerErrorBehavior == WorkerErrorBehavior.NotifyExecuted;
+                    return work.Registration.Options.WorkerErrorBehavior == WorkerErrorBehavior.RaiseExecutedAndContinue;
                 default:
                     return false;
             }

@@ -1,9 +1,12 @@
-﻿namespace Flower.Works
+﻿using System;
+
+namespace Flower.Works
 {
     public interface IExecutableWork : ITriggeredWork
     {
         ExecutableWorkState State { get; }
         void Execute();
+        Exception Exception { get; }
     }
 
     public interface IExecutableWork<out TInput> : ITriggeredWork<TInput>, IExecutableWork
