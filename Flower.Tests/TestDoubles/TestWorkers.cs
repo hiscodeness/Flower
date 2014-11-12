@@ -8,10 +8,10 @@ namespace Flower.Tests.TestDoubles
     {
         public void Execute()
         {
-            throw new Exception(ExceptionMessage);
+            throw new Exception(ErrorMessage);
         }
 
-        public static string ExceptionMessage
+        public static string ErrorMessage
         {
             get { return "Test worker exception."; }
         }

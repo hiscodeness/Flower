@@ -13,7 +13,7 @@ namespace Flower.Tests.Works
     public class ExecutableWorkTests
     {
         [Fact]
-        public void ExceptionIsSetOnExecutableWork()
+        public void WorkerErrorIsSetOnExecutableWork()
         {
             // Arrange
             var options = new WorkRegistryOptions(
@@ -23,13 +23,13 @@ namespace Flower.Tests.Works
             var work = workRegistry.Register(trigger, new TestWorkerThrowsException());
             IExecutableActionWork result = null;
             work.Executed.Subscribe(w => result = w);
-            
+
             // Act
             trigger.OnNext(4);
 
             // Assert
             Assert.Equal(ExecutableWorkState.Error, result.State);
-            Assert.Equal(TestWorkerThrowsException.ExceptionMessage, result.Exception.Message);
+            Assert.Equal(TestWorkerThrowsException.ErrorMessage, result.Error.Message);
         }
     }
 }

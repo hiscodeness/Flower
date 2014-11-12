@@ -11,7 +11,7 @@ namespace Flower.Works
         public TInput Input { get; private set; }
         IWork ITriggeredWork.Work { get { return Work; } }
         public IWorkRunner WorkRunner { get; private set; }
-        public Exception Exception { get; private set; }
+        public Exception Error { get; private set; }
 
         protected ExecutableWork(IWorkRunner workRunner, IRegisteredWork<TInput> work, TInput input)
         {
@@ -34,7 +34,7 @@ namespace Flower.Works
             catch (Exception e)
             {
                 State = ExecutableWorkState.Error;
-                Exception = e;
+                Error = e;
                 work.WorkerErrored(e);
             }
             finally

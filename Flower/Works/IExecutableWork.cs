@@ -6,7 +6,7 @@ namespace Flower.Works
     {
         ExecutableWorkState State { get; }
         void Execute();
-        Exception Exception { get; }
+        Exception Error { get; }
     }
 
     public interface IExecutableWork<out TInput> : ITriggeredWork<TInput>, IExecutableWork
