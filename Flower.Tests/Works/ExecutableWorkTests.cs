@@ -154,6 +154,26 @@ namespace Flower.Tests.Works
             Assert.Equal(new[] { 3 }, context.Executed.Select(w => w.Output));
         }
 
+        [Fact]
+        public void WorkerErrorShownAsSuchWhenWorkCompletes()
+        {
+            // Arrange
+            var options = new WorkRegistryOptions(RegisterWorkBehavior.RegisterActivated, workerErrorBehavior: WorkerErrorBehavior.SwallowErrorAndCompleteWork);
+            var workRegistry = new WorkRegistry(options);
+            var trigger = new Subject<int>();
+            var work = workRegistry.Register(trigger, new TestWorkerIntToIntThrowOnEven());
+            WorkState? result = null;
+            work.Executed.Subscribe(_ => { }, () => result = work.State);
+
+            // Act
+            trigger.OnNext(3);
+            trigger.OnNext(4);
+            trigger.OnNext(5);
+
+            // Assert
+            Assert.Equal(WorkState.WorkerError, result);
+        }
+
         private class WorkerErrorBehaviorTestContext
         {
             private readonly Subject<int> trigger;
