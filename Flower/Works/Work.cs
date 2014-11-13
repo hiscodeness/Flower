@@ -8,6 +8,7 @@ namespace Flower.Works
     internal abstract class Work<TInput> : IRegisteredWork<TInput>
     {
         private IDisposable triggerSubscription;
+        private bool isBeingRemovedFromWorkRegistry;
 
         protected Work(IWorkRegistration<TInput> registration)
         {
@@ -47,40 +48,29 @@ namespace Flower.Works
             triggerSubscription = null;
         }
 
-        public void Complete()
+        public void Complete(WorkState withState)
         {
             if (Registration.WorkRegistry.Works.Contains(this))
             {
+                isBeingRemovedFromWorkRegistry = true;
                 Registration.WorkRegistry.Complete(this);
-                return;
+                isBeingRemovedFromWorkRegistry = false;
             }
 
-            State = WorkState.Completed;
+            if (isBeingRemovedFromWorkRegistry) return;
+
+            State = withState;
             WorkCompleted();
+        }
+
+        void IWork.Complete()
+        {
+            Complete(WorkState.Completed);
         }
 
         protected abstract void WorkTriggered(ITriggeredWork triggeredWork);
         protected abstract IExecutableWork CreateExecutableWork(IWorkRunner workRunner, TInput input);
         protected abstract void WorkCompleted();
-
-        public void WorkerErrored(Exception error)
-        {
-            switch (Registration.WorkRegistry.Options.WorkerErrorBehavior)
-            {
-                case WorkerErrorBehavior.RaiseExecutedAndContinue:
-                    // Eats exception
-                    //Log.Warning("Continue on worker error: {0}.", error);
-                    break;
-                case WorkerErrorBehavior.SwallowErrorAndCompleteWork:
-                    Registration.WorkRegistry.Complete(this);
-                    State = WorkState.WorkerError;
-                    break;
-                case WorkerErrorBehavior.CompleteWorkAndThrow:
-                    Registration.WorkRegistry.Complete(this);
-                    State = WorkState.WorkerError;
-                    throw error;
-            }
-        }
 
         private void TriggerOnNext(TInput input)
         {
@@ -97,14 +87,13 @@ namespace Flower.Works
         private void TriggerOnError(Exception exception)
         {
             TriggerEvents.RaiseTriggerErrored(exception);
-            Registration.WorkRegistry.Complete(this);
-            State = WorkState.TriggerError;
+            Complete(WorkState.TriggerError);
         }
 
         private void TriggerOnCompleted()
         {
             TriggerEvents.RaiseTriggerCompleted();
-            Registration.WorkRegistry.Complete(this);
+            Complete(WorkState.Completed);
         }
     }
 

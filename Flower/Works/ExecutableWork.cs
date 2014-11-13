@@ -30,30 +30,49 @@ namespace Flower.Works
                 ExecuteWorker();
                 ReleaseWorker();
                 State = ExecutableWorkState.Success;
+                WorkerExecuted();
             }
             catch (Exception e)
             {
                 State = ExecutableWorkState.Error;
                 Error = e;
-                work.WorkerErrored(e);
-            }
-            finally
-            {
-                if (ShouldNotifyWorkerExecuted())
-                {
-                    WorkerExecuted();
-                }
+                WorkerErrored(e);
             }
         }
 
-        private bool ShouldNotifyWorkerExecuted()
+        private void WorkerErrored(Exception error)
+        {
+            if (ShouldNotifyWorkerExecutedWhenWorkerErrored())
+            {
+                WorkerExecuted();
+            }
+
+            switch (work.Registration.WorkRegistry.Options.WorkerErrorBehavior)
+            {
+                case WorkerErrorBehavior.SwallowErrorAndContinue:
+                case WorkerErrorBehavior.RaiseExecutedAndContinue:
+                    // Log.Warning("Continue on worker error: {0}.", error);
+                    break;
+                case WorkerErrorBehavior.RaiseExecutedAndCompleteWork:
+                case WorkerErrorBehavior.SwallowErrorAndCompleteWork:
+                    work.Complete(WorkState.WorkerError);
+                    break;
+                case WorkerErrorBehavior.CompleteWorkAndThrow:
+                    work.Complete(WorkState.WorkerError);
+                    throw error;
+            }
+        }
+
+        private bool ShouldNotifyWorkerExecutedWhenWorkerErrored()
         {
             switch (State)
             {
                 case ExecutableWorkState.Success:
                     return true;
                 case ExecutableWorkState.Error:
-                    return work.Registration.Options.WorkerErrorBehavior == WorkerErrorBehavior.RaiseExecutedAndContinue;
+                    return
+                        work.Registration.Options.WorkerErrorBehavior == WorkerErrorBehavior.RaiseExecutedAndContinue ||
+                        work.Registration.Options.WorkerErrorBehavior == WorkerErrorBehavior.RaiseExecutedAndCompleteWork;
                 default:
                     return false;
             }

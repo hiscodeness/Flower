@@ -19,7 +19,9 @@ namespace Flower
     {
         CompleteWorkAndThrow,
         SwallowErrorAndCompleteWork,
-        RaiseExecutedAndContinue
+        RaiseExecutedAndCompleteWork,
+        RaiseExecutedAndContinue,
+        SwallowErrorAndContinue
     }
 
     public class WorkRegistryOptions

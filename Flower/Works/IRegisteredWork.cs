@@ -6,7 +6,7 @@ namespace Flower.Works
     internal interface IRegisteredWork : IWork
     {
         ITriggerEvents TriggerEvents { get; }
-        void WorkerErrored(Exception error);
+        void Complete(WorkState withState);
     }
 
     internal interface IRegisteredWork<TInput> : IRegisteredWork, IWork<TInput>
