@@ -74,7 +74,7 @@ namespace Flower.Tests.TestDoubles
         {
             if (input%2 == 0)
             {
-                throw new InvalidOperationException(ErrorMessage);
+                throw new ArgumentException(ErrorMessage);
             }
 
             return WorkerFunc(input);
