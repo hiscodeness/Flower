@@ -1,44 +1,38 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using Flower.Works;
 
 namespace Flower.WorkRunners
 {
     /// <summary>
-    /// A work runner that runs the work immediately after triggering when it is appended.
+    /// A work runner that executes a single work immediately after being submitted.
     /// </summary>
-    public sealed class ImmediateWorkRunner : IWorkRunner, IDisposable
+    public sealed class ImmediateWorkRunner : IWorkRunner
     {
-        private readonly BlockingCollection<ITriggeredWork> runningWorks =
-            new BlockingCollection<ITriggeredWork>();
+        private IExecutableWork work;
+        private bool isExecuted;
 
-        /// <summary>
-        /// Gets the works still pending with the work runner.
-        /// </summary>
-        public IEnumerable<ITriggeredWork> PendingWorks
+        public IEnumerable<IExecutableWork> PendingWorks
         {
             get { yield break; }
         }
 
-        /// <summary>
-        /// Gets the currently running active works.
-        /// </summary>
-        public IEnumerable<ITriggeredWork> RunningWorks
+        public IEnumerable<IExecutableWork> ExecutingWorks
         {
-            get { return runningWorks; }
+            get { return !isExecuted && work != null ? new[] { work } : Enumerable.Empty<IExecutableWork>(); }
         }
 
-        public void Dispose()
+        public void Submit(IExecutableWork executableWork)
         {
-            runningWorks.Dispose();
-        }
+            if (work != null)
+            {
+                throw new InvalidOperationException("Only one work can be submitted.");
+            }
 
-        public void Submit(ITriggeredWork triggeredWork)
-        {
-            runningWorks.Add(triggeredWork);
-            triggeredWork.Execute();
-            runningWorks.TryTake(out triggeredWork);
+            work = executableWork;
+            work.Execute();
+            isExecuted = true;
         }
     }
 }

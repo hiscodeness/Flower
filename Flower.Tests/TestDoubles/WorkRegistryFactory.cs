@@ -4,8 +4,7 @@
     {
         public static WorkRegistry CreateAutoActivating()
         {
-            var options = new WorkRegistryOptions(RegisterWorkBehavior.RegisterActivated,
-                                                  TriggerErrorBehavior.CompleteWork);
+            var options = new WorkRegistryOptions(RegisterWorkBehavior.RegisterActivated);
             return new WorkRegistry(options);
         }
     }

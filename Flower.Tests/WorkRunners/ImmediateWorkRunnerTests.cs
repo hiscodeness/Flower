@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using FakeItEasy;
 using Flower.WorkRunners;
 using Flower.Works;
@@ -17,7 +16,7 @@ namespace Flower.Tests.WorkRunners
 
             // Assert
             Assert.Empty(workRunner.PendingWorks);
-            Assert.Empty(workRunner.RunningWorks);
+            Assert.Empty(workRunner.ExecutingWorks);
         }
 
         [Fact]
@@ -25,27 +24,15 @@ namespace Flower.Tests.WorkRunners
         {
             // Arrange
             var workRunner = new ImmediateWorkRunner();
-            var result = workRunner.RunningWorks;
-            var work = A.Fake<ITriggeredActionWork>();
-            A.CallTo(() => work.Execute()).Invokes(_ => result = workRunner.RunningWorks.ToList());
+            var result = workRunner.ExecutingWorks;
+            var work = A.Fake<IExecutableActionWork>();
+            A.CallTo(() => work.Execute()).Invokes(_ => result = workRunner.ExecutingWorks.ToList());
 
             // Act
             workRunner.Submit(work);
 
             // Assert
             Assert.Equal(work, result.Single());
-        }
-
-        [Fact]
-        public void DisposingDisposesRunningWorks()
-        {
-            // Arrange
-            var workRunner = new ImmediateWorkRunner();
-            var work = A.Fake<ITriggeredActionWork>();
-            A.CallTo(() => work.Execute()).Invokes(_ => workRunner.Dispose());
-
-            // Act, Assert
-            Assert.Throws<ObjectDisposedException>(() => workRunner.Submit(work));
         }
     }
 }

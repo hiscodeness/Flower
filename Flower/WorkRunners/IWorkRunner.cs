@@ -4,24 +4,17 @@ using Flower.Works;
 namespace Flower.WorkRunners
 {
     /// <summary>
-    /// Runs triggered work items.
+    /// Executes triggered works.
     /// </summary>
     public interface IWorkRunner
     {
-        /// <summary>
-        /// Gets the triggered work items still pending with this <see cref="IWorkRunner" />.
-        /// </summary>
-        IEnumerable<ITriggeredWork> PendingWorks { get; }
+        IEnumerable<IExecutableWork> PendingWorks { get; }
+        IEnumerable<IExecutableWork> ExecutingWorks { get; }
 
         /// <summary>
-        /// Gets the currently running active work items.
+        /// Submit a work to be executed by this runner at the next opportunity.
         /// </summary>
-        IEnumerable<ITriggeredWork> RunningWorks { get; }
-
-        /// <summary>
-        /// Submit a work item to be run by this runner at the next opportunity.
-        /// </summary>
-        /// <param name="triggeredWork">The work item to run at the next opportunity.</param>
-        void Submit(ITriggeredWork triggeredWork);
+        /// <param name="executableWork">The work to execute at the next opportunity.</param>
+        void Submit(IExecutableWork executableWork);
     }
 }

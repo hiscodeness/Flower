@@ -12,6 +12,7 @@ namespace Flower.Tests
 {
     public class WorkRegistryTests
     {
+
         [Fact]
         public void RegisteringAndPipingWorkersCreatesAWorkflow()
         {
@@ -30,6 +31,25 @@ namespace Flower.Tests
 
             // Assert
             Assert.Equal(expected, result);
+        }
+        
+        [Fact]
+        public void ManuallyCompletingWorkCompletesPipedWorks()
+        {
+            // Arrange
+            var workRegistry = WorkRegistryFactory.CreateAutoActivating();
+            var trigger = new Subject<int>();
+            var work1 = workRegistry.Register(trigger, new TestWorkerIntToString());
+            var work2 = work1.Pipe(new TestWorkerStringToInt());
+            var work3 = work2.Pipe(new TestWorkerIntToIntSquared());
+
+            // Act
+            work1.Complete();
+
+            // Assert
+            Assert.Equal(WorkState.Completed, work1.State);
+            Assert.Equal(WorkState.Completed, work2.State);
+            Assert.Equal(WorkState.Completed, work3.State);
         }
 
         [Fact]
@@ -51,7 +71,41 @@ namespace Flower.Tests
         }
 
         [Fact]
-        public void WorkCanBeUnregistered()
+        public void CompletingWorkCompletesTriggeredObservable()
+        {
+            // Arrange
+            var workRegistry = WorkRegistryFactory.CreateAutoActivating();
+            var trigger = new Subject<int>();
+            var work = workRegistry.Register(trigger, new TestWorkerIntToString());
+            var workTriggeredCompleted = false;
+            work.Triggered.Subscribe(_ => { }, () => workTriggeredCompleted = true);
+
+            // Act
+            work.Complete();
+
+            // Assert
+            Assert.True(workTriggeredCompleted);
+        }
+
+        [Fact]
+        public void CompletingWorkCompletesExecutedObservable()
+        {
+            // Arrange
+            var workRegistry = WorkRegistryFactory.CreateAutoActivating();
+            var trigger = new Subject<int>();
+            var work = workRegistry.Register(trigger, new TestWorkerIntToString());
+            var workExecutedCompleted = false;
+            work.Executed.Subscribe(_ => { }, () => workExecutedCompleted = true);
+
+            // Act
+            work.Complete();
+
+            // Assert
+            Assert.True(workExecutedCompleted);
+        }
+
+        [Fact]
+        public void WorkCanBeCompletedManually()
         {
             // Arrange
             var subject = new Subject<int>();
@@ -59,25 +113,48 @@ namespace Flower.Tests
             var work = workRegistry.Register(subject, new TestWorkerIntToIntSquared());
 
             // Act
-            workRegistry.Unregister(work);
+            workRegistry.Complete(work);
 
             // Assert
             Assert.False(subject.HasObservers);
-            Assert.Equal(WorkState.Unregistered, work.State);
+            Assert.Equal(WorkState.Completed, work.State);
             Assert.False(workRegistry.Works.Any());
         }
 
         [Fact]
-        public void WorkCanBeUnregisteredOnce()
+        public void WorksCanBeCompletedManually()
+        {
+            // Arrange
+            var subject = new Subject<int>();
+            var workRegistry = WorkRegistryFactory.CreateAutoActivating();
+            var work1 = workRegistry.Register(subject, new TestWorkerIntToIntSquared());
+            var work2 = workRegistry.Register(subject, new TestWorkerIntToIntSquared());
+            var work3 = workRegistry.Register(subject, new TestWorkerIntToIntSquared());
+
+            // Act
+            workRegistry.Complete(work1);
+            workRegistry.Complete(work3);
+
+            // Assert
+            Assert.True(subject.HasObservers);
+            Assert.Equal(WorkState.Completed, work1.State);
+            Assert.Equal(WorkState.Active, work2.State);
+            Assert.Equal(WorkState.Completed, work3.State);
+            Assert.Equal(work2, workRegistry.Works.Single());
+        }
+
+
+        [Fact]
+        public void WorkCanBeCompletedManuallyExactlyOnce()
         {
             // Arrange
             var subject = new Subject<int>();
             var workRegistry = WorkRegistryFactory.CreateAutoActivating();
             var work = workRegistry.Register(subject, new TestWorkerIntToIntSquared());
-            workRegistry.Unregister(work);
+            workRegistry.Complete(work);
 
             // Act / Assert
-            Assert.Throws<InvalidOperationException>(() => workRegistry.Unregister(work));
+            Assert.Throws<InvalidOperationException>(() => workRegistry.Complete(work));
         }
 
         [Fact]
@@ -117,7 +194,52 @@ namespace Flower.Tests
         }
 
         [Fact]
-        public void DisposeUnregistersAllWorks()
+        public void ManuallyCompletingWorkAlsoCompletesDependentPipedWorks()
+        {
+            // Arrange
+            var subject = new Subject<int>();
+            var workRegistry = WorkRegistryFactory.CreateAutoActivating();
+            var work1 = workRegistry.Register(subject, new TestWorkerIntToIntSquared());
+            var work2 = work1.Pipe(new TestWorkerIntToString());
+            var work3 = work2.Pipe(new TestWorkerStringToInt());
+            var work4 = workRegistry.Register(subject, new TestWorkerIntToIntSquared());
+
+            // Act 
+            work2.Complete();
+
+            // Assert
+            Assert.Equal(new[] { work1, work4 }, workRegistry.Works);
+            Assert.Equal(WorkState.Active, work1.State);
+            Assert.Equal(WorkState.Completed, work2.State);
+            Assert.Equal(WorkState.Completed, work3.State);
+            Assert.Equal(WorkState.Active, work4.State);
+        }
+        
+        [Fact]
+        public void CompletingAllWorksIsPossibleAfterManuallyCompletingAWork()
+        {
+            // Arrange
+            var subject = new Subject<int>();
+            var workRegistry = WorkRegistryFactory.CreateAutoActivating();
+            var work1 = workRegistry.Register(subject, new TestWorkerIntToIntSquared());
+            var work2 = work1.Pipe(new TestWorkerIntToString());
+            var work3 = work2.Pipe(new TestWorkerStringToInt());
+            var work4 = workRegistry.Register(subject, new TestWorkerIntToIntSquared());
+            work2.Complete();
+
+            // Act 
+            workRegistry.CompleteAll();
+
+            // Assert
+            Assert.Empty(workRegistry.Works);
+            Assert.Equal(WorkState.Completed, work1.State);
+            Assert.Equal(WorkState.Completed, work2.State);
+            Assert.Equal(WorkState.Completed, work3.State);
+            Assert.Equal(WorkState.Completed, work4.State);
+        }
+
+        [Fact]
+        public void ItIsPossibleToCompleteAllWorks()
         {
             // Arrange
             var subject = new Subject<int>();
@@ -125,35 +247,36 @@ namespace Flower.Tests
             workRegistry.Register(subject, new TestWorkerIntToIntSquared())
                         .Pipe(new TestWorkerIntToString())
                         .Pipe(new TestWorkerStringToInt());
+            workRegistry.Register(subject, new TestWorkerIntToIntSquared());
             var works = workRegistry.Works.ToList();
 
             // Act 
-            workRegistry.Dispose();
+            workRegistry.CompleteAll();
 
             // Assert
             Assert.Equal(0, workRegistry.Works.Count());
-            Assert.True(works.All(work => work.State == WorkState.Unregistered));
+            Assert.True(works.All(work => work.State == WorkState.Completed));
         }
 
         [Fact]
-        public void CannotUnregisterNull()
+        public void CannotCompleteNullWork()
         {
             // Arrange
             var workRegistry = new WorkRegistry();
 
             // Act / Assert
-            Assert.Throws<ArgumentNullException>(() => workRegistry.Unregister(null));
+            Assert.Throws<ArgumentNullException>(() => workRegistry.Complete(null));
         }
         
         [Fact]
-        public void CannotUnregisterIfNotRegistered()
+        public void CannotCompleteWorkIfNotRegisteredWithTheWorkRegistry()
         {
             // Arrange
             var workRegistry = new WorkRegistry();
             var work = A.Fake<IWork>();
 
             // Act / Assert
-            Assert.Throws<InvalidOperationException>(() => workRegistry.Unregister(work));
+            Assert.Throws<InvalidOperationException>(() => workRegistry.Complete(work));
         }
     }
 }

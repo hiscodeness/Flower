@@ -69,6 +69,7 @@
     <Compile Include="TestDoubles\TestWorks.cs" />
     <Compile Include="TriggeringTests.cs" />
     <Compile Include="WorkRunners\ImmediateWorkRunnerTests.cs" />
+    <Compile Include="Works\ExecutableWorkTests.cs" />
     <Compile Include="Works\TriggeredWorkTests.cs" />
     <Compile Include="Works\WorkTests.cs" />
     <Compile Include="Works\WorkTests.Input.cs" />

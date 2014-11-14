@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
@@ -8,10 +7,9 @@ using Flower.Works;
 
 namespace Flower
 {
-    public sealed class WorkRegistry : IWorkRegistry, IActivatable, ISuspendable, IDisposable
+    public sealed class WorkRegistry : IWorkRegistry, IActivatable, ISuspendable
     {
-        private bool isDisposed;
-        private readonly BlockingCollection<IWork> works = new BlockingCollection<IWork>();
+        private readonly IList<IWork> works = new List<IWork>();
 
         public WorkRegistry(WorkRegistryOptions options = null)
         {
@@ -20,7 +18,7 @@ namespace Flower
 
         public IEnumerable<IWork> Works
         {
-            get { return isDisposed ? Enumerable.Empty<IWork>() : works; }
+            get { return works; }
         }
 
         public WorkRegistryOptions Options { get; private set; }
@@ -28,22 +26,14 @@ namespace Flower
         public IActionWork Register<TInput>(IObservable<TInput> trigger, IWorkerResolver workerResolver)
         {
             var work = new ActionWork(new ActionWorkRegistration(this, trigger.Select(input => (object)input), workerResolver));
-            Add(work);
-            if (Options.RegisterWorkBehavior == RegisterWorkBehavior.RegisterActivated)
-            {
-                work.Activate();
-            }
+            Register(work);
             return work;
         }
-
+        
         public IActionWork<TInput> Register<TInput>(IObservable<TInput> trigger, IWorkerResolver<TInput> workerResolver)
         {
             var work = new ActionWork<TInput>(new ActionWorkRegistration<TInput>(this, trigger, workerResolver));
-            Add(work);
-            if(Options.RegisterWorkBehavior == RegisterWorkBehavior.RegisterActivated)
-            {
-                work.Activate();
-            }
+            Register(work);
             return work;
         }
 
@@ -52,27 +42,8 @@ namespace Flower
             IWorkerResolver<TInput, TOutput> workerResolver)
         {
             var work = new FuncWork<TInput, TOutput>(new FuncWorkRegistration<TInput, TOutput>(this, trigger, workerResolver));
-            Add(work);
-            if(Options.RegisterWorkBehavior == RegisterWorkBehavior.RegisterActivated)
-            {
-                work.Activate();
-            }
+            Register(work);
             return work;
-        }
-
-        public void Unregister(IWork work)
-        {
-            if (work == null) throw new ArgumentNullException("work");
-
-            if (!works.Contains(work))
-            {
-                throw new InvalidOperationException(
-                    "Cannot unregister work that is not contained in this work registry.");
-            }
-
-            work.Suspend();
-            Remove(work);
-            work.Unregister();
         }
 
         public void Activate()
@@ -90,18 +61,37 @@ namespace Flower
                 work.Suspend();
             }
         }
-
-        public void Dispose()
+        
+        public void Complete(IWork work)
         {
-            if (isDisposed) return;
+            if (work == null) throw new ArgumentNullException("work");
 
-            isDisposed = true;
-            foreach (var work in works.ToList())
+            if (!works.Contains(work))
             {
-                Unregister(work);
+                throw new InvalidOperationException(
+                    "Cannot complete work that is not contained in this work registry.");
             }
 
-            works.Dispose();
+            work.Suspend();
+            Remove(work);
+            work.Complete();
+        }
+
+        public void CompleteAll()
+        {
+            foreach (var work in works.Reverse().ToList())
+            {
+                Complete(work);
+            }
+        }
+        
+        private void Register(IWork work)
+        {
+            Add(work);
+            if (Options.RegisterWorkBehavior == RegisterWorkBehavior.RegisterActivated)
+            {
+                work.Activate();
+            }
         }
 
         private void Add<TWork>(TWork work) where TWork : IWork
@@ -111,7 +101,7 @@ namespace Flower
 
         private void Remove(IWork work)
         {
-            works.TryTake(out work);
+            works.Remove(work);
         }
     }
 }

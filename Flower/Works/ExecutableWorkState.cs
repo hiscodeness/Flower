@@ -5,7 +5,7 @@ namespace Flower.Works
     /// <summary>
     /// State of a work that has been triggered.
     /// </summary>
-    public enum TriggeredWorkState
+    public enum ExecutableWorkState
     {
         /// <summary>
         /// The work has been triggered and will be (or has been) submitted on a <see cref="IWorkRunner" />.

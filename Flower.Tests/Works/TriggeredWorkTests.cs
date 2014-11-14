@@ -10,24 +10,6 @@ namespace Flower.Tests.Works
     public class TriggeredWorkTests
     {
         [Fact]
-        public void WhenTriggeredHasCorrectOutputValue()
-        {
-            // Arrange
-            var workRegistry = WorkRegistryFactory.CreateAutoActivating();
-            var trigger = new Subject<int>();
-            var work = workRegistry.Register(trigger, new TestWorkerIntToIntSquared());
-            var outputs = new List<int>();
-            work.Triggered.Subscribe(w => outputs.Add(w.Output));
-            work.Executed.Subscribe(w => outputs.Add(w.Output));
-
-            // Act
-            trigger.OnNext(2);
-
-            // Assert
-            Assert.Equal(default(int), outputs.First());
-        }
-
-        [Fact]
         public void WhenExecutedHasCorrectOutputValue()
         {
             // Arrange
@@ -35,7 +17,6 @@ namespace Flower.Tests.Works
             var trigger = new Subject<int>();
             var work = workRegistry.Register(trigger, new TestWorkerIntToIntSquared());
             var outputs = new List<int>();
-            work.Triggered.Subscribe(w => outputs.Add(w.Output));
             work.Executed.Subscribe(w => outputs.Add(w.Output));
 
             // Act

@@ -4,6 +4,19 @@ using System.Globalization;
 
 namespace Flower.Tests.TestDoubles
 {
+    internal class TestWorkerThrowsException : IWorker
+    {
+        public void Execute()
+        {
+            throw new Exception(ErrorMessage);
+        }
+
+        public static string ErrorMessage
+        {
+            get { return "Test worker exception."; }
+        }
+    }
+
     internal class TestWorker : IWorker
     {
         public void Execute()
@@ -49,6 +62,22 @@ namespace Flower.Tests.TestDoubles
         public int Execute(string input)
         {
             return int.Parse(input);
+        }
+    }
+
+    internal class TestWorkerIntToIntThrowOnEven : IWorker<int, int>
+    {
+        public const string ErrorMessage = "Even numbers throw exception.";
+        public static readonly Func<int, int> WorkerFunc = i => i;
+
+        public int Execute(int input)
+        {
+            if (input%2 == 0)
+            {
+                throw new ArgumentException(ErrorMessage);
+            }
+
+            return WorkerFunc(input);
         }
     }
 }

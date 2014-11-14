@@ -8,6 +8,7 @@ namespace Flower.Works
     internal abstract class Work<TInput> : IRegisteredWork<TInput>
     {
         private IDisposable triggerSubscription;
+        private bool isBeingRemovedFromWorkRegistry;
 
         protected Work(IWorkRegistration<TInput> registration)
         {
@@ -20,10 +21,10 @@ namespace Flower.Works
         public IWorkRegistration<TInput> Registration { get; private set; }
         public ITriggerEvents TriggerEvents { get; private set; }
 
-        public ITriggeredWork Trigger(IWorkRunner workRunner, TInput input)
+        public IExecutableWork Trigger(IWorkRunner workRunner, TInput input)
         {
-            var triggeredWork = CreateTriggeredWork(workRunner, input);
-            TriggeredWorkCreated(triggeredWork);
+            var triggeredWork = CreateExecutableWork(workRunner, input);
+            WorkTriggered(triggeredWork);
             return triggeredWork;
         }
 
@@ -47,37 +48,29 @@ namespace Flower.Works
             triggerSubscription = null;
         }
 
-        public void Unregister()
+        public void Complete(WorkState withState)
         {
             if (Registration.WorkRegistry.Works.Contains(this))
             {
-                Registration.WorkRegistry.Unregister(this);
+                isBeingRemovedFromWorkRegistry = true;
+                Registration.WorkRegistry.Complete(this);
+                isBeingRemovedFromWorkRegistry = false;
             }
 
-            State = WorkState.Unregistered;
+            if (isBeingRemovedFromWorkRegistry) return;
+
+            State = withState;
+            WorkCompleted();
         }
 
-        protected abstract void TriggeredWorkCreated(ITriggeredWork triggeredWork);
-        protected abstract ITriggeredWork CreateTriggeredWork(IWorkRunner workRunner, TInput input);
-
-        public void WorkerErrored(Exception error)
+        void IWork.Complete()
         {
-            switch (Registration.WorkRegistry.Options.WorkerErrorBehavior)
-            {
-                case WorkerErrorBehavior.Ignore:
-                    // Eats exception
-                    //Log.Warning("Continue on worker error: {0}.", error);
-                    break;
-                case WorkerErrorBehavior.CompleteWork:
-                    Registration.WorkRegistry.Unregister(this);
-                    State = WorkState.WorkerError;
-                    break;
-                case WorkerErrorBehavior.CompleteWorkAndThrow:
-                    Registration.WorkRegistry.Unregister(this);
-                    State = WorkState.WorkerError;
-                    throw error;
-            }
+            Complete(WorkState.Completed);
         }
+
+        protected abstract void WorkTriggered(ITriggeredWork triggeredWork);
+        protected abstract IExecutableWork CreateExecutableWork(IWorkRunner workRunner, TInput input);
+        protected abstract void WorkCompleted();
 
         private void TriggerOnNext(TInput input)
         {
@@ -93,111 +86,129 @@ namespace Flower.Works
 
         private void TriggerOnError(Exception exception)
         {
-            Registration.WorkRegistry.Unregister(this);
-            State = WorkState.TriggerError;
             TriggerEvents.RaiseTriggerErrored(exception);
+            Complete(WorkState.TriggerError);
         }
 
         private void TriggerOnCompleted()
         {
-            Registration.WorkRegistry.Unregister(this);
-            State = WorkState.Completed;
             TriggerEvents.RaiseTriggerCompleted();
+            Complete(WorkState.Completed);
         }
     }
 
     internal class ActionWork : Work<object>, IRegisteredActionWork
     {
-        private readonly WorkObservablesHelper<IRegisteredActionWork, ITriggeredActionWork> observables;
+        private readonly ActionWorkObservablesHelper observables;
 
         public ActionWork(IActionWorkRegistration registration)
             : base(registration)
         {
             Registration = registration;
-            observables = new WorkObservablesHelper<IRegisteredActionWork, ITriggeredActionWork>(this);
+            observables = new ActionWorkObservablesHelper(this);
         }
 
         new public IActionWorkRegistration Registration { get; private set; }
         public IObservable<ITriggeredActionWork> Triggered { get { return observables.WorkTriggered; } }
-        public IObservable<ITriggeredActionWork> Executed { get { return observables.WorkExecuted; } }
+        public IObservable<IExecutableActionWork> Executed { get { return observables.WorkExecuted; } }
 
-        protected override ITriggeredWork CreateTriggeredWork(IWorkRunner workRunner, object input)
+        protected override IExecutableWork CreateExecutableWork(IWorkRunner workRunner, object input)
         {
-            return new TriggeredActionWork(workRunner, this, input);
+            return new ExecutableActionWork(workRunner, this, input);
         }
 
-        protected override void TriggeredWorkCreated(ITriggeredWork triggeredWork)
+        protected override void WorkTriggered(ITriggeredWork triggeredWork)
         {
             observables.RaiseWorkTriggered(triggeredWork as ITriggeredActionWork);
         }
 
-        public void WorkerExecuted(ITriggeredActionWork triggeredWork)
+        public void WorkerExecuted(IExecutableActionWork triggeredWork)
         {
             observables.RaiseWorkExecuted(triggeredWork);
+        }
+
+        protected override void WorkCompleted()
+        {
+            observables.RaiseWorkCompleted();
         }
     }
 
     internal class ActionWork<TInput> : Work<TInput>, IRegisteredActionWork<TInput>
     {
-        private readonly WorkObservablesHelper<IRegisteredActionWork<TInput>, ITriggeredActionWork<TInput>> observables;
+        private readonly ActionWorkObservablesHelper<TInput> observables;
 
         public ActionWork(IActionWorkRegistration<TInput> registration)
             : base(registration)
         {
             Registration = registration;
-            observables = new WorkObservablesHelper<IRegisteredActionWork<TInput>, ITriggeredActionWork<TInput>>(this);
+            observables = new ActionWorkObservablesHelper<TInput>(this);
         }
 
         new public IActionWorkRegistration<TInput> Registration { get; private set; }
         public IObservable<ITriggeredActionWork<TInput>> Triggered { get { return observables.WorkTriggered; } }
-        public IObservable<ITriggeredActionWork<TInput>> Executed { get { return observables.WorkExecuted; } }
+        public IObservable<IExecutableActionWork<TInput>> Executed { get { return observables.WorkExecuted; } }
 
-        protected override ITriggeredWork CreateTriggeredWork(IWorkRunner workRunner, TInput input)
+        protected override IExecutableWork CreateExecutableWork(IWorkRunner workRunner, TInput input)
         {
-            return new TriggeredActionWork<TInput>(workRunner, this, input);
+            return new ExecutableActionWork<TInput>(workRunner, this, input);
         }
 
-        protected override void TriggeredWorkCreated(ITriggeredWork triggeredWork)
+        protected override void WorkTriggered(ITriggeredWork triggeredWork)
         {
             observables.RaiseWorkTriggered(triggeredWork as ITriggeredActionWork<TInput>);
         }
 
-        public void WorkerExecuted(ITriggeredActionWork<TInput> triggeredWork)
+        public void WorkerExecuted(IExecutableActionWork<TInput> triggeredWork)
         {
             observables.RaiseWorkExecuted(triggeredWork);
+        }
+        
+        protected override void WorkCompleted()
+        {
+            observables.RaiseWorkCompleted();
         }
     }
 
     internal class FuncWork<TInput, TOutput> : Work<TInput>, IRegisteredFuncWork<TInput, TOutput>
     {
-        private readonly WorkObservablesHelper<IRegisteredFuncWork<TInput, TOutput>, ITriggeredFuncWork<TInput, TOutput>> observables;
+        private readonly FuncWorkObservablesHelper<TInput, TOutput> observables;
 
         public FuncWork(IFuncWorkRegistration<TInput, TOutput> registration)
             : base(registration)
         {
             Registration = registration;
-            observables = new WorkObservablesHelper<IRegisteredFuncWork<TInput, TOutput>, ITriggeredFuncWork<TInput, TOutput>>(this);
-            Output = Executed.Select(executedWork => executedWork.Output);
-        }
+            observables = new FuncWorkObservablesHelper<TInput, TOutput>(this);
+            Output = Executed.Where(WorkSucceeded).Select(executedWork => executedWork.Output);
+        }        
 
         new public IFuncWorkRegistration<TInput, TOutput> Registration { get; private set; }
         public IObservable<ITriggeredFuncWork<TInput, TOutput>> Triggered { get { return observables.WorkTriggered; } }
-        public IObservable<ITriggeredFuncWork<TInput, TOutput>> Executed { get { return observables.WorkExecuted; } }
+        public IObservable<IExecutableFuncWork<TInput, TOutput>> Executed { get { return observables.WorkExecuted; } }
         public IObservable<TOutput> Output { get; private set; }
 
-        protected override ITriggeredWork CreateTriggeredWork(IWorkRunner workRunner, TInput input)
+        protected override IExecutableWork CreateExecutableWork(IWorkRunner workRunner, TInput input)
         {
-            return new TriggeredFuncWork<TInput, TOutput>(workRunner, this, input);
+            return new ExecutableFuncWork<TInput, TOutput>(workRunner, this, input);
         }
 
-        protected override void TriggeredWorkCreated(ITriggeredWork triggeredWork)
+        protected override void WorkTriggered(ITriggeredWork triggeredWork)
         {
             observables.RaiseWorkTriggered(triggeredWork as ITriggeredFuncWork<TInput, TOutput>);
         }
 
-        public void WorkerExecuted(ITriggeredFuncWork<TInput, TOutput> triggeredWork)
+        public void WorkerExecuted(IExecutableFuncWork<TInput, TOutput> triggeredWork)
         {
             observables.RaiseWorkExecuted(triggeredWork);
+        }
+
+        protected override void WorkCompleted()
+        {
+            observables.RaiseWorkCompleted();
+        }
+    
+        private static bool WorkSucceeded(IExecutableFuncWork<TInput, TOutput> executedWork)
+        {
+            return executedWork.State == ExecutableWorkState.Success;
         }
     }
 }

@@ -17,27 +17,24 @@ namespace Flower
         Active,
 
         /// <summary>
-        /// The work has been unregistered from the <see cref="IWorkRegistry" /> because the trigger
+        /// The work has been removed from the <see cref="IWorkRegistry" /> because the trigger
         /// observable ended in error.
         /// </summary>
         TriggerError,
 
         /// <summary>
-        /// The work has been unregistered from the <see cref="IWorkRegistry" /> because the worker
+        /// The work has been removed from the <see cref="IWorkRegistry" /> because the worker
         /// errored.
         /// </summary>
         WorkerError,
 
         /// <summary>
-        /// The work has been unregistered from the <see cref="WorkRegistry" /> because the trigger
-        /// completed.
+        /// The work has been completed and removed from the <see cref="IWorkRegistry" />.
         /// </summary>
-        Completed,
-
-        /// <summary>
-        /// The work has been unregistered from the <see cref="WorkRegistry" /> manually. The
-        /// work has also unsubscribed from the trigger.
-        /// </summary>
-        Unregistered
+        /// <remarks>
+        /// Works are completed when the trigger completes or errors. Workers can also be completed
+        /// manually by calling <see cref="IWorkRegistry.Complete"/>.
+        /// </remarks>
+        Completed
     }
 }
