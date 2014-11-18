@@ -46,7 +46,7 @@ namespace Flower.Tests.WorkRunners
         }
 
         [Fact]
-        public void BackgroundThreadQueueDoesntThrowWhenDisposed()
+        public void BackgroundThreadQueueDoesntWaitForAllTriggeredWorksToExecute()
         {
             // Arrange
             var manualResetEvent = new ManualResetEventSlim();
@@ -74,7 +74,7 @@ namespace Flower.Tests.WorkRunners
 
             // Assert
             Assert.DoesNotThrow(workRunner.Dispose);
-            Assert.InRange(stopwatch.ElapsedMilliseconds, 0, 250);
+            Assert.InRange(stopwatch.ElapsedMilliseconds, 0, 299);
             Assert.Equal(2, executedWorkCount);
         }
         
