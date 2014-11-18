@@ -174,7 +174,7 @@ namespace Flower.Tests.Works
             Assert.Equal(WorkState.WorkerError, result);
         }
 
-        private class WorkerErrorBehaviorTestContext
+        private sealed class WorkerErrorBehaviorTestContext : IDisposable
         {
             private readonly Subject<int> trigger;
 
@@ -200,6 +200,11 @@ namespace Flower.Tests.Works
                 {
                     trigger.OnNext(value);
                 }
+            }
+
+            public void Dispose()
+            {
+                trigger.Dispose();
             }
         }
     }
