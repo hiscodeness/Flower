@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ namespace Flower.Tests.WorkRunners
         [Theory]
         [InlineData(5, 100)]
         [InlineData(100, 5)]
-        public void BackgroundTreadQueueExecutesOneWorkWhileOthersArePending(int delayInMilliseconds, int workCount)
+        public void BackgroundThreadQueueExecutesOneWorkWhileOthersArePending(int delayInMilliseconds, int workCount)
         {
             // Arrange
             var countdown = new CountdownEvent(workCount);
@@ -42,6 +43,39 @@ namespace Flower.Tests.WorkRunners
             Assert.True(workRunnerSnapshots.Select(state => state.ExecutingWorks.Count).All(count => count == 1));
             var maxPendingCount = Enumerable.Range(1, workCount-1).Aggregate((acc, x) => acc + x);
             Assert.InRange(workRunnerSnapshots.Sum(state => state.PendingWorks.Count), workCount, maxPendingCount);
+        }
+
+        [Fact]
+        public void BackgroundThreadQueueDoesntThrowWhenDisposed()
+        {
+            // Arrange
+            var manualResetEvent = new ManualResetEventSlim();
+            var workRunner = new BackgroundThreadQueueWorkRunner();
+            var executableWork = A.Fake<IExecutableWork>();
+            var executedWorkCount = 0;
+            A.CallTo(() => executableWork.Execute()).Invokes(
+                _ =>
+                    {
+                        executedWorkCount++;
+                        manualResetEvent.Set();
+                        Task.Delay(100).Wait();
+                    });
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            // Act
+            for (var i = 0; i < 5; i++)
+            {
+                workRunner.Submit(executableWork);
+            }
+            manualResetEvent.Wait(TimeSpan.FromSeconds(10));
+            manualResetEvent.Reset();
+            manualResetEvent.Wait(TimeSpan.FromSeconds(10));
+
+            // Assert
+            Assert.DoesNotThrow(workRunner.Dispose);
+            Assert.InRange(stopwatch.ElapsedMilliseconds, 0, 250);
+            Assert.Equal(2, executedWorkCount);
         }
         
         private static WorkRunnerSnapshot GetSnapshot(IWorkRunner workRunner)

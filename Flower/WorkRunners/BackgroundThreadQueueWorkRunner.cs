@@ -1,27 +1,28 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Flower.Works;
 
 namespace Flower.WorkRunners
 {
-    public class BackgroundThreadQueueWorkRunner : IWorkRunner
+    public sealed class BackgroundThreadQueueWorkRunner : IWorkRunner, IDisposable
     {
+        private readonly ManualResetEventSlim manualResetEvent = new ManualResetEventSlim();
         private readonly BlockingCollection<IExecutableWork> pendingWorks = new BlockingCollection<IExecutableWork>();
-        private readonly BlockingCollection<IExecutableWork> executingWorks = new BlockingCollection<IExecutableWork>();
+        private IExecutableWork executingWork;
 
         public BackgroundThreadQueueWorkRunner()
         {
-            // All tasks are queued and dequeued on a separate long running thread
             Task.Factory.StartNew(DequeuePendingWorksThread, TaskCreationOptions.LongRunning);
         }
 
         public IEnumerable<IExecutableWork> PendingWorks { get { return pendingWorks; } }
-        public IEnumerable<IExecutableWork> ExecutingWorks { get { return executingWorks; } }
-        
+        public IEnumerable<IExecutableWork> ExecutingWorks { get { return new[] { executingWork }; } }
+
         public void Submit(IExecutableWork executableWork)
         {
             pendingWorks.Add(executableWork);
@@ -29,14 +30,34 @@ namespace Flower.WorkRunners
 
         private void DequeuePendingWorksThread()
         {
-            foreach (var work in pendingWorks.GetConsumingEnumerable())
-            {
-                executingWorks.Add(work);
-                work.Execute();
-                executingWorks.Take();
-            }
+            DequeueUntilAddingCompleted();
+            manualResetEvent.Set();
+        }
 
+        private void DequeueUntilAddingCompleted()
+        {
+            foreach (var work in pendingWorks.GetConsumingEnumerable().TakeWhile(ContinueDequeuing)) 
+            {
+                Debug.Assert(executingWork == null, "Internal error, currently executing work should have been null.");
+                executingWork = work;
+                work.Execute();
+                executingWork = null;
+            }
+        }
+
+        private bool ContinueDequeuing(IExecutableWork work)
+        {
+            return !pendingWorks.IsAddingCompleted;
+        }
+
+        public void Dispose()
+        {
+            if (pendingWorks.IsAddingCompleted) return;
+
+            pendingWorks.CompleteAdding();
+            manualResetEvent.Wait();
             pendingWorks.Dispose();
+            manualResetEvent.Dispose();
         }
     }
 }
