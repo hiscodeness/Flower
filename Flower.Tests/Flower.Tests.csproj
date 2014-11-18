@@ -60,7 +60,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TestDoubles\TestExecutableWorks.cs" />
     <Compile Include="TestDoubles\TestWorkRegistrations.cs" />
     <Compile Include="TestDoubles\WorkRegistryFactory.cs" />
     <Compile Include="WorkRegistryOptionsTests.cs" />
