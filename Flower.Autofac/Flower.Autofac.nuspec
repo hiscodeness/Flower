@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>Jussi Mattila</authors>
+    <owners>Jussi Mattila</owners>
+    <licenseUrl>https://github.com/hiscodeness/Flower/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/hiscodeness/Flower</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>Copyright 2014</copyright>
+    <dependencies>
+      <dependency id="Flower" version="$version$" />
+    </dependencies>
+  </metadata>
+</package>
