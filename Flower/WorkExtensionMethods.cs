@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Reactive.Linq;
-using Flower.Workers;
 using Flower.Works;
 
 namespace Flower
