@@ -6,7 +6,7 @@
     <title>$title$</title>
     <authors>Jussi Mattila</authors>
     <owners>Jussi Mattila</owners>
-    <licenseUrl>The MIT License (MIT)</licenseUrl>
+    <licenseUrl>https://github.com/hiscodeness/Flower/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/hiscodeness/Flower</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
