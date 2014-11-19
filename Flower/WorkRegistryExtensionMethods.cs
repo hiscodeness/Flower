@@ -11,7 +11,7 @@ namespace Flower
          IObservable<TInput> trigger,
          IWorker worker)
         {
-            return workRegistry.Register(trigger, WorkerResolver.CreateFromInstance(worker));
+            return workRegistry.Register(trigger, WorkerScope.Instance(worker));
         }
 
         public static IActionWork<TInput> Register<TInput>(
@@ -19,7 +19,7 @@ namespace Flower
            IObservable<TInput> trigger,
            IWorker<TInput> worker)
         {
-            return workRegistry.Register(trigger, WorkerResolver.CreateFromInstance(worker));
+            return workRegistry.Register(trigger, WorkerScope.Instance(worker));
         }
 
         public static IFuncWork<TInput, TOutput> Register<TInput, TOutput>(
@@ -27,7 +27,7 @@ namespace Flower
             IObservable<TInput> trigger,
             IWorker<TInput, TOutput> worker)
         {
-            return workRegistry.Register(trigger, WorkerResolver.CreateFromInstance(worker));
+            return workRegistry.Register(trigger, WorkerScope.Instance(worker));
         }
     }
 }

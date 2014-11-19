@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using Flower.Workers;
 using Flower.Works;
 
@@ -23,25 +24,25 @@ namespace Flower
 
         public WorkRegistryOptions Options { get; private set; }
 
-        public IActionWork Register<TInput>(IObservable<TInput> trigger, IWorkerResolver workerResolver)
+        public IActionWork Register<TInput>(IObservable<TInput> trigger, Func<IScope<IWorker>> createWorkerScope)
         {
-            var work = new ActionWork(new ActionWorkRegistration(this, trigger.Select(input => (object)input), workerResolver));
+            var work = new ActionWork(new ActionWorkRegistration(this, trigger.Select(input => (object)input), createWorkerScope));
             Register(work);
             return work;
         }
-        
-        public IActionWork<TInput> Register<TInput>(IObservable<TInput> trigger, IWorkerResolver<TInput> workerResolver)
+
+        public IActionWork<TInput> Register<TInput>(IObservable<TInput> trigger, Func<IScope<IWorker<TInput>>> createWorkerScope)
         {
-            var work = new ActionWork<TInput>(new ActionWorkRegistration<TInput>(this, trigger, workerResolver));
+            var work = new ActionWork<TInput>(new ActionWorkRegistration<TInput>(this, trigger, createWorkerScope));
             Register(work);
             return work;
         }
 
         public IFuncWork<TInput, TOutput> Register<TInput, TOutput>(
             IObservable<TInput> trigger,
-            IWorkerResolver<TInput, TOutput> workerResolver)
+            Func<IScope<IWorker<TInput, TOutput>>> createWorkerScope)
         {
-            var work = new FuncWork<TInput, TOutput>(new FuncWorkRegistration<TInput, TOutput>(this, trigger, workerResolver));
+            var work = new FuncWork<TInput, TOutput>(new FuncWorkRegistration<TInput, TOutput>(this, trigger, createWorkerScope));
             Register(work);
             return work;
         }

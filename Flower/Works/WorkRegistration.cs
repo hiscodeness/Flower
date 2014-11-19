@@ -19,36 +19,36 @@ namespace Flower.Works
 
     internal class ActionWorkRegistration : WorkRegistration<object>, IActionWorkRegistration
     {
-        public ActionWorkRegistration(IWorkRegistry workRegistry, IObservable<object> trigger, IWorkerResolver workerResolver)
+        public ActionWorkRegistration(IWorkRegistry workRegistry, IObservable<object> trigger, Func<IScope<IWorker>> createWorkerScope)
             : base(workRegistry, trigger)
         {
-            WorkerResolver = workerResolver;
+            CreateWorkerScope = createWorkerScope;
         }
 
-        public IWorkerResolver WorkerResolver { get; private set; }
+        public Func<IScope<IWorker>> CreateWorkerScope { get; private set; }
     }
     
     internal class ActionWorkRegistration<TInput> : WorkRegistration<TInput>, IActionWorkRegistration<TInput>
     {
         public ActionWorkRegistration(
-            IWorkRegistry workRegistry, IObservable<TInput> trigger, IWorkerResolver<TInput> workerResolver)
+            IWorkRegistry workRegistry, IObservable<TInput> trigger, Func<IScope<IWorker<TInput>>> createWorkerScope)
             : base(workRegistry, trigger)
         {
-            WorkerResolver = workerResolver;
+            CreateWorkerScope = createWorkerScope;
         }
 
-        public IWorkerResolver<TInput> WorkerResolver { get; private set; }
+        public Func<IScope<IWorker<TInput>>> CreateWorkerScope { get; private set; }
     }
 
     internal class FuncWorkRegistration<TInput, TOutput> : WorkRegistration<TInput>, IFuncWorkRegistration<TInput, TOutput>
     {
         public FuncWorkRegistration(
-            IWorkRegistry workRegistry, IObservable<TInput> trigger, IWorkerResolver<TInput, TOutput> workerResolver)
+            IWorkRegistry workRegistry, IObservable<TInput> trigger, Func<IScope<IWorker<TInput, TOutput>>> createWorkerScope)
             : base(workRegistry, trigger)
         {
-            WorkerResolver = workerResolver;
+            CreateWorkerScope = createWorkerScope;
         }
 
-        public IWorkerResolver<TInput, TOutput> WorkerResolver { get; private set; }
+        public Func<IScope<IWorker<TInput, TOutput>>> CreateWorkerScope { get; private set; }
     }
 }

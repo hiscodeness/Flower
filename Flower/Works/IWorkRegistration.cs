@@ -16,16 +16,16 @@ namespace Flower.Works
 
     public interface IActionWorkRegistration : IWorkRegistration<object>
     {
-        IWorkerResolver WorkerResolver { get; }
+        Func<IScope<IWorker>> CreateWorkerScope { get; }
     }
 
     public interface IActionWorkRegistration<TInput> : IWorkRegistration<TInput>
     {
-        IWorkerResolver<TInput> WorkerResolver { get; }
+        Func<IScope<IWorker<TInput>>> CreateWorkerScope { get; }
     }
 
-    public interface IFuncWorkRegistration<TInput, TOutput> : IWorkRegistration<TInput>
+    public interface IFuncWorkRegistration<TInput, out TOutput> : IWorkRegistration<TInput>
     {
-        IWorkerResolver<TInput, TOutput> WorkerResolver { get; }
+        Func<IScope<IWorker<TInput, TOutput>>> CreateWorkerScope { get; }
     }
 }
