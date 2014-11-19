@@ -13,15 +13,15 @@ namespace Flower
     
         IActionWork Register<TInput>(
            IObservable<TInput> trigger,
-           IWorkerResolver workerResolver);
+           Func<IScope<IWorker>> createWorkerScope);
 
         IActionWork<TInput> Register<TInput>(
            IObservable<TInput> trigger,
-           IWorkerResolver<TInput> workerResolver);
+           Func<IScope<IWorker<TInput>>> createWorkerScope);
 
         IFuncWork<TInput, TOutput> Register<TInput, TOutput>(
             IObservable<TInput> trigger,
-            IWorkerResolver<TInput, TOutput> workerResolver);
+            Func<IScope<IWorker<TInput, TOutput>>> createWorkerScope);
         
         void Complete(IWork work);
         void CompleteAll();

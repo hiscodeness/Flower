@@ -21,7 +21,7 @@ namespace Flower.Tests.Works
             var work = workRegistry.Register(trigger, worker);
 
             // Assert
-            Assert.Equal(worker, work.Registration.WorkerResolver.Resolve());
+            Assert.Equal(worker, work.Registration.CreateWorkerScope().Worker);
         }
 
         [Fact]

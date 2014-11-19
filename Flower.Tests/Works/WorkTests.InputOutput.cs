@@ -38,14 +38,14 @@ namespace Flower.Tests.Works
         }
 
         [Fact]
-        public void PipingWorkOutputToWorkerResolverInputSucceeds()
+        public void PipingWorkOutputToWorkerScopeSucceeds()
         {
             // Arrange
             var work = new TestWorkIntToIntSquared();
-            var workerResolver = WorkerResolver.CreateFromInstance(new TestWorkerIntToIntSquared());
+            var createWorkerScope = WorkerScope.Instance(new TestWorkerIntToIntSquared());
 
             // Act
-            var pipedWork = work.Pipe(workerResolver);
+            var pipedWork = work.Pipe(createWorkerScope);
 
             // Assert
             Assert.NotNull(pipedWork.Registration.Trigger);

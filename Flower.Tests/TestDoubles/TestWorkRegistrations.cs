@@ -10,13 +10,13 @@ namespace Flower.Tests.TestDoubles
         private readonly WorkRegistry workRegistry = new WorkRegistry();
         private readonly Subject<int> trigger = new Subject<int>();
 
-        private readonly IWorkerResolver<int, int> workerResolver =
-            Workers.WorkerResolver.CreateFromInstance(new TestWorkerIntToIntSquared());
+        private readonly Func<IScope<IWorker<int, int>>> createWorkerScope =
+            Workers.WorkerScope.Instance(new TestWorkerIntToIntSquared());
 
         public IWorkRegistry WorkRegistry { get { return workRegistry; } }
         public WorkRegistryOptions Options { get { return workRegistry.Options; } }
         public IObservable<int> Trigger { get { return trigger; } }
-        public IWorkerResolver<int, int> WorkerResolver { get { return workerResolver; } }
+        public Func<IScope<IWorker<int, int>>> CreateWorkerScope { get { return createWorkerScope; } }
         
         public void Dispose()
         {

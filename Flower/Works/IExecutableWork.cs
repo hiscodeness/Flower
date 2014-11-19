@@ -16,17 +16,17 @@ namespace Flower.Works
 
     public interface IExecutableActionWork : ITriggeredActionWork, IExecutableWork<object>
     {
-        IWorker Worker { get; }
+        IScope<IWorker> WorkerScope { get; }
     }
 
     public interface IExecutableActionWork<TInput> : ITriggeredActionWork<TInput>, IExecutableWork<TInput>
     {
-        IWorker<TInput> Worker { get; }
+        IScope<IWorker<TInput>> WorkerScope { get; }
     }
 
     public interface IExecutableFuncWork<TInput, TOutput> : ITriggeredFuncWork<TInput, TOutput>, IExecutableWork<TInput>
     {
-        IWorker<TInput, TOutput> Worker { get; }
+        IScope<IWorker<TInput, TOutput>> WorkerScope { get; }
         TOutput Output { get; }
     }
 }

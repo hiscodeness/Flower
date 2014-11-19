@@ -1,5 +1,6 @@
 ﻿using System;
 using Flower.WorkRunners;
+using Flower.Workers;
 
 namespace Flower.Works
 {
@@ -26,9 +27,9 @@ namespace Flower.Works
             try
             {
                 State = ExecutableWorkState.Executing;
-                ResolveWorker();
+                CreateWorkerScope();
                 ExecuteWorker();
-                ReleaseWorker();
+                DisposeWorkerScope();
                 State = ExecutableWorkState.Success;
                 WorkerExecuted();
             }
@@ -78,9 +79,9 @@ namespace Flower.Works
             }
         }
 
-        protected abstract void ResolveWorker();
+        protected abstract void CreateWorkerScope();
         protected abstract void ExecuteWorker();
-        protected abstract void ReleaseWorker();
+        protected abstract void DisposeWorkerScope();
         protected abstract void WorkerExecuted();
     }
 
@@ -94,21 +95,21 @@ namespace Flower.Works
             this.work = work;
         }
 
-        public IWorker Worker { get; private set; }
+        public IScope<IWorker> WorkerScope { get; private set; }
 
-        protected override void ResolveWorker()
+        protected override void CreateWorkerScope()
         {
-            Worker = work.Registration.WorkerResolver.Resolve();
+            WorkerScope = work.Registration.CreateWorkerScope();
         }
 
         protected override void ExecuteWorker()
         {
-            Worker.Execute();
+            WorkerScope.Worker.Execute();
         }
 
-        protected override void ReleaseWorker()
+        protected override void DisposeWorkerScope()
         {
-            work.Registration.WorkerResolver.Release(Worker);
+            WorkerScope.Dispose();
         }
 
         protected override void WorkerExecuted()
@@ -130,21 +131,21 @@ namespace Flower.Works
         IWork ITriggeredWork.Work { get { return Work; } }
         IWork<TInput> ITriggeredWork<TInput>.Work { get { return Work; } }
         public new IActionWork<TInput> Work { get { return work; } }
-        public IWorker<TInput> Worker { get; private set; }
+        public IScope<IWorker<TInput>> WorkerScope { get; private set; }
 
-        protected override void ResolveWorker()
+        protected override void CreateWorkerScope()
         {
-            Worker = work.Registration.WorkerResolver.Resolve(Input);
+            WorkerScope = work.Registration.CreateWorkerScope();
         }
 
         protected override void ExecuteWorker()
         {
-            Worker.Execute(Input);
+            WorkerScope.Worker.Execute(Input);
         }
 
-        protected override void ReleaseWorker()
+        protected override void DisposeWorkerScope()
         {
-            work.Registration.WorkerResolver.Release(Worker);
+            WorkerScope.Dispose();
         }
 
         protected override void WorkerExecuted()
@@ -165,22 +166,22 @@ namespace Flower.Works
         IWork ITriggeredWork.Work { get { return Work; } }
         IWork<TInput> ITriggeredWork<TInput>.Work { get { return Work; } }
         public new IFuncWork<TInput, TOutput> Work { get { return work; } }
-        public IWorker<TInput, TOutput> Worker { get; private set; }
+        public IScope<IWorker<TInput, TOutput>> WorkerScope { get; private set; }
         public TOutput Output { get; private set; }
 
-        protected override void ResolveWorker()
+        protected override void CreateWorkerScope()
         {
-            Worker = work.Registration.WorkerResolver.Resolve(Input);
+            WorkerScope = work.Registration.CreateWorkerScope();
         }
 
         protected override void ExecuteWorker()
         {
-            Output = Worker.Execute(Input);
+            Output = WorkerScope.Worker.Execute(Input);
         }
 
-        protected override void ReleaseWorker()
+        protected override void DisposeWorkerScope()
         {
-            work.Registration.WorkerResolver.Release(Worker);
+            WorkerScope.Dispose();
         }
 
         protected override void WorkerExecuted()
