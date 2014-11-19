@@ -3,7 +3,7 @@ using Autofac.Features.OwnedInstances;
 
 namespace Flower.Autofac
 {
-    public class OwnedScope<T> : IScope<T>
+    public sealed class OwnedScope<T> : IScope<T>
     {
         private readonly Owned<T> owned;
 

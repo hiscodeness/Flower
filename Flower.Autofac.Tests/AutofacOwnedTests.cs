@@ -35,7 +35,7 @@ namespace Flower.Autofac.Tests
         }
     }
 
-    public class TestWorker : IWorker<int, int>, IDisposable
+    public sealed class TestWorker : IWorker<int, int>, IDisposable
     {
         public bool IsDisposed { get; private set; }
 
