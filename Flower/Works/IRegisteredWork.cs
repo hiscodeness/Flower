@@ -1,6 +1,3 @@
-using System;
-using Flower.WorkRunners;
-
 namespace Flower.Works
 {
     internal interface IRegisteredWork : IWork
@@ -9,9 +6,8 @@ namespace Flower.Works
         void Complete(WorkState withState);
     }
 
-    internal interface IRegisteredWork<TInput> : IRegisteredWork, IWork<TInput>
+    internal interface IRegisteredWork<out TInput> : IRegisteredWork, IWork<TInput>
     {
-        IExecutableWork Trigger(IWorkRunner workRunner, TInput input);
     }
 
     internal interface IRegisteredActionWork : IRegisteredWork<object>, IActionWork

@@ -21,13 +21,6 @@ namespace Flower.Works
         public IWorkRegistration<TInput> Registration { get; private set; }
         public ITriggerEvents TriggerEvents { get; private set; }
 
-        public IExecutableWork Trigger(IWorkRunner workRunner, TInput input)
-        {
-            var triggeredWork = CreateExecutableWork(workRunner, input);
-            WorkTriggered(triggeredWork);
-            return triggeredWork;
-        }
-
         public void Activate()
         {
             if (State == WorkState.Active) return;
@@ -77,7 +70,8 @@ namespace Flower.Works
         private void TriggerOnNext(TInput input)
         {
             var workRunner = ResolveWorkRunner();
-            var triggeredWork = Trigger(workRunner, input);
+            var triggeredWork = CreateExecutableWork(workRunner, input);
+            WorkTriggered(triggeredWork);
             workRunner.Submit(triggeredWork);
         }
 
