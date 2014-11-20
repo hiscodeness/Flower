@@ -24,25 +24,38 @@ namespace Flower
 
         public WorkRegistryOptions DefaultOptions { get; private set; }
 
-        public IActionWork Register<TInput>(IObservable<TInput> trigger, Func<IScope<IWorker>> createWorkerScope)
+        public IActionWork Register<TInput>(
+            IObservable<TInput> trigger,
+            Func<IScope<IWorker>> createWorkerScope,
+            WorkRegistryOptions options = null)
         {
-            var work = new ActionWork(new ActionWorkRegistration(this, trigger.Select(input => (object)input), createWorkerScope));
+            options = CreateRegisterOptions(options);
+            var registration = CreateRegistration(trigger, createWorkerScope, options);
+            var work = new ActionWork(registration);
             Register(work);
             return work;
         }
 
-        public IActionWork<TInput> Register<TInput>(IObservable<TInput> trigger, Func<IScope<IWorker<TInput>>> createWorkerScope)
+        public IActionWork<TInput> Register<TInput>(
+            IObservable<TInput> trigger,
+            Func<IScope<IWorker<TInput>>> createWorkerScope,
+            WorkRegistryOptions options = null)
         {
-            var work = new ActionWork<TInput>(new ActionWorkRegistration<TInput>(this, trigger, createWorkerScope));
+            options = CreateRegisterOptions(options);
+            var registration = CreateRegistration(trigger, createWorkerScope, options);
+            var work = new ActionWork<TInput>(registration);
             Register(work);
             return work;
         }
-
+        
         public IFuncWork<TInput, TOutput> Register<TInput, TOutput>(
             IObservable<TInput> trigger,
-            Func<IScope<IWorker<TInput, TOutput>>> createWorkerScope)
+            Func<IScope<IWorker<TInput, TOutput>>> createWorkerScope,
+            WorkRegistryOptions options = null)
         {
-            var work = new FuncWork<TInput, TOutput>(new FuncWorkRegistration<TInput, TOutput>(this, trigger, createWorkerScope));
+            options = CreateRegisterOptions(options);
+            var registration = CreateRegistration(trigger, createWorkerScope, options);
+            var work = new FuncWork<TInput, TOutput>(registration);
             Register(work);
             return work;
         }
@@ -85,7 +98,33 @@ namespace Flower
                 Complete(work);
             }
         }
-        
+
+        private WorkRegistryOptions CreateRegisterOptions(WorkRegistryOptions options)
+        {
+            return options ?? new WorkRegistryOptions(DefaultOptions);
+        }
+
+        private ActionWorkRegistration CreateRegistration<TInput>(
+            IObservable<TInput> trigger, Func<IScope<IWorker>> createWorkerScope, WorkRegistryOptions options)
+        {
+            return new ActionWorkRegistration(
+                this, trigger.Select(input => (object)input), createWorkerScope, options);
+        }
+
+        private ActionWorkRegistration<TInput> CreateRegistration<TInput>(
+            IObservable<TInput> trigger, Func<IScope<IWorker<TInput>>> createWorkerScope, WorkRegistryOptions options)
+        {
+            return new ActionWorkRegistration<TInput>(this, trigger, createWorkerScope, options);
+        }
+
+        private FuncWorkRegistration<TInput, TOutput> CreateRegistration<TInput, TOutput>(
+            IObservable<TInput> trigger,
+            Func<IScope<IWorker<TInput, TOutput>>> createWorkerScope,
+            WorkRegistryOptions options)
+        {
+            return new FuncWorkRegistration<TInput, TOutput>(this, trigger, createWorkerScope, options);
+        }
+
         private void Register(IWork work)
         {
             Add(work);

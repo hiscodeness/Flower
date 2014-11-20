@@ -318,5 +318,23 @@ namespace Flower.Tests
             // Act / Assert
             Assert.Throws<InvalidOperationException>(() => workRegistry.Complete(work));
         }
+        
+        [Fact]
+        public void EachRegisteredWorkHasUniqueOptions()
+        {
+            // Arrange
+            var workRegistry = new WorkRegistry();
+            var trigger = new Subject<int>();
+            
+            // Act
+            var work1 = workRegistry.Register(trigger, new TestWorkerInt());
+            var work2 = workRegistry.Register(
+                trigger, new TestWorkerInt(), new WorkRegistryOptions(RegisterWorkBehavior.RegisterSuspended));
+
+            // Assert
+            Assert.NotEqual(workRegistry.DefaultOptions, work1.Registration.Options);
+            Assert.NotEqual(workRegistry.DefaultOptions, work2.Registration.Options);
+            Assert.NotEqual(work1.Registration.Options, work2.Registration.Options);
+        }
     }
 }

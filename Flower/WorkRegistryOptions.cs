@@ -41,6 +41,13 @@ namespace Flower
                 Default.WorkRunnerResolver,
                 workerErrorBehavior) {}
 
+        public WorkRegistryOptions(WorkRegistryOptions prototype)
+            : this(
+                prototype.RegisterWorkBehavior,
+                prototype.TriggerErrorBehavior,
+                prototype.WorkRunnerResolver,
+                prototype.WorkerErrorBehavior) {}
+
         public WorkRegistryOptions(
             RegisterWorkBehavior registerWorkBehavior = RegisterWorkBehavior.RegisterActivated,
             TriggerErrorBehavior triggerErrorBehavior = TriggerErrorBehavior.CompleteWorkAndThrow,
