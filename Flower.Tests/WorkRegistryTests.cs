@@ -194,6 +194,46 @@ namespace Flower.Tests
         }
 
         [Fact]
+        public void ActivatingAllActivatesOnlySuspendedWorks()
+        {
+            // Arrange
+            var subject = new Subject<int>();
+            var workRegistry = new WorkRegistry(new WorkRegistryOptions(RegisterWorkBehavior.RegisterSuspended));
+            var work1 = workRegistry.Register(subject, new TestWorkerIntToIntSquared());
+            var work2 = work1.Pipe(new TestWorkerIntToString());
+            var work3 = work2.Pipe(new TestWorkerStringToInt());
+            work3.Activate();
+
+            // Act 
+            workRegistry.Activate();
+
+            // Assert
+            Assert.Equal(3, workRegistry.Works.Count());
+            Assert.True(workRegistry.Works.All(work => work.State == WorkState.Active));
+        }
+
+        [Fact]
+        public void ActivatingSingleWorkActivatesOnlyThatWork()
+        {
+            // Arrange
+            var subject = new Subject<int>();
+            var workRegistry = new WorkRegistry(new WorkRegistryOptions(RegisterWorkBehavior.RegisterSuspended));
+            var work1 = workRegistry.Register(subject, new TestWorkerIntToIntSquared());
+            var work2 = work1.Pipe(new TestWorkerIntToString());
+            var work3 = work2.Pipe(new TestWorkerStringToInt());
+
+            // Act 
+            work1.Activate();
+            work3.Activate();
+
+            // Assert
+            Assert.Equal(3, workRegistry.Works.Count());
+            Assert.Equal(WorkState.Active, work1.State);
+            Assert.Equal(WorkState.Suspended, work2.State);
+            Assert.Equal(WorkState.Active, work3.State);
+        }
+
+        [Fact]
         public void ManuallyCompletingWorkAlsoCompletesDependentPipedWorks()
         {
             // Arrange
