@@ -35,6 +35,9 @@ namespace Flower
         public RegisterOptions(Func<IWork, IWorkRunner> workRunnerFactory)
             : this(Default.RegisterWorkBehavior, Default.TriggerErrorBehavior, workRunnerFactory) {}
 
+        public RegisterOptions(IWorkRunner workRunner)
+            : this(Default.RegisterWorkBehavior, Default.TriggerErrorBehavior, _ => workRunner) { }
+
         public RegisterOptions(WorkerErrorBehavior workerErrorBehavior)
             : this(
                 Default.RegisterWorkBehavior,
@@ -48,7 +51,7 @@ namespace Flower
                 prototype.TriggerErrorBehavior,
                 prototype.WorkRunnerFactory,
                 prototype.WorkerErrorBehavior) {}
-
+        
         public RegisterOptions(
             RegisterWorkBehavior registerWorkBehavior = RegisterWorkBehavior.RegisterActivated,
             TriggerErrorBehavior triggerErrorBehavior = TriggerErrorBehavior.CompleteWorkAndThrow,
@@ -95,6 +98,20 @@ namespace Flower
                 RegisterWorkBehavior,
                 TriggerErrorBehavior,
                 workRunnerFactory,
+                WorkerErrorBehavior);
+        }
+        
+        public RegisterOptions With(IWorkRunner workRunner)
+        {
+            if (workRunner == null)
+            {
+                throw new ArgumentNullException("workRunner");
+            }
+
+            return new RegisterOptions(
+                RegisterWorkBehavior,
+                TriggerErrorBehavior,
+                _ => workRunner,
                 WorkerErrorBehavior);
         }
 

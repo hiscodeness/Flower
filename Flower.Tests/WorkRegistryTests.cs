@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using FakeItEasy;
 using Flower.Tests.TestDoubles;
+using Flower.WorkRunners;
 using Flower.Works;
 using Xunit;
 
@@ -13,7 +14,17 @@ namespace Flower.Tests
     public class WorkRegistryTests
     {
         [Fact]
-        public void RegisteringAndPipingWorkersCreatesAWorkflow()
+        public void UsingCustomWorkRunnersIsEasy()
+        {
+            // Arrange
+            var workRunner = new BackgroundThreadQueueWorkRunner();
+
+            // Assert
+            Assert.DoesNotThrow(() => new WorkRegistry(new RegisterOptions(workRunner)));
+        }
+
+        [Fact]
+        public void RegisteringAndPipingWorkersCreatesWorkflows()
         {
             // Arrange
             IList<int> expected = Enumerable.Range(0, 3).ToList();

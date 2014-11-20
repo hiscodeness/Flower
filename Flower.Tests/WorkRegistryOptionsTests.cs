@@ -22,16 +22,25 @@ namespace Flower.Tests
         }
 
         [Fact]
-        public void CannotChangeWorkRunnerResolverToNull()
+        public void CannotChangeWorkRunnerFactoryToNull()
         {
             // Arrange
             var options = new RegisterOptions();
 
             // Act / Assert
-            Assert.Throws<ArgumentNullException>(() => options = options.With(null));
+            Assert.Throws<ArgumentNullException>(() => options = options.With((Func<IWork, IWorkRunner>)null));
         }
+        
+        [Fact]
+        public void CannotChangeWorkRunnerToNull()
+        {
+            // Arrange
+            var options = new RegisterOptions();
 
-
+            // Act / Assert
+            Assert.Throws<ArgumentNullException>(() => options = options.With((IWorkRunner)null));
+        }
+        
         [Fact]
         public void CanChangeRegisterWorkerBehavior()
         {
