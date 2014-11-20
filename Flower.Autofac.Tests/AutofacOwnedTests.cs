@@ -2,7 +2,6 @@
 using System.Reactive.Subjects;
 using Autofac;
 using Autofac.Features.OwnedInstances;
-using Flower;
 using Flower.Works;
 using Xunit;
 

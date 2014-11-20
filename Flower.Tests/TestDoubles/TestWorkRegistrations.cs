@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reactive.Subjects;
-using Flower.Workers;
 using Flower.Works;
 
 namespace Flower.Tests.TestDoubles

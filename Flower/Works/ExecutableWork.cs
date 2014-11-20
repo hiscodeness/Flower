@@ -1,6 +1,5 @@
 ﻿using System;
 using Flower.WorkRunners;
-using Flower.Workers;
 
 namespace Flower.Works
 {

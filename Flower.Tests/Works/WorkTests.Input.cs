@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Reactive.Subjects;
 using Flower.Tests.TestDoubles;
-using Flower.Workers;
 using Flower.Works;
 using Xunit;
 
