@@ -1,5 +1,6 @@
 using System;
 using Flower.WorkRunners;
+using Flower.Works;
 
 namespace Flower
 {
@@ -31,75 +32,79 @@ namespace Flower
         public RegisterOptions(TriggerErrorBehavior triggerErrorBehavior)
             : this(Default.RegisterWorkBehavior, triggerErrorBehavior) {}
 
-        public RegisterOptions(IWorkRunnerResolver workRunnerResolver)
-            : this(Default.RegisterWorkBehavior, Default.TriggerErrorBehavior, workRunnerResolver) {}
+        public RegisterOptions(Func<IWork, IWorkRunner> workRunnerFactory)
+            : this(Default.RegisterWorkBehavior, Default.TriggerErrorBehavior, workRunnerFactory) {}
 
         public RegisterOptions(WorkerErrorBehavior workerErrorBehavior)
             : this(
                 Default.RegisterWorkBehavior,
                 Default.TriggerErrorBehavior,
-                Default.WorkRunnerResolver,
+                Default.WorkRunnerFactory,
                 workerErrorBehavior) {}
 
         public RegisterOptions(RegisterOptions prototype)
             : this(
                 prototype.RegisterWorkBehavior,
                 prototype.TriggerErrorBehavior,
-                prototype.WorkRunnerResolver,
+                prototype.WorkRunnerFactory,
                 prototype.WorkerErrorBehavior) {}
 
         public RegisterOptions(
             RegisterWorkBehavior registerWorkBehavior = RegisterWorkBehavior.RegisterActivated,
             TriggerErrorBehavior triggerErrorBehavior = TriggerErrorBehavior.CompleteWorkAndThrow,
-            IWorkRunnerResolver workRunnerResolver = null,
+            Func<IWork, IWorkRunner> workRunnerFactory = null,
             WorkerErrorBehavior workerErrorBehavior = WorkerErrorBehavior.CompleteWorkAndThrow)
         {
             RegisterWorkBehavior = registerWorkBehavior;
             TriggerErrorBehavior = triggerErrorBehavior;
-            WorkRunnerResolver = workRunnerResolver ?? new DefaultWorkRunnerResolver();
+            WorkRunnerFactory = workRunnerFactory ?? (_ => new ImmediateWorkRunner());
             WorkerErrorBehavior = workerErrorBehavior;
         }
 
         public RegisterWorkBehavior RegisterWorkBehavior { get; private set; }
         public TriggerErrorBehavior TriggerErrorBehavior { get; private set; }
-        public IWorkRunnerResolver WorkRunnerResolver { get; private set; }
+        public Func<IWork, IWorkRunner> WorkRunnerFactory { get; private set; }
         public WorkerErrorBehavior WorkerErrorBehavior { get; private set; }
 
         public RegisterOptions With(RegisterWorkBehavior registerWorkBehavior)
         {
-            return new RegisterOptions(registerWorkBehavior,
-                                           TriggerErrorBehavior,
-                                           WorkRunnerResolver,
-                                           WorkerErrorBehavior);
+            return new RegisterOptions(
+                registerWorkBehavior,
+                TriggerErrorBehavior,
+                WorkRunnerFactory,
+                WorkerErrorBehavior);
         }
 
         public RegisterOptions With(TriggerErrorBehavior triggerErrorBehavior)
         {
-            return new RegisterOptions(RegisterWorkBehavior,
-                                           triggerErrorBehavior,
-                                           WorkRunnerResolver,
-                                           WorkerErrorBehavior);
+            return new RegisterOptions(
+                RegisterWorkBehavior,
+                triggerErrorBehavior,
+                WorkRunnerFactory,
+                WorkerErrorBehavior);
         }
 
-        public RegisterOptions With(IWorkRunnerResolver workRunnerResolver)
+        public RegisterOptions With(Func<IWork, IWorkRunner> workRunnerFactory)
         {
-            if (workRunnerResolver == null)
+            if (workRunnerFactory == null)
             {
-                throw new ArgumentNullException("workRunnerResolver");
+                throw new ArgumentNullException("workRunnerFactory");
             }
 
-            return new RegisterOptions(RegisterWorkBehavior,
-                                           TriggerErrorBehavior,
-                                           workRunnerResolver,
-                                           WorkerErrorBehavior);
+            return new RegisterOptions(
+                RegisterWorkBehavior,
+                TriggerErrorBehavior,
+                workRunnerFactory,
+                WorkerErrorBehavior);
         }
 
         public RegisterOptions With(WorkerErrorBehavior workerErrorBehavior)
         {
-            return new RegisterOptions(RegisterWorkBehavior,
-                                           TriggerErrorBehavior,
-                                           WorkRunnerResolver,
-                                           workerErrorBehavior);
+            return new RegisterOptions(
+                RegisterWorkBehavior,
+                TriggerErrorBehavior,
+                WorkRunnerFactory,
+                workerErrorBehavior);
         }
     }
 }

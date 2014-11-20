@@ -12,7 +12,6 @@ namespace Flower.Tests
 {
     public class WorkRegistryTests
     {
-
         [Fact]
         public void RegisteringAndPipingWorkersCreatesAWorkflow()
         {

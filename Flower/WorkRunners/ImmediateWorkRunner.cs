@@ -10,28 +10,30 @@ namespace Flower.WorkRunners
     /// </summary>
     public sealed class ImmediateWorkRunner : IWorkRunner
     {
-        private IExecutableWork work;
+        private IExecutableWork executingWork;
         private bool isExecuted;
 
-        public IEnumerable<IExecutableWork> PendingWorks
-        {
-            get { yield break; }
-        }
+        public IEnumerable<IExecutableWork> PendingWorks { get { yield break; } }
 
         public IEnumerable<IExecutableWork> ExecutingWorks
         {
-            get { return !isExecuted && work != null ? new[] { work } : Enumerable.Empty<IExecutableWork>(); }
+            get
+            {
+                return !isExecuted && executingWork != null
+                           ? new[] { executingWork }
+                           : Enumerable.Empty<IExecutableWork>();
+            }
         }
 
         public void Submit(IExecutableWork executableWork)
         {
-            if (work != null)
+            if (executingWork != null)
             {
                 throw new InvalidOperationException("Only one work can be submitted.");
             }
 
-            work = executableWork;
-            work.Execute();
+            executingWork = executableWork;
+            executingWork.Execute();
             isExecuted = true;
         }
     }

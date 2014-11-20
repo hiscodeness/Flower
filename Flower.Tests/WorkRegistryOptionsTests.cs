@@ -1,6 +1,7 @@
 ﻿using System;
 using FakeItEasy;
 using Flower.WorkRunners;
+using Flower.Works;
 using Xunit;
 
 namespace Flower.Tests
@@ -16,7 +17,7 @@ namespace Flower.Tests
             // Assert
             Assert.Equal(RegisterWorkBehavior.RegisterActivated, options.RegisterWorkBehavior);
             Assert.Equal(TriggerErrorBehavior.CompleteWorkAndThrow, options.TriggerErrorBehavior);
-            Assert.NotNull(options.WorkRunnerResolver);
+            Assert.NotNull(options.WorkRunnerFactory);
             Assert.Equal(WorkerErrorBehavior.CompleteWorkAndThrow, options.WorkerErrorBehavior);
         }
 
@@ -62,13 +63,14 @@ namespace Flower.Tests
         {
             // Arrange
             var options = new RegisterOptions();
-            var workRunnerResolver = A.Fake<IWorkRunnerResolver>();
+            var workRunner = A.Fake<IWorkRunner>();
+            Func<IWork, IWorkRunner> workRunnerFactory = _ => workRunner;
 
             // Act
-            options = options.With(workRunnerResolver);
+            options = options.With(workRunnerFactory);
 
             // Assert
-            Assert.Equal(workRunnerResolver, options.WorkRunnerResolver);
+            Assert.Equal(workRunnerFactory, options.WorkRunnerFactory);
         }
 
         [Fact]
