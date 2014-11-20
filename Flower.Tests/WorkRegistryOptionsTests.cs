@@ -11,7 +11,7 @@ namespace Flower.Tests
         public void SensibleDefaultOptions()
         {
             // Act
-            var options = new WorkRegistryOptions();
+            var options = new RegisterOptions();
 
             // Assert
             Assert.Equal(RegisterWorkBehavior.RegisterActivated, options.RegisterWorkBehavior);
@@ -24,7 +24,7 @@ namespace Flower.Tests
         public void CannotChangeWorkRunnerResolverToNull()
         {
             // Arrange
-            var options = new WorkRegistryOptions();
+            var options = new RegisterOptions();
 
             // Act / Assert
             Assert.Throws<ArgumentNullException>(() => options = options.With(null));
@@ -35,7 +35,7 @@ namespace Flower.Tests
         public void CanChangeRegisterWorkerBehavior()
         {
             // Arrange
-            var options = new WorkRegistryOptions();
+            var options = new RegisterOptions();
 
             // Act
             options = options.With(RegisterWorkBehavior.RegisterActivated);
@@ -48,7 +48,7 @@ namespace Flower.Tests
         public void CanChangeTriggerErrorBehavior()
         {
             // Arrange
-            var options = new WorkRegistryOptions();
+            var options = new RegisterOptions();
 
             // Act
             options = options.With(TriggerErrorBehavior.SwallowErrorAndCompleteWork);
@@ -61,7 +61,7 @@ namespace Flower.Tests
         public void CanChangeWorkRunnerResolver()
         {
             // Arrange
-            var options = new WorkRegistryOptions();
+            var options = new RegisterOptions();
             var workRunnerResolver = A.Fake<IWorkRunnerResolver>();
 
             // Act
@@ -75,7 +75,7 @@ namespace Flower.Tests
         public void CanChangeWorkerErrorBehavior()
         {
             // Arrange
-            var options = new WorkRegistryOptions();
+            var options = new RegisterOptions();
 
             // Act
             options = options.With(WorkerErrorBehavior.RaiseExecutedAndContinue);

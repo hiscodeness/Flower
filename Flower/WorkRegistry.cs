@@ -12,9 +12,9 @@ namespace Flower
     {
         private readonly IList<IWork> works = new List<IWork>();
 
-        public WorkRegistry(WorkRegistryOptions options = null)
+        public WorkRegistry(RegisterOptions options = null)
         {
-            DefaultOptions = options ?? WorkRegistryOptions.Default;
+            DefaultOptions = options ?? RegisterOptions.Default;
         }
 
         public IEnumerable<IWork> Works
@@ -22,12 +22,12 @@ namespace Flower
             get { return works; }
         }
 
-        public WorkRegistryOptions DefaultOptions { get; private set; }
+        public RegisterOptions DefaultOptions { get; private set; }
 
         public IActionWork Register<TInput>(
             IObservable<TInput> trigger,
             Func<IScope<IWorker>> createWorkerScope,
-            WorkRegistryOptions options = null)
+            RegisterOptions options = null)
         {
             options = CreateRegisterOptions(options);
             var registration = CreateRegistration(trigger, createWorkerScope, options);
@@ -39,7 +39,7 @@ namespace Flower
         public IActionWork<TInput> Register<TInput>(
             IObservable<TInput> trigger,
             Func<IScope<IWorker<TInput>>> createWorkerScope,
-            WorkRegistryOptions options = null)
+            RegisterOptions options = null)
         {
             options = CreateRegisterOptions(options);
             var registration = CreateRegistration(trigger, createWorkerScope, options);
@@ -51,7 +51,7 @@ namespace Flower
         public IFuncWork<TInput, TOutput> Register<TInput, TOutput>(
             IObservable<TInput> trigger,
             Func<IScope<IWorker<TInput, TOutput>>> createWorkerScope,
-            WorkRegistryOptions options = null)
+            RegisterOptions options = null)
         {
             options = CreateRegisterOptions(options);
             var registration = CreateRegistration(trigger, createWorkerScope, options);
@@ -99,20 +99,20 @@ namespace Flower
             }
         }
 
-        private WorkRegistryOptions CreateRegisterOptions(WorkRegistryOptions options)
+        private RegisterOptions CreateRegisterOptions(RegisterOptions options)
         {
-            return options ?? new WorkRegistryOptions(DefaultOptions);
+            return options ?? new RegisterOptions(DefaultOptions);
         }
 
         private ActionWorkRegistration CreateRegistration<TInput>(
-            IObservable<TInput> trigger, Func<IScope<IWorker>> createWorkerScope, WorkRegistryOptions options)
+            IObservable<TInput> trigger, Func<IScope<IWorker>> createWorkerScope, RegisterOptions options)
         {
             return new ActionWorkRegistration(
                 this, trigger.Select(input => (object)input), createWorkerScope, options);
         }
 
         private ActionWorkRegistration<TInput> CreateRegistration<TInput>(
-            IObservable<TInput> trigger, Func<IScope<IWorker<TInput>>> createWorkerScope, WorkRegistryOptions options)
+            IObservable<TInput> trigger, Func<IScope<IWorker<TInput>>> createWorkerScope, RegisterOptions options)
         {
             return new ActionWorkRegistration<TInput>(this, trigger, createWorkerScope, options);
         }
@@ -120,7 +120,7 @@ namespace Flower
         private FuncWorkRegistration<TInput, TOutput> CreateRegistration<TInput, TOutput>(
             IObservable<TInput> trigger,
             Func<IScope<IWorker<TInput, TOutput>>> createWorkerScope,
-            WorkRegistryOptions options)
+            RegisterOptions options)
         {
             return new FuncWorkRegistration<TInput, TOutput>(this, trigger, createWorkerScope, options);
         }

@@ -10,7 +10,7 @@ namespace Flower
             this IWorkRegistry workRegistry,
             IObservable<TInput> trigger,
             IWorker worker,
-            WorkRegistryOptions options = null)
+            RegisterOptions options = null)
         {
             return workRegistry.Register(trigger, WorkerScope.Instance(worker), options);
         }
@@ -19,7 +19,7 @@ namespace Flower
             this IWorkRegistry workRegistry,
             IObservable<TInput> trigger,
             IWorker<TInput> worker,
-            WorkRegistryOptions options = null)
+            RegisterOptions options = null)
         {
             return workRegistry.Register(trigger, WorkerScope.Instance(worker), options);
         }
@@ -28,7 +28,7 @@ namespace Flower
             this IWorkRegistry workRegistry,
             IObservable<TInput> trigger,
             IWorker<TInput, TOutput> worker,
-            WorkRegistryOptions options = null)
+            RegisterOptions options = null)
         {
             return workRegistry.Register(trigger, WorkerScope.Instance(worker), options);
         }

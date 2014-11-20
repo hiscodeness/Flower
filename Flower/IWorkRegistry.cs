@@ -7,24 +7,24 @@ namespace Flower
 {
     public interface IWorkRegistry
     {
-        WorkRegistryOptions DefaultOptions { get; }
+        RegisterOptions DefaultOptions { get; }
 
         IEnumerable<IWork> Works { get; }
 
         IActionWork Register<TInput>(
             IObservable<TInput> trigger,
             Func<IScope<IWorker>> createWorkerScope,
-            WorkRegistryOptions options = null);
+            RegisterOptions options = null);
 
         IActionWork<TInput> Register<TInput>(
             IObservable<TInput> trigger,
             Func<IScope<IWorker<TInput>>> createWorkerScope,
-            WorkRegistryOptions options = null);
+            RegisterOptions options = null);
 
         IFuncWork<TInput, TOutput> Register<TInput, TOutput>(
             IObservable<TInput> trigger,
             Func<IScope<IWorker<TInput, TOutput>>> createWorkerScope,
-            WorkRegistryOptions options = null);
+            RegisterOptions options = null);
 
         void Complete(IWork work);
         void CompleteAll();
