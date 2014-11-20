@@ -181,7 +181,7 @@ namespace Flower.Works
 
             private bool ShouldForwardErrorToSubscribers()
             {
-                return work.Registration.WorkRegistry.Options.TriggerErrorBehavior
+                return work.Registration.WorkRegistry.DefaultOptions.TriggerErrorBehavior
                        == TriggerErrorBehavior.CompleteWorkAndThrow;
             }
 

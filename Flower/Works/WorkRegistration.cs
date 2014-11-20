@@ -13,7 +13,7 @@ namespace Flower.Works
         }
 
         public IWorkRegistry WorkRegistry { get; private set; }
-        public WorkRegistryOptions Options { get { return WorkRegistry.Options; } }
+        public WorkRegistryOptions Options { get { return WorkRegistry.DefaultOptions; } }
         public IObservable<TInput> Trigger { get; private set; }
     }
 

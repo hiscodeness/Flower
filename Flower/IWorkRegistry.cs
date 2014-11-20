@@ -7,7 +7,7 @@ namespace Flower
 {
     public interface IWorkRegistry
     {
-        WorkRegistryOptions Options { get; }
+        WorkRegistryOptions DefaultOptions { get; }
 
         IEnumerable<IWork> Works { get; }   
     

@@ -14,7 +14,7 @@ namespace Flower
 
         public WorkRegistry(WorkRegistryOptions options = null)
         {
-            Options = options ?? WorkRegistryOptions.Default;
+            DefaultOptions = options ?? WorkRegistryOptions.Default;
         }
 
         public IEnumerable<IWork> Works
@@ -22,7 +22,7 @@ namespace Flower
             get { return works; }
         }
 
-        public WorkRegistryOptions Options { get; private set; }
+        public WorkRegistryOptions DefaultOptions { get; private set; }
 
         public IActionWork Register<TInput>(IObservable<TInput> trigger, Func<IScope<IWorker>> createWorkerScope)
         {
@@ -89,7 +89,7 @@ namespace Flower
         private void Register(IWork work)
         {
             Add(work);
-            if (Options.RegisterWorkBehavior == RegisterWorkBehavior.RegisterActivated)
+            if (DefaultOptions.RegisterWorkBehavior == RegisterWorkBehavior.RegisterActivated)
             {
                 work.Activate();
             }
