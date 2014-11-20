@@ -23,6 +23,11 @@ namespace Flower.Works
 
         public void Execute()
         {
+            if (State != ExecutableWorkState.Pending)
+            {
+                throw new InvalidOperationException("Work can be executed only once.");
+            }
+
             try
             {
                 State = ExecutableWorkState.Executing;

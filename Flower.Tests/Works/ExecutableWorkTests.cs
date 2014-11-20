@@ -11,6 +11,69 @@ namespace Flower.Tests.Works
     public class ExecutableWorkTests
     {
         [Fact]
+        public void ExecutedWorkReferencesCorrectWork()
+        {
+            // Arrange
+            var context = new WorkerErrorBehaviorTestContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+
+            // Act
+            context.Trigger(3);
+
+            // Assert
+            Assert.Equal(context.Work, context.Executed.Single().Work);
+        }
+
+        [Fact]
+        public void ExecutedWorkHasCorrectInput()
+        {
+            // Arrange
+            var context = new WorkerErrorBehaviorTestContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+
+            // Act
+            context.Trigger(3, 5, 7);
+
+            // Assert
+            Assert.Equal(new [] {3, 5, 7}, context.Executed.Select(w => w.Input));
+        }
+
+        [Fact]
+        public void ExecutedWorkHasCorrectOutput()
+        {
+            // Arrange
+            var context = new WorkerErrorBehaviorTestContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+
+            // Act
+            context.Trigger(3, 5, 7);
+
+            // Assert
+            Assert.Equal(new[] { 3, 5, 7 }, context.Executed.Select(w => w.Output));
+        }
+
+        [Fact]
+        public void ExecutedWorkHasWorkRunnerSet()
+        {
+            // Arrange
+            var context = new WorkerErrorBehaviorTestContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+
+            // Act
+            context.Trigger(3);
+
+            // Assert
+            Assert.NotNull(context.Executed.Single().WorkRunner);
+        }
+
+        [Fact]
+        public void ExecutedWorkCannotBeExecutedAgain()
+        {
+            // Arrange
+            var context = new WorkerErrorBehaviorTestContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+            context.Trigger(3);
+
+            // Act / Assert
+            Assert.Throws<InvalidOperationException>(() => context.Executed.Single().Execute());
+        }
+
+        [Fact]
         public void WorkerErrorExceptionIsSetOnExecuted()
         {
             // Arrange
