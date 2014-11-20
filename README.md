@@ -1,7 +1,8 @@
 Flower
 ======
+![alt text](https://ci.appveyor.com/api/projects/status/36ichmofcn1aoatg/branch/master?svg=true "master branch status badge")
 
-Library that allows execution of works, after being triggered by observables or by other finished works.
-Results from one work can be piped (or flow) to the next work.
+Flower allows registering workers that are executed after being triggered by an observable.
+Results from one worker can be easily piped (flowed) to another worker.
 
-Simple example: (TBD)
+Examples (TBD)
