@@ -5,8 +5,8 @@ namespace Flower
 {
     public enum RegisterWorkBehavior
     {
-        RegisterSuspended,
-        RegisterActivated
+        RegisterActivated,
+        RegisterSuspended
     }
 
     public enum TriggerErrorBehavior
@@ -24,12 +24,32 @@ namespace Flower
         SwallowErrorAndContinue
     }
 
-    public class WorkRegistryOptions
+    public class RegisterOptions
     {
-        public static readonly WorkRegistryOptions Default = new WorkRegistryOptions();
+        public static readonly RegisterOptions Default = new RegisterOptions();
 
-        public WorkRegistryOptions(
-            RegisterWorkBehavior registerWorkBehavior = RegisterWorkBehavior.RegisterSuspended,
+        public RegisterOptions(TriggerErrorBehavior triggerErrorBehavior)
+            : this(Default.RegisterWorkBehavior, triggerErrorBehavior) {}
+
+        public RegisterOptions(IWorkRunnerResolver workRunnerResolver)
+            : this(Default.RegisterWorkBehavior, Default.TriggerErrorBehavior, workRunnerResolver) {}
+
+        public RegisterOptions(WorkerErrorBehavior workerErrorBehavior)
+            : this(
+                Default.RegisterWorkBehavior,
+                Default.TriggerErrorBehavior,
+                Default.WorkRunnerResolver,
+                workerErrorBehavior) {}
+
+        public RegisterOptions(RegisterOptions prototype)
+            : this(
+                prototype.RegisterWorkBehavior,
+                prototype.TriggerErrorBehavior,
+                prototype.WorkRunnerResolver,
+                prototype.WorkerErrorBehavior) {}
+
+        public RegisterOptions(
+            RegisterWorkBehavior registerWorkBehavior = RegisterWorkBehavior.RegisterActivated,
             TriggerErrorBehavior triggerErrorBehavior = TriggerErrorBehavior.CompleteWorkAndThrow,
             IWorkRunnerResolver workRunnerResolver = null,
             WorkerErrorBehavior workerErrorBehavior = WorkerErrorBehavior.CompleteWorkAndThrow)
@@ -45,38 +65,38 @@ namespace Flower
         public IWorkRunnerResolver WorkRunnerResolver { get; private set; }
         public WorkerErrorBehavior WorkerErrorBehavior { get; private set; }
 
-        public WorkRegistryOptions With(RegisterWorkBehavior registerWorkBehavior)
+        public RegisterOptions With(RegisterWorkBehavior registerWorkBehavior)
         {
-            return new WorkRegistryOptions(registerWorkBehavior,
+            return new RegisterOptions(registerWorkBehavior,
                                            TriggerErrorBehavior,
                                            WorkRunnerResolver,
                                            WorkerErrorBehavior);
         }
 
-        public WorkRegistryOptions With(TriggerErrorBehavior triggerErrorBehavior)
+        public RegisterOptions With(TriggerErrorBehavior triggerErrorBehavior)
         {
-            return new WorkRegistryOptions(RegisterWorkBehavior,
+            return new RegisterOptions(RegisterWorkBehavior,
                                            triggerErrorBehavior,
                                            WorkRunnerResolver,
                                            WorkerErrorBehavior);
         }
 
-        public WorkRegistryOptions With(IWorkRunnerResolver workRunnerResolver)
+        public RegisterOptions With(IWorkRunnerResolver workRunnerResolver)
         {
             if (workRunnerResolver == null)
             {
                 throw new ArgumentNullException("workRunnerResolver");
             }
 
-            return new WorkRegistryOptions(RegisterWorkBehavior,
+            return new RegisterOptions(RegisterWorkBehavior,
                                            TriggerErrorBehavior,
                                            workRunnerResolver,
                                            WorkerErrorBehavior);
         }
 
-        public WorkRegistryOptions With(WorkerErrorBehavior workerErrorBehavior)
+        public RegisterOptions With(WorkerErrorBehavior workerErrorBehavior)
         {
-            return new WorkRegistryOptions(RegisterWorkBehavior,
+            return new RegisterOptions(RegisterWorkBehavior,
                                            TriggerErrorBehavior,
                                            WorkRunnerResolver,
                                            workerErrorBehavior);

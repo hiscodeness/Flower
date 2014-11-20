@@ -48,7 +48,7 @@ namespace Flower.Works
                 WorkerExecuted();
             }
 
-            switch (work.Registration.WorkRegistry.Options.WorkerErrorBehavior)
+            switch (work.Registration.WorkRegistry.DefaultOptions.WorkerErrorBehavior)
             {
                 case WorkerErrorBehavior.SwallowErrorAndContinue:
                 case WorkerErrorBehavior.RaiseExecutedAndContinue:

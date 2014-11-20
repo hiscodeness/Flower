@@ -17,8 +17,7 @@ namespace Flower.Autofac.Tests
             var containerBuilder = new ContainerBuilder();
             containerBuilder.RegisterType<TestWorker>();
             var container = containerBuilder.Build();
-            var workRegistry = new WorkRegistry(
-                WorkRegistryOptions.Default.With(RegisterWorkBehavior.RegisterActivated));
+            var workRegistry = new WorkRegistry();
             var trigger = new Subject<int>();
             var resolve = container.Resolve<Func<Owned<TestWorker>>>();
             var work = workRegistry.Register(trigger, resolve.Scope());

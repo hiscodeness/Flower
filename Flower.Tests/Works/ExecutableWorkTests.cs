@@ -158,7 +158,7 @@ namespace Flower.Tests.Works
         public void WorkerErrorShownAsSuchWhenWorkCompletes()
         {
             // Arrange
-            var options = new WorkRegistryOptions(RegisterWorkBehavior.RegisterActivated, workerErrorBehavior: WorkerErrorBehavior.SwallowErrorAndCompleteWork);
+            var options = new RegisterOptions(RegisterWorkBehavior.RegisterActivated, workerErrorBehavior: WorkerErrorBehavior.SwallowErrorAndCompleteWork);
             var workRegistry = new WorkRegistry(options);
             var trigger = new Subject<int>();
             var work = workRegistry.Register(trigger, new TestWorkerIntToIntThrowOnEven());
@@ -180,7 +180,7 @@ namespace Flower.Tests.Works
 
             public WorkerErrorBehaviorTestContext(WorkerErrorBehavior behavior)
             {
-                var options = new WorkRegistryOptions(RegisterWorkBehavior.RegisterActivated, workerErrorBehavior: behavior);
+                var options = new RegisterOptions(RegisterWorkBehavior.RegisterActivated, workerErrorBehavior: behavior);
                 var workRegistry = new WorkRegistry(options);
                 trigger = new Subject<int>();
                 Work = workRegistry.Register(trigger, new TestWorkerIntToIntThrowOnEven());

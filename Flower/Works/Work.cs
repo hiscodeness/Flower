@@ -30,6 +30,8 @@ namespace Flower.Works
 
         public void Activate()
         {
+            if (State == WorkState.Active) return;
+
             if (State != WorkState.Suspended)
             {
                 throw new InvalidOperationException("Only suspended work can be activated.");
