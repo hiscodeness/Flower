@@ -54,7 +54,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TestDoubles\TestWorkRegistrations.cs" />
-    <Compile Include="TestDoubles\WorkRegistryFactory.cs" />
     <Compile Include="WorkRegistryOptionsTests.cs" />
     <Compile Include="WorkRegistryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

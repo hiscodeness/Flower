@@ -29,7 +29,7 @@ namespace Flower.Tests.Works
         {
             // Arrange
             var trigger = new Subject<int>();
-            var registry = WorkRegistryFactory.CreateAutoActivating();
+            var registry = new WorkRegistry();
             var work = registry.Register(trigger, new TestWorker());
             ITriggeredActionWork triggeredWork = null;
 

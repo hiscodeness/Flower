@@ -5,8 +5,8 @@ namespace Flower
 {
     public enum RegisterWorkBehavior
     {
-        RegisterSuspended,
-        RegisterActivated
+        RegisterActivated,
+        RegisterSuspended
     }
 
     public enum TriggerErrorBehavior
@@ -28,8 +28,21 @@ namespace Flower
     {
         public static readonly WorkRegistryOptions Default = new WorkRegistryOptions();
 
+        public WorkRegistryOptions(TriggerErrorBehavior triggerErrorBehavior)
+            : this(Default.RegisterWorkBehavior, triggerErrorBehavior) {}
+
+        public WorkRegistryOptions(IWorkRunnerResolver workRunnerResolver)
+            : this(Default.RegisterWorkBehavior, Default.TriggerErrorBehavior, workRunnerResolver) {}
+
+        public WorkRegistryOptions(WorkerErrorBehavior workerErrorBehavior)
+            : this(
+                Default.RegisterWorkBehavior,
+                Default.TriggerErrorBehavior,
+                Default.WorkRunnerResolver,
+                workerErrorBehavior) {}
+
         public WorkRegistryOptions(
-            RegisterWorkBehavior registerWorkBehavior = RegisterWorkBehavior.RegisterSuspended,
+            RegisterWorkBehavior registerWorkBehavior = RegisterWorkBehavior.RegisterActivated,
             TriggerErrorBehavior triggerErrorBehavior = TriggerErrorBehavior.CompleteWorkAndThrow,
             IWorkRunnerResolver workRunnerResolver = null,
             WorkerErrorBehavior workerErrorBehavior = WorkerErrorBehavior.CompleteWorkAndThrow)

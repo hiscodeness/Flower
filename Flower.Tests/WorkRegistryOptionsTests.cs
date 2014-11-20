@@ -14,7 +14,7 @@ namespace Flower.Tests
             var options = new WorkRegistryOptions();
 
             // Assert
-            Assert.Equal(RegisterWorkBehavior.RegisterSuspended, options.RegisterWorkBehavior);
+            Assert.Equal(RegisterWorkBehavior.RegisterActivated, options.RegisterWorkBehavior);
             Assert.Equal(TriggerErrorBehavior.CompleteWorkAndThrow, options.TriggerErrorBehavior);
             Assert.NotNull(options.WorkRunnerResolver);
             Assert.Equal(WorkerErrorBehavior.CompleteWorkAndThrow, options.WorkerErrorBehavior);

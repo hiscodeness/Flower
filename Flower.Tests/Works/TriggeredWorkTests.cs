@@ -13,7 +13,7 @@ namespace Flower.Tests.Works
         public void WhenExecutedHasCorrectOutputValue()
         {
             // Arrange
-            var workRegistry = WorkRegistryFactory.CreateAutoActivating();
+            var workRegistry = new WorkRegistry();
             var trigger = new Subject<int>();
             var work = workRegistry.Register(trigger, new TestWorkerIntToIntSquared());
             var outputs = new List<int>();

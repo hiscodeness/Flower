@@ -14,7 +14,7 @@ namespace Flower.Tests.Works
         {
             // Arrange
             var subject = new Subject<int>();
-            var workRegistry = WorkRegistryFactory.CreateAutoActivating();
+            var workRegistry = new WorkRegistry();
             var work = workRegistry.Register(subject, new TestWorkerIntToIntSquared());
             workRegistry.Complete(work);
 
@@ -57,7 +57,7 @@ namespace Flower.Tests.Works
         {
             // Arrange
             var trigger = new Subject<int>();
-            var registry = WorkRegistryFactory.CreateAutoActivating();
+            var registry = new WorkRegistry();
             var work = registry.Register(trigger, new TestWorkerIntToIntSquared());
             ITriggeredFuncWork<int, int> triggeredWork = null;
 
