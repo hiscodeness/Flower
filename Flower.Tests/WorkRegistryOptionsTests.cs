@@ -68,7 +68,7 @@ namespace Flower.Tests
         }
 
         [Fact]
-        public void CanChangeWorkRunnerResolver()
+        public void CanChangeWorkRunnerFactory()
         {
             // Arrange
             var options = new RegisterOptions();

@@ -6,9 +6,9 @@ namespace Flower
 {
     public static class CreateOwnedInstanceExtensionMethods
     {
-        public static Func<IScope<T>> Scope<T>(this Func<Owned<T>> resolve)
+        public static Func<IScope<T>> Scope<T>(this Func<Owned<T>> resolveOwned)
         {
-            return () => new OwnedScope<T>(resolve);
+            return () => new OwnedScope<T>(resolveOwned);
         }
     }
 }

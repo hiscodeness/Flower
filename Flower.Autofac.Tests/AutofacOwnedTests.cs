@@ -19,8 +19,8 @@ namespace Flower.Autofac.Tests
             var container = containerBuilder.Build();
             var workRegistry = new WorkRegistry();
             var trigger = new Subject<int>();
-            var resolve = container.Resolve<Func<Owned<TestWorkerIntToStringDisposable>>>();
-            var work = workRegistry.Register(trigger, resolve.Scope());
+            var factory = container.Resolve<Func<Owned<TestWorkerIntToStringDisposable>>>();
+            var work = workRegistry.Register(trigger, factory.Scope());
             IExecutableFuncWork<int, string> executedWork = null;
             work.Executed.Subscribe(w => executedWork = w);
 

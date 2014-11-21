@@ -7,9 +7,9 @@ namespace Flower.Autofac
     {
         private readonly Owned<T> owned;
 
-        public OwnedScope(Func<Owned<T>> createOwned)
+        public OwnedScope(Func<Owned<T>> resolveOwned)
         {
-            owned = createOwned();
+            owned = resolveOwned();
             Worker = owned.Value;
         }
 
