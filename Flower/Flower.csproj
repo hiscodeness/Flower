@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IScope.cs" />
+    <Compile Include="Workers\Worker.cs" />
     <Compile Include="WorkRunners\BackgroundThreadQueueWorkRunner.cs" />
     <Compile Include="Works\IExecutableWork.cs" />
     <Compile Include="Works\IRegisteredWork.cs" />

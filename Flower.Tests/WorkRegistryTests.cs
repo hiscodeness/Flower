@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -345,6 +346,39 @@ namespace Flower.Tests
             Assert.NotEqual(workRegistry.DefaultOptions, work1.Registration.Options);
             Assert.NotEqual(workRegistry.DefaultOptions, work2.Registration.Options);
             Assert.NotEqual(work1.Registration.Options, work2.Registration.Options);
+        }
+
+        [Fact]
+        public void ActionWithNoInputCanBeRegistered()
+        {
+          // Arrange
+          var workRegistry = new WorkRegistry();
+          var trigger = new Subject<int>();
+
+          // Act / Assert
+          Assert.DoesNotThrow(() => workRegistry.Register(trigger, () => { }));
+        }
+
+        [Fact]
+        public void ActionWithInputCanBeRegistered()
+        {
+            // Arrange
+            var workRegistry = new WorkRegistry();
+            var trigger = new Subject<int>();
+
+            // Act / Assert
+            Assert.DoesNotThrow(() => workRegistry.Register(trigger, i => { }));
+        }
+
+        [Fact]
+        public void FuncCanBeRegistered()
+        {
+            // Arrange
+            var workRegistry = new WorkRegistry();
+            var trigger = new Subject<int>();
+
+            // Act / Assert
+            Assert.DoesNotThrow(() => workRegistry.Register(trigger, i => i.ToString(CultureInfo.InvariantCulture)));
         }
     }
 }
