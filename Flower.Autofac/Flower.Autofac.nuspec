@@ -6,9 +6,7 @@
     <title>$title$</title>
     <description>$description$</description>
     <summary>
-      Flower is a library for registering workers
-      that are submitted for execution on a work
-      runner when triggered by an observable.
+      Flower is a library for registering workers that are submitted for execution on a work runner when triggered by an observable.
     </summary>
     <authors>Jussi Mattila</authors>
     <owners>Jussi Mattila</owners>
