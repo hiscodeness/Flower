@@ -162,7 +162,8 @@ namespace Flower.Works
     {
         private readonly IRegisteredFuncWork<TInput, TOutput> work;
 
-        public ExecutableFuncWork(IWorkRunner workRunner, IRegisteredFuncWork<TInput, TOutput> work, TInput input) : base(workRunner, work, input)
+        public ExecutableFuncWork(IWorkRunner workRunner, IRegisteredFuncWork<TInput, TOutput> work, TInput input)
+            : base(workRunner, work, input)
         {
             this.work = work;
         }

@@ -4,14 +4,12 @@ namespace Flower.Workers
 {
     public static class WorkerScope
     {
-        public static Func<IScope<IWorker>> Instance(
-            IWorker worker)
+        public static Func<IScope<IWorker>> Instance(IWorker worker)
         {
             return () => new WorkerInstanceScope(worker);
         }
 
-        public static Func<IScope<IWorker<TInput>>> Instance<TInput>(
-            IWorker<TInput> worker)
+        public static Func<IScope<IWorker<TInput>>> Instance<TInput>(IWorker<TInput> worker)
         {
             return () => new WorkerInstanceScope<TInput>(worker);
         }

@@ -8,12 +8,13 @@ namespace Flower.Works
     public enum ExecutableWorkState
     {
         /// <summary>
-        /// The work has been triggered and will be (or has been) submitted on a <see cref="IWorkRunner" />.
+        /// The work has been triggered and is being submitted on a <see cref="IWorkRunner" />,
+        /// which will execute the work at the next opportunity.
         /// </summary>
         Pending,
 
         /// <summary>
-        /// The is being executed by a <see cref="IWorkRunner" />.
+        /// The work is being executed by a <see cref="IWorkRunner" />.
         /// </summary>
         Executing,
 

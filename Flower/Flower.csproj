@@ -48,8 +48,6 @@
     <Compile Include="Works\IExecutableWork.cs" />
     <Compile Include="Works\IRegisteredWork.cs" />
     <Compile Include="RegisterOptions.cs" />
-    <Compile Include="WorkRunners\IWorkRunnerResolver.cs" />
-    <Compile Include="WorkRunners\WorkRunnerResolver.cs" />
     <Compile Include="Works\IActivatable.cs" />
     <Compile Include="WorkRunners\ImmediateWorkRunner.cs" />
     <Compile Include="Works\ITriggerEvents.cs" />
