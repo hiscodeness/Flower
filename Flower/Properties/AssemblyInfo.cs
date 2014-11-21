@@ -4,8 +4,8 @@ using System.Runtime.InteropServices;
 [assembly: Guid("97219a9e-6baa-4cad-9abc-65a56b482bf4")]
 [assembly: AssemblyTitle("Flower")]
 [assembly: AssemblyDescription(
-    "A library for registering workers that " + 
-    "are submitted for execution on a work " + 
+    "Flower is a library for registering workers " +
+    "that are submitted for execution on a work " + 
     "runner when triggered by an observable.")]
 [assembly: AssemblyProduct("Flower")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]

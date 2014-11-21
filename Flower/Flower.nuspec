@@ -4,12 +4,12 @@
     <id>$id$</id>
     <version>$version$</version>
     <title>$title$</title>
+    <description>$description$</description>
     <authors>Jussi Mattila</authors>
     <owners>Jussi Mattila</owners>
     <licenseUrl>https://github.com/hiscodeness/Flower/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/hiscodeness/Flower</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>$description$</description>
     <copyright>$copyright$</copyright>
   </metadata>
 </package>

@@ -2,8 +2,8 @@
 using System.Runtime.InteropServices;
 
 [assembly: Guid("97219a9e-6baa-4cad-9abc-65a56b482bf4")]
-[assembly: AssemblyTitle("Flower Autofac extension")]
-[assembly: AssemblyDescription("A library for registering Autofac Owned workers with Flower.")]
+[assembly: AssemblyTitle("Flower.Autofac")]
+[assembly: AssemblyDescription("Flower extensions for registering Autofac Owned workers.")]
 [assembly: AssemblyProduct("Flower")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyCompany("None")]
