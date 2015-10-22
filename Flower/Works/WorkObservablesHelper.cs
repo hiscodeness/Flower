@@ -40,8 +40,8 @@ namespace Flower.Works
             workExecutedHelper = new WorkExecutedHelper(work);
         }
 
-        public IObservable<TTriggeredWork> WorkTriggered { get { return workTriggeredHelper.WorkTriggered; } }
-        public IObservable<TExecutableWork> WorkExecuted { get { return workExecutedHelper.WorkExecuted; } }
+        public IObservable<TTriggeredWork> WorkTriggered => workTriggeredHelper.WorkTriggered;
+        public IObservable<TExecutableWork> WorkExecuted => workExecutedHelper.WorkExecuted;
 
         public void RaiseWorkTriggered(TTriggeredWork triggeredWork)
         {
@@ -61,7 +61,7 @@ namespace Flower.Works
 
         private class WorkCompletedHelper
         {
-            protected event Action workCompleted;
+            protected event Action WorkCompleted;
             
             public void RaiseWorkCompleted()
             {
@@ -70,11 +70,8 @@ namespace Flower.Works
 
             private void OnWorkCompleted()
             {
-                var handler = workCompleted;
-                if (handler != null)
-                {
-                    handler();
-                }
+                var handler = WorkCompleted;
+                handler?.Invoke();
             }
         }
 
@@ -87,7 +84,7 @@ namespace Flower.Works
                 WorkTriggered = Observable.Create(CreateTriggeredSubscription());
             }
 
-            public IObservable<TTriggeredWork> WorkTriggered { get; private set; }
+            public IObservable<TTriggeredWork> WorkTriggered { get; }
 
             public void RaiseWorkTriggered(TTriggeredWork triggeredWork)
             {
@@ -102,21 +99,18 @@ namespace Flower.Works
             private IDisposable CreateTriggeredSubscription(IObserver<TTriggeredWork> observer)
             {
                 workTriggered += observer.OnNext;
-                workCompleted += observer.OnCompleted;
+                WorkCompleted += observer.OnCompleted;
                 return Disposable.Create(() =>
                     {
                         workTriggered -= observer.OnNext;
-                        workCompleted -= observer.OnCompleted;
+                        WorkCompleted -= observer.OnCompleted;
                     });
             }
 
             private void OnWorkTriggered(TTriggeredWork triggeredWork)
             {
                 var handler = workTriggered;
-                if (handler != null)
-                {
-                    handler(triggeredWork);
-                }
+                handler?.Invoke(triggeredWork);
             }
         }
 
@@ -131,7 +125,7 @@ namespace Flower.Works
                 WorkExecuted = Observable.Create(CreateExecutedSubscription());
             }
 
-            public IObservable<TExecutableWork> WorkExecuted { get; private set; }
+            public IObservable<TExecutableWork> WorkExecuted { get; }
 
             public void RaiseWorkExecuted(TExecutableWork triggeredWork)
             {
@@ -152,7 +146,7 @@ namespace Flower.Works
                 }
 
                 workExecuted += observer.OnNext;
-                workCompleted += observer.OnCompleted;
+                WorkCompleted += observer.OnCompleted;
                 if (ShouldForwardErrorToSubscribers())
                 {
                     work.TriggerEvents.TriggerErrored += observer.OnError;
@@ -163,7 +157,7 @@ namespace Flower.Works
                     () =>
                         {
                             workExecuted -= observer.OnNext;
-                            workCompleted -= observer.OnCompleted;
+                            WorkCompleted -= observer.OnCompleted;
                             work.TriggerEvents.TriggerCompleted -= observer.OnCompleted;
                             work.TriggerEvents.TriggerErrored -= observer.OnError;
                         });
@@ -188,10 +182,7 @@ namespace Flower.Works
             private void OnWorkExecuted(TExecutableWork triggeredWork)
             {
                 var handler = workExecuted;
-                if (handler != null)
-                {
-                    handler(triggeredWork);
-                }
+                handler?.Invoke(triggeredWork);
             }
         }
     }

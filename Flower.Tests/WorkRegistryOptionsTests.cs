@@ -27,8 +27,11 @@ namespace Flower.Tests
             // Arrange
             var options = new RegisterOptions();
 
-            // Act / Assert
-            Assert.Throws<ArgumentNullException>(() => options = options.With((Func<IWork, IWorkRunner>)null));
+            // Act
+            var ex = Record.Exception(() => options = options.With((Func<IWork, IWorkRunner>)null));
+
+            // Assert
+            Assert.IsType<ArgumentNullException>(ex);
         }
         
         [Fact]
@@ -37,10 +40,13 @@ namespace Flower.Tests
             // Arrange
             var options = new RegisterOptions();
 
-            // Act / Assert
-            Assert.Throws<ArgumentNullException>(() => options = options.With((IWorkRunner)null));
+            // Act
+            var ex = Record.Exception(() => options = options.With((IWorkRunner)null));
+
+            // Assert
+            Assert.IsType<ArgumentNullException>(ex);
         }
-        
+
         [Fact]
         public void CanChangeRegisterWorkerBehavior()
         {

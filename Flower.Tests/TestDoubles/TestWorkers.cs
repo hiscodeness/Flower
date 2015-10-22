@@ -11,10 +11,7 @@ namespace Flower.Tests.TestDoubles
             throw new Exception(ErrorMessage);
         }
 
-        public static string ErrorMessage
-        {
-            get { return "Test worker exception."; }
-        }
+        public static string ErrorMessage => "Test worker exception.";
     }
 
     internal class TestWorker : IWorker
@@ -36,7 +33,7 @@ namespace Flower.Tests.TestDoubles
             inputs.Add(input);
         }
 
-        public IEnumerable<int> Inputs { get { return inputs; } } 
+        public IEnumerable<int> Inputs => inputs;
     }
 
     internal class TestWorkerIntToIntSquared : IWorker<int, int>

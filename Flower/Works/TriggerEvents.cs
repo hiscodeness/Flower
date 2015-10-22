@@ -10,19 +10,13 @@ namespace Flower.Works
         public void RaiseTriggerErrored(Exception exception)
         {
             var handler = TriggerErrored;
-            if (handler != null)
-            {
-                handler(exception);
-            }
+            handler?.Invoke(exception);
         }
 
         public void RaiseTriggerCompleted()
         {
             var handler = TriggerCompleted;
-            if (handler != null)
-            {
-                handler();
-            }
+            handler?.Invoke();
         }
     }
 }

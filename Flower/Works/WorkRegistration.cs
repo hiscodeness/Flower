@@ -12,9 +12,9 @@ namespace Flower.Works
             Options = options;
         }
 
-        public IWorkRegistry WorkRegistry { get; private set; }
+        public IWorkRegistry WorkRegistry { get; }
         public IObservable<TInput> Trigger { get; private set; }
-        public RegisterOptions Options { get; private set; }
+        public RegisterOptions Options { get; }
     }
 
     internal class ActionWorkRegistration : WorkRegistration<object>, IActionWorkRegistration
@@ -25,7 +25,7 @@ namespace Flower.Works
             CreateWorkerScope = createWorkerScope;
         }
 
-        public Func<IScope<IWorker>> CreateWorkerScope { get; private set; }
+        public Func<IScope<IWorker>> CreateWorkerScope { get; }
     }
     
     internal class ActionWorkRegistration<TInput> : WorkRegistration<TInput>, IActionWorkRegistration<TInput>
@@ -37,7 +37,7 @@ namespace Flower.Works
             CreateWorkerScope = createWorkerScope;
         }
 
-        public Func<IScope<IWorker<TInput>>> CreateWorkerScope { get; private set; }
+        public Func<IScope<IWorker<TInput>>> CreateWorkerScope { get; }
     }
 
     internal class FuncWorkRegistration<TInput, TOutput> : WorkRegistration<TInput>, IFuncWorkRegistration<TInput, TOutput>
@@ -49,6 +49,6 @@ namespace Flower.Works
             CreateWorkerScope = createWorkerScope;
         }
 
-        public Func<IScope<IWorker<TInput, TOutput>>> CreateWorkerScope { get; private set; }
+        public Func<IScope<IWorker<TInput, TOutput>>> CreateWorkerScope { get; }
     }
 }

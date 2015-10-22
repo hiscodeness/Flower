@@ -64,10 +64,10 @@ namespace Flower
             WorkerErrorBehavior = workerErrorBehavior;
         }
 
-        public RegisterWorkBehavior RegisterWorkBehavior { get; private set; }
-        public TriggerErrorBehavior TriggerErrorBehavior { get; private set; }
-        public Func<IWork, IWorkRunner> WorkRunnerFactory { get; private set; }
-        public WorkerErrorBehavior WorkerErrorBehavior { get; private set; }
+        public RegisterWorkBehavior RegisterWorkBehavior { get; }
+        public TriggerErrorBehavior TriggerErrorBehavior { get; }
+        public Func<IWork, IWorkRunner> WorkRunnerFactory { get; }
+        public WorkerErrorBehavior WorkerErrorBehavior { get; }
 
         public RegisterOptions With(RegisterWorkBehavior registerWorkBehavior)
         {
@@ -91,7 +91,7 @@ namespace Flower
         {
             if (workRunnerFactory == null)
             {
-                throw new ArgumentNullException("workRunnerFactory");
+                throw new ArgumentNullException(nameof(workRunnerFactory));
             }
 
             return new RegisterOptions(
@@ -105,7 +105,7 @@ namespace Flower
         {
             if (workRunner == null)
             {
-                throw new ArgumentNullException("workRunner");
+                throw new ArgumentNullException(nameof(workRunner));
             }
 
             return new RegisterOptions(

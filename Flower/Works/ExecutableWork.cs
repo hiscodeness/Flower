@@ -7,10 +7,10 @@ namespace Flower.Works
     {
         private readonly IRegisteredWork<TInput> work; 
         public ExecutableWorkState State { get; private set; }
-        public IWork<TInput> Work { get { return work; } }
-        public TInput Input { get; private set; }
-        IWork ITriggeredWork.Work { get { return Work; } }
-        public IWorkRunner WorkRunner { get; private set; }
+        public IWork<TInput> Work => work;
+        public TInput Input { get; }
+        IWork ITriggeredWork.Work => Work;
+        public IWorkRunner WorkRunner { get; }
         public Exception Error { get; private set; }
 
         protected ExecutableWork(IWorkRunner workRunner, IRegisteredWork<TInput> work, TInput input)
@@ -132,9 +132,9 @@ namespace Flower.Works
             this.work = work;
         }
 
-        IWork ITriggeredWork.Work { get { return Work; } }
-        IWork<TInput> ITriggeredWork<TInput>.Work { get { return Work; } }
-        public new IActionWork<TInput> Work { get { return work; } }
+        IWork ITriggeredWork.Work => Work;
+        IWork<TInput> ITriggeredWork<TInput>.Work => Work;
+        public new IActionWork<TInput> Work => work;
         public IScope<IWorker<TInput>> WorkerScope { get; private set; }
 
         protected override void CreateWorkerScope()
@@ -168,9 +168,9 @@ namespace Flower.Works
             this.work = work;
         }
 
-        IWork ITriggeredWork.Work { get { return Work; } }
-        IWork<TInput> ITriggeredWork<TInput>.Work { get { return Work; } }
-        public new IFuncWork<TInput, TOutput> Work { get { return work; } }
+        IWork ITriggeredWork.Work => Work;
+        IWork<TInput> ITriggeredWork<TInput>.Work => Work;
+        public new IFuncWork<TInput, TOutput> Work => work;
         public IScope<IWorker<TInput, TOutput>> WorkerScope { get; private set; }
         public TOutput Output { get; private set; }
 
