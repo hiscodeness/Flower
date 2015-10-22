@@ -226,7 +226,7 @@ namespace Flower.Tests.Works
             var options = new RegisterOptions(RegisterWorkBehavior.RegisterActivated, workerErrorBehavior: WorkerErrorBehavior.SwallowErrorAndCompleteWork);
             var workRegistry = new WorkRegistry(options);
             var trigger = new Subject<int>();
-            var work = workRegistry.Register(trigger, new TestWorkerIntToIntThrowOnEven());
+            var work = workRegistry.RegisterWorker(trigger, new TestWorkerIntToIntThrowOnEven());
             WorkState? result = null;
             work.Executed.Subscribe(_ => { }, () => result = work.State);
 
@@ -248,7 +248,7 @@ namespace Flower.Tests.Works
                 var options = new RegisterOptions(RegisterWorkBehavior.RegisterActivated, workerErrorBehavior: behavior);
                 var workRegistry = new WorkRegistry(options);
                 trigger = new Subject<int>();
-                Work = workRegistry.Register(trigger, new TestWorkerIntToIntThrowOnEven());
+                Work = workRegistry.RegisterWorker(trigger, new TestWorkerIntToIntThrowOnEven());
                 Executed = new List<IExecutableFuncWork<int, int>>();
                 Output = new List<int>();
                 Work.Executed.Subscribe(Executed.Add);

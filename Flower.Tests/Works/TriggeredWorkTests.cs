@@ -16,7 +16,7 @@ namespace Flower.Tests.Works
             // Arrange
             var workRegistry = new WorkRegistry();
             var trigger = new Subject<int>();
-            var work = workRegistry.Register(trigger, new TestWorkerIntToIntSquared());
+            var work = workRegistry.RegisterWorker(trigger, new TestWorkerIntToIntSquared());
             ITriggeredFuncWork<int, int> triggeredWork = null;
             work.Triggered.Subscribe(w => triggeredWork = w);
 
@@ -33,7 +33,7 @@ namespace Flower.Tests.Works
             // Arrange
             var workRegistry = new WorkRegistry();
             var trigger = new Subject<int>();
-            var work = workRegistry.Register(trigger, new TestWorkerIntToIntSquared());
+            var work = workRegistry.RegisterWorker(trigger, new TestWorkerIntToIntSquared());
             ITriggeredFuncWork<int, int> triggeredWork = null;
             work.Triggered.Subscribe(w => triggeredWork = w);
 
@@ -50,7 +50,7 @@ namespace Flower.Tests.Works
             // Arrange
             var workRegistry = new WorkRegistry();
             var trigger = new Subject<int>();
-            var work = workRegistry.Register(trigger, new TestWorkerIntToIntSquared());
+            var work = workRegistry.RegisterWorker(trigger, new TestWorkerIntToIntSquared());
             ITriggeredFuncWork<int, int> triggeredWork = null;
             work.Triggered.Subscribe(w => triggeredWork = w);
 
@@ -67,7 +67,7 @@ namespace Flower.Tests.Works
             // Arrange
             var workRegistry = new WorkRegistry();
             var trigger = new Subject<int>();
-            var work = workRegistry.Register(trigger, new TestWorkerIntToIntSquared());
+            var work = workRegistry.RegisterWorker(trigger, new TestWorkerIntToIntSquared());
             var outputs = new List<int>();
             work.Executed.Subscribe(w => outputs.Add(w.Output));
 

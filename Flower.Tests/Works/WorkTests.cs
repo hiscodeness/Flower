@@ -18,7 +18,7 @@ namespace Flower.Tests.Works
             var worker = A.Fake<IWorker>();
 
             // Act
-            var work = workRegistry.Register(trigger, worker);
+            var work = workRegistry.RegisterWorker(trigger, worker);
 
             // Assert
             Assert.Equal(worker, work.Registration.CreateWorkerScope().Worker);
@@ -30,7 +30,7 @@ namespace Flower.Tests.Works
             // Arrange
             var trigger = new Subject<int>();
             var registry = new WorkRegistry();
-            var work = registry.Register(trigger, new TestWorker());
+            var work = registry.RegisterWorker(trigger, new TestWorker());
             ITriggeredActionWork triggeredWork = null;
 
             // Act

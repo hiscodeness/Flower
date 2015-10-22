@@ -16,7 +16,7 @@ namespace Flower.Tests.Works
             var workRegistry = new WorkRegistry();
             var trigger = new Subject<int>();
             var worker = new TestWorkerInt();
-            workRegistry.Register(trigger, worker);
+            workRegistry.RegisterWorker(trigger, worker);
 
             // Act
             trigger.OnNext(42);
@@ -31,7 +31,7 @@ namespace Flower.Tests.Works
             // Arrange
             var trigger = new Subject<int>();
             var registry = new WorkRegistry();
-            var work = registry.Register(trigger, new TestWorkerInt());
+            var work = registry.RegisterWorker(trigger, new TestWorkerInt());
             ITriggeredActionWork<int> triggeredWork = null;
 
             // Act

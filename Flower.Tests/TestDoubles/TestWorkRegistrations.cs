@@ -10,7 +10,7 @@ namespace Flower.Tests.TestDoubles
         private readonly Subject<int> trigger = new Subject<int>();
 
         private readonly Func<IScope<IWorker<int, int>>> createWorkerScope =
-            Workers.WorkerScope.Instance(new TestWorkerIntToIntSquared());
+            Workers.WorkerScope.FromInstance(new TestWorkerIntToIntSquared());
 
         public IWorkRegistry WorkRegistry => workRegistry;
         public RegisterOptions Options => workRegistry.DefaultOptions;

@@ -44,7 +44,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IScope.cs" />
+    <Compile Include="Workers\IWorkerResolver.cs" />
     <Compile Include="Workers\Worker.cs" />
+    <Compile Include="Workers\WorkerResolverScope.cs" />
     <Compile Include="WorkRunners\BackgroundThreadQueueWorkRunner.cs" />
     <Compile Include="Works\IExecutableWork.cs" />
     <Compile Include="Works\IRegisteredWork.cs" />
@@ -64,7 +66,6 @@
     <Compile Include="Works\TriggerEvents.cs" />
     <Compile Include="Works\Work.cs" />
     <Compile Include="Workers\WorkerScope.cs" />
-    <Compile Include="WorkRegistryExtensionMethods.cs" />
     <Compile Include="WorkExtensionMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WorkRegistry.cs" />
