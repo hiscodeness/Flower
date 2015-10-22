@@ -65,8 +65,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutofacLifetimeScopeTests.cs" />
     <Compile Include="AutofacOwnedTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestWorkerDisposable.cs" />
+    <Compile Include="TestWorkerIntToStringDisposable.cs" />
+    <Compile Include="TestWorkerStringDisposable.cs" />
+    <Compile Include="TestWorkerStringToIntDisposable.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

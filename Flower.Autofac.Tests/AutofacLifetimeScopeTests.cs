@@ -1,17 +1,17 @@
-﻿using System;
-using System.Globalization;
-using System.Reactive.Subjects;
-using Autofac;
-using Autofac.Features.OwnedInstances;
-using Flower.Works;
-using Xunit;
-
-namespace Flower.Autofac.Tests
+﻿namespace Flower.Autofac.Tests
 {
-    public class AutofacOwnedTests
+    using System;
+    using System.Globalization;
+    using System.Reactive.Subjects;
+    using Flower.Works;
+    using global::Autofac;
+    using global::Autofac.Features.OwnedInstances;
+    using Xunit;
+
+    public class AutofacLifetimeScopeTests
     {
         [Fact]
-        public void OwnedInstancesAreExecutedAndDisposed()
+        public void WorkersResolvedFromLifetimeScopeAreExecutedAndDisposed()
         {
             // Arrange
             var containerBuilder = new ContainerBuilder();
@@ -19,8 +19,7 @@ namespace Flower.Autofac.Tests
             var container = containerBuilder.Build();
             var workRegistry = new WorkRegistry();
             var trigger = new Subject<int>();
-            var factory = container.Resolve<Func<Owned<TestWorkerIntToStringDisposable>>>();
-            var work = workRegistry.RegisterFactory(trigger, factory.Scope());
+            var work = workRegistry.RegisterFactory(trigger, container.ResolveFactory<TestWorkerIntToStringDisposable>());
             IExecutableFuncWork<int, string> executedWork = null;
             work.Executed.Subscribe(w => executedWork = w);
 
@@ -43,10 +42,8 @@ namespace Flower.Autofac.Tests
             var container = containerBuilder.Build();
             var workRegistry = new WorkRegistry();
             var trigger = new Subject<int>();
-            var intToString = container.Resolve<Func<Owned<TestWorkerIntToStringDisposable>>>();
-            var stringToInt = container.Resolve<Func<Owned<TestWorkerStringToIntDisposable>>>();
-            var work1 = workRegistry.RegisterFactory(trigger, intToString.Scope());
-            var work2 = work1.Pipe(stringToInt.Scope());
+            var work1 = workRegistry.RegisterFactory(trigger, container.ResolveFactory<TestWorkerIntToStringDisposable>());
+            var work2 = work1.Pipe(container.ResolveFactory<TestWorkerStringToIntDisposable>());
             IExecutableFuncWork<string, int> executedWork = null;
             work2.Executed.Subscribe(w => executedWork = w);
 
@@ -69,10 +66,8 @@ namespace Flower.Autofac.Tests
             var container = containerBuilder.Build();
             var workRegistry = new WorkRegistry();
             var trigger = new Subject<int>();
-            var intToString = container.Resolve<Func<Owned<TestWorkerIntToStringDisposable>>>();
-            var stringToInt = container.Resolve<Func<Owned<TestWorkerStringDisposable>>>();
-            var work1 = workRegistry.RegisterFactory(trigger, intToString.Scope());
-            var work2 = work1.Pipe(stringToInt.Scope());
+            var work1 = workRegistry.RegisterFactory(trigger, container.ResolveFactory<TestWorkerIntToStringDisposable>());
+            var work2 = work1.Pipe(container.ResolveFactory<TestWorkerStringDisposable>());
             IExecutableActionWork<string> executedWork = null;
             work2.Executed.Subscribe(w => executedWork = w);
 
@@ -95,10 +90,8 @@ namespace Flower.Autofac.Tests
             var container = containerBuilder.Build();
             var workRegistry = new WorkRegistry();
             var trigger = new Subject<int>();
-            var intToString = container.Resolve<Func<Owned<TestWorkerIntToStringDisposable>>>();
-            var worker = container.Resolve<Func<Owned<TestWorkerDisposable>>>();
-            var work1 = workRegistry.RegisterFactory(trigger, intToString.Scope());
-            var work2 = work1.Pipe(worker.Scope());
+            var work1 = workRegistry.RegisterFactory(trigger, container.ResolveFactory<TestWorkerIntToStringDisposable>());
+            var work2 = work1.Pipe(container.ResolveFactory<TestWorkerDisposable>());
             IExecutableActionWork executedWork = null;
             work2.Executed.Subscribe(w => executedWork = w);
 
