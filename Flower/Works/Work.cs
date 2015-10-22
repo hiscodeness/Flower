@@ -17,9 +17,9 @@ namespace Flower.Works
         }
 
         public WorkState State { get; private set; }
-        IWorkRegistration IWork.Registration { get { return Registration; } }
-        public IWorkRegistration<TInput> Registration { get; private set; }
-        public ITriggerEvents TriggerEvents { get; private set; }
+        IWorkRegistration IWork.Registration => Registration;
+        public IWorkRegistration<TInput> Registration { get; }
+        public ITriggerEvents TriggerEvents { get; }
 
         public void Activate()
         {
@@ -99,9 +99,9 @@ namespace Flower.Works
             observables = new ActionWorkObservablesHelper(this);
         }
 
-        new public IActionWorkRegistration Registration { get; private set; }
-        public IObservable<ITriggeredActionWork> Triggered { get { return observables.WorkTriggered; } }
-        public IObservable<IExecutableActionWork> Executed { get { return observables.WorkExecuted; } }
+        new public IActionWorkRegistration Registration { get; }
+        public IObservable<ITriggeredActionWork> Triggered => observables.WorkTriggered;
+        public IObservable<IExecutableActionWork> Executed => observables.WorkExecuted;
 
         protected override IExecutableWork CreateExecutableWork(IWorkRunner workRunner, object input)
         {
@@ -135,9 +135,9 @@ namespace Flower.Works
             observables = new ActionWorkObservablesHelper<TInput>(this);
         }
 
-        new public IActionWorkRegistration<TInput> Registration { get; private set; }
-        public IObservable<ITriggeredActionWork<TInput>> Triggered { get { return observables.WorkTriggered; } }
-        public IObservable<IExecutableActionWork<TInput>> Executed { get { return observables.WorkExecuted; } }
+        new public IActionWorkRegistration<TInput> Registration { get; }
+        public IObservable<ITriggeredActionWork<TInput>> Triggered => observables.WorkTriggered;
+        public IObservable<IExecutableActionWork<TInput>> Executed => observables.WorkExecuted;
 
         protected override IExecutableWork CreateExecutableWork(IWorkRunner workRunner, TInput input)
         {
@@ -172,10 +172,10 @@ namespace Flower.Works
             Output = Executed.Where(WorkSucceeded).Select(executedWork => executedWork.Output);
         }        
 
-        new public IFuncWorkRegistration<TInput, TOutput> Registration { get; private set; }
-        public IObservable<ITriggeredFuncWork<TInput, TOutput>> Triggered { get { return observables.WorkTriggered; } }
-        public IObservable<IExecutableFuncWork<TInput, TOutput>> Executed { get { return observables.WorkExecuted; } }
-        public IObservable<TOutput> Output { get; private set; }
+        new public IFuncWorkRegistration<TInput, TOutput> Registration { get; }
+        public IObservable<ITriggeredFuncWork<TInput, TOutput>> Triggered => observables.WorkTriggered;
+        public IObservable<IExecutableFuncWork<TInput, TOutput>> Executed => observables.WorkExecuted;
+        public IObservable<TOutput> Output { get; }
 
         protected override IExecutableWork CreateExecutableWork(IWorkRunner workRunner, TInput input)
         {

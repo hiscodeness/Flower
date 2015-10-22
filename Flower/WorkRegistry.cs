@@ -15,12 +15,9 @@ namespace Flower
             DefaultOptions = options ?? RegisterOptions.Default;
         }
 
-        public IEnumerable<IWork> Works
-        {
-            get { return works; }
-        }
+        public IEnumerable<IWork> Works => works;
 
-        public RegisterOptions DefaultOptions { get; private set; }
+        public RegisterOptions DefaultOptions { get; }
 
         public IActionWork Register<TInput>(
             IObservable<TInput> trigger,
@@ -76,7 +73,7 @@ namespace Flower
         
         public void Complete(IWork work)
         {
-            if (work == null) throw new ArgumentNullException("work");
+            if (work == null) throw new ArgumentNullException(nameof(work));
 
             if (!works.Contains(work))
             {

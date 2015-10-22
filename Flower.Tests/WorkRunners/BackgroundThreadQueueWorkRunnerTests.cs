@@ -71,9 +71,9 @@ namespace Flower.Tests.WorkRunners
             manualResetEvent.Wait(TimeSpan.FromSeconds(10));
             manualResetEvent.Reset();
             manualResetEvent.Wait(TimeSpan.FromSeconds(10));
+            workRunner.Dispose();
 
             // Assert
-            Assert.DoesNotThrow(workRunner.Dispose);
             Assert.InRange(stopwatch.ElapsedMilliseconds, 0, 299);
             Assert.Equal(2, executedWorkCount);
         }

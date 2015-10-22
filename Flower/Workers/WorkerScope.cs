@@ -27,7 +27,7 @@ namespace Flower.Workers
                 Worker = instance;
             }
 
-            public IWorker Worker { get; private set; }
+            public IWorker Worker { get; }
 
             public void Dispose()
             {
@@ -42,7 +42,7 @@ namespace Flower.Workers
                 Worker = instance;
             }
 
-            public IWorker<TInput> Worker { get; private set; }
+            public IWorker<TInput> Worker { get; }
 
             public void Dispose()
             {
@@ -57,7 +57,7 @@ namespace Flower.Workers
                 Worker = instance;
             }
 
-            public IWorker<TInput, TOutput> Worker { get; private set; }
+            public IWorker<TInput, TOutput> Worker { get; }
 
             public void Dispose()
             {

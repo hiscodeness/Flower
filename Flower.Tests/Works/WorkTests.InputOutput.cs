@@ -18,8 +18,11 @@ namespace Flower.Tests.Works
             var work = workRegistry.Register(subject, new TestWorkerIntToIntSquared());
             workRegistry.Complete(work);
 
-            // Act/Assert
-            Assert.Throws<InvalidOperationException>(() => work.Activate());
+            // Act
+            var ex = Record.Exception(() => work.Activate());
+
+            // Assert
+            Assert.IsType<InvalidOperationException>(ex);
         }
 
         [Fact]

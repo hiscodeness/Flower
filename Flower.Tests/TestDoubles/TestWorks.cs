@@ -30,13 +30,14 @@ namespace Flower.Tests.TestDoubles
             output.Dispose();
         }
 
-        public IFuncWorkRegistration<int, int> Registration { get { return registration; } }
-        public WorkState State { get; private set; }
-        IWorkRegistration<int> IWork<int>.Registration { get { return Registration; } }
-        IWorkRegistration IWork.Registration { get { return Registration; } }
-        IObservable<IExecutableFuncWork<int, int>> IFuncWork<int, int>.Executed { get { return null; } }
-        public IObservable<int> Output { get { return output; } }
-        IObservable<ITriggeredFuncWork<int, int>> IFuncWork<int, int>.Triggered { get { return null; } }
+        public IFuncWorkRegistration<int, int> Registration => registration;
+        public WorkState State { get; }
+        IWorkRegistration<int> IWork<int>.Registration => Registration;
+        IWorkRegistration IWork.Registration => Registration;
+        IObservable<IExecutableFuncWork<int, int>> IFuncWork<int, int>.Executed => null;
+        public IObservable<int> Output => output;
+        IObservable<ITriggeredFuncWork<int, int>> IFuncWork<int, int>.Triggered => null;
+
         public void Complete()
         {
             throw new NotImplementedException();

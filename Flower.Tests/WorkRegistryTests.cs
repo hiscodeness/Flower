@@ -21,7 +21,7 @@ namespace Flower.Tests
             var workRunner = new BackgroundThreadQueueWorkRunner();
 
             // Assert
-            Assert.DoesNotThrow(() => new WorkRegistry(new RegisterOptions(workRunner)));
+            var workRegistry = new WorkRegistry(new RegisterOptions(workRunner));
         }
 
         [Fact]
@@ -164,8 +164,11 @@ namespace Flower.Tests
             var work = workRegistry.Register(subject, new TestWorkerIntToIntSquared());
             workRegistry.Complete(work);
 
-            // Act / Assert
-            Assert.Throws<InvalidOperationException>(() => workRegistry.Complete(work));
+            // Act
+            var ex = Record.Exception(() => workRegistry.Complete(work));
+
+            // Assert
+            Assert.IsType<InvalidOperationException>(ex);
         }
 
         [Fact]
@@ -315,10 +318,13 @@ namespace Flower.Tests
             // Arrange
             var workRegistry = new WorkRegistry();
 
-            // Act / Assert
-            Assert.Throws<ArgumentNullException>(() => workRegistry.Complete(null));
+            // Act
+            var ex = Record.Exception(() => workRegistry.Complete(null));
+
+            // Assert
+            Assert.IsType<ArgumentNullException>(ex);
         }
-        
+
         [Fact]
         public void CannotCompleteWorkIfNotRegisteredWithTheWorkRegistry()
         {
@@ -326,10 +332,13 @@ namespace Flower.Tests
             var workRegistry = new WorkRegistry();
             var work = A.Fake<IWork>();
 
-            // Act / Assert
-            Assert.Throws<InvalidOperationException>(() => workRegistry.Complete(work));
+            // Act
+            var ex = Record.Exception(() => workRegistry.Complete(work));
+
+            // Assert
+            Assert.IsType<InvalidOperationException>(ex);
         }
-        
+
         [Fact]
         public void EachRegisteredWorkHasUniqueOptions()
         {
@@ -351,12 +360,15 @@ namespace Flower.Tests
         [Fact]
         public void ActionWithNoInputCanBeRegistered()
         {
-          // Arrange
-          var workRegistry = new WorkRegistry();
-          var trigger = new Subject<int>();
+            // Arrange
+            var workRegistry = new WorkRegistry();
+            var trigger = new Subject<int>();
 
-          // Act / Assert
-          Assert.DoesNotThrow(() => workRegistry.Register(trigger, () => { }));
+            // Act
+            var ex = Record.Exception(() => workRegistry.Register(trigger, () => { }));
+
+            // Assert
+            Assert.Null(ex);
         }
 
         [Fact]
@@ -366,8 +378,11 @@ namespace Flower.Tests
             var workRegistry = new WorkRegistry();
             var trigger = new Subject<int>();
 
-            // Act / Assert
-            Assert.DoesNotThrow(() => workRegistry.Register(trigger, i => { }));
+            // Act
+            var ex = Record.Exception(() => workRegistry.Register(trigger, i => { }));
+
+            // Assert
+            Assert.Null(ex);
         }
 
         [Fact]
@@ -377,8 +392,11 @@ namespace Flower.Tests
             var workRegistry = new WorkRegistry();
             var trigger = new Subject<int>();
 
-            // Act / Assert
-            Assert.DoesNotThrow(() => workRegistry.Register(trigger, i => i.ToString(CultureInfo.InvariantCulture)));
+            // Act
+            var ex = Record.Exception(() => workRegistry.Register(trigger, i => i.ToString(CultureInfo.InvariantCulture)));
+
+            // Assert
+            Assert.Null(ex);
         }
     }
 }

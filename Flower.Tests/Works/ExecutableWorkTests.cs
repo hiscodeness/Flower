@@ -69,8 +69,11 @@ namespace Flower.Tests.Works
             var context = new WorkerErrorBehaviorTestContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
             context.Trigger(3);
 
-            // Act / Assert
-            Assert.Throws<InvalidOperationException>(() => context.Executed.Single().Execute());
+            // Act
+            var ex = Record.Exception(() => context.Executed.Single().Execute());
+
+            // Assert
+            Assert.IsType<InvalidOperationException>(ex);
         }
 
         [Fact]
@@ -208,9 +211,10 @@ namespace Flower.Tests.Works
             var context = new WorkerErrorBehaviorTestContext(WorkerErrorBehavior.CompleteWorkAndThrow);
 
             // Act
-            Assert.Throws<ArgumentException>(() => context.Trigger(3, 4, 5));
+            var ex = Record.Exception(() => context.Trigger(3, 4, 5));
 
             // Assert
+            Assert.IsType<ArgumentException>(ex);
             Assert.Equal(WorkState.WorkerError, context.Work.State);
             Assert.Equal(new[] { 3 }, context.Executed.Select(w => w.Output));
         }
@@ -251,9 +255,9 @@ namespace Flower.Tests.Works
                 Work.Output.Subscribe(Output.Add);
             }
             
-            public IFuncWork<int, int> Work { get; private set; }
-            public List<IExecutableFuncWork<int, int>> Executed { get; private set; }
-            public List<int> Output { get; private set; }
+            public IFuncWork<int, int> Work { get; }
+            public List<IExecutableFuncWork<int, int>> Executed { get; }
+            public List<int> Output { get; }
 
             public void Trigger(params int[] values)
             {

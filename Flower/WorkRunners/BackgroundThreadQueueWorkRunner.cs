@@ -20,8 +20,8 @@ namespace Flower.WorkRunners
             Task.Factory.StartNew(DequeuePendingWorksThread, TaskCreationOptions.LongRunning);
         }
 
-        public IEnumerable<IExecutableWork> PendingWorks { get { return pendingWorks; } }
-        public IEnumerable<IExecutableWork> ExecutingWorks { get { return new[] { executingWork }; } }
+        public IEnumerable<IExecutableWork> PendingWorks => pendingWorks;
+        public IEnumerable<IExecutableWork> ExecutingWorks => new[] { executingWork };
 
         public void Submit(IExecutableWork executableWork)
         {

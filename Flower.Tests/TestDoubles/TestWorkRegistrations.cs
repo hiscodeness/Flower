@@ -12,11 +12,11 @@ namespace Flower.Tests.TestDoubles
         private readonly Func<IScope<IWorker<int, int>>> createWorkerScope =
             Workers.WorkerScope.Instance(new TestWorkerIntToIntSquared());
 
-        public IWorkRegistry WorkRegistry { get { return workRegistry; } }
-        public RegisterOptions Options { get { return workRegistry.DefaultOptions; } }
-        public IObservable<int> Trigger { get { return trigger; } }
-        public Func<IScope<IWorker<int, int>>> CreateWorkerScope { get { return createWorkerScope; } }
-        
+        public IWorkRegistry WorkRegistry => workRegistry;
+        public RegisterOptions Options => workRegistry.DefaultOptions;
+        public IObservable<int> Trigger => trigger;
+        public Func<IScope<IWorker<int, int>>> CreateWorkerScope => createWorkerScope;
+
         public void Dispose()
         {
             workRegistry.CompleteAll();

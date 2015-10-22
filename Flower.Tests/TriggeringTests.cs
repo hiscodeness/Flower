@@ -116,16 +116,18 @@ namespace Flower.Tests
         public void TriggerErrorsThrowIfSubscribersDoNotHandleThem()
         {
             // Arrange
-            var options = new RegisterOptions(RegisterWorkBehavior.RegisterActivated);
+            var options = new RegisterOptions();
             var registry = new WorkRegistry(options);
             var trigger = new Subject<int>();
             var work = registry.Register(trigger, new TestWorkerIntToIntSquared());
-            // * Output subscription uses an overload that does not specify a delegate for the OnError notification
+            // Output subscription uses an overload that does not specify a delegate for the OnError notification
             work.Output.Subscribe(_ => { });
 
-            // Act / Assert
-            // Should throw here because of * described above
-            Assert.Throws<Exception>(() => trigger.OnError(new Exception()));
+            // Act
+            var ex = Record.Exception(() => trigger.OnError(new Exception()));
+
+            // Assert
+            Assert.IsType<Exception>(ex);
         }
         
         [Fact]
@@ -133,7 +135,7 @@ namespace Flower.Tests
         {
             // Arrange
             var trigger = new Subject<int>();
-            var options = new RegisterOptions(RegisterWorkBehavior.RegisterActivated);
+            var options = new RegisterOptions();
             var registry = new WorkRegistry(options);
             var work = registry.Register(trigger, new TestWorkerIntToIntSquared());
             Exception exception = null;
