@@ -37,7 +37,8 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CreateOwnedInstanceExtensionMethods.cs" />
+    <Compile Include="FuncOwnedFactoryExtensionMethods.cs" />
+    <Compile Include="LifetimeScopeExtensionMethods.cs" />
     <Compile Include="OwnedScope.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -15,7 +15,7 @@ namespace Flower.Tests.Works
             // Arrange
             var subject = new Subject<int>();
             var workRegistry = new WorkRegistry();
-            var work = workRegistry.Register(subject, new TestWorkerIntToIntSquared());
+            var work = workRegistry.RegisterWorker(subject, new TestWorkerIntToIntSquared());
             workRegistry.Complete(work);
 
             // Act
@@ -45,7 +45,7 @@ namespace Flower.Tests.Works
         {
             // Arrange
             var work = new TestWorkIntToIntSquared();
-            var createWorkerScope = WorkerScope.Instance(new TestWorkerIntToIntSquared());
+            var createWorkerScope = WorkerScope.FromInstance(new TestWorkerIntToIntSquared());
 
             // Act
             var pipedWork = work.Pipe(createWorkerScope);
@@ -61,7 +61,7 @@ namespace Flower.Tests.Works
             // Arrange
             var trigger = new Subject<int>();
             var registry = new WorkRegistry();
-            var work = registry.Register(trigger, new TestWorkerIntToIntSquared());
+            var work = registry.RegisterWorker(trigger, new TestWorkerIntToIntSquared());
             ITriggeredFuncWork<int, int> triggeredWork = null;
 
             // Act
