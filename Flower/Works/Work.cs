@@ -105,7 +105,10 @@ namespace Flower.Works
 
         protected override IExecutableWork CreateExecutableWork(IWorkRunner workRunner, object input)
         {
-            return new ExecutableActionWork(workRunner, this, input);
+            var executableWork = new ExecutableActionWork(workRunner, this, input);
+            return Registration.Options.IsWorkDecorated
+                ? Registration.Options.WorkDecoratorFactory.Decorate(executableWork)
+                : executableWork;
         }
 
         protected override void WorkTriggered(ITriggeredWork triggeredWork)
@@ -141,7 +144,10 @@ namespace Flower.Works
 
         protected override IExecutableWork CreateExecutableWork(IWorkRunner workRunner, TInput input)
         {
-            return new ExecutableActionWork<TInput>(workRunner, this, input);
+            var executableWork = new ExecutableActionWork<TInput>(workRunner, this, input);
+            return Registration.Options.IsWorkDecorated
+                ? Registration.Options.WorkDecoratorFactory.Decorate(executableWork)
+                : executableWork;
         }
 
         protected override void WorkTriggered(ITriggeredWork triggeredWork)
@@ -179,7 +185,10 @@ namespace Flower.Works
 
         protected override IExecutableWork CreateExecutableWork(IWorkRunner workRunner, TInput input)
         {
-            return new ExecutableFuncWork<TInput, TOutput>(workRunner, this, input);
+            var executableWork = new ExecutableFuncWork<TInput, TOutput>(workRunner, this, input);
+            return Registration.Options.IsWorkDecorated
+                ? Registration.Options.WorkDecoratorFactory.Decorate(executableWork)
+                : executableWork;
         }
 
         protected override void WorkTriggered(ITriggeredWork triggeredWork)
