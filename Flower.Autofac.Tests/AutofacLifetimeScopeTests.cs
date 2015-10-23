@@ -5,7 +5,6 @@
     using System.Reactive.Subjects;
     using Flower.Works;
     using global::Autofac;
-    using global::Autofac.Features.OwnedInstances;
     using Xunit;
 
     public class AutofacLifetimeScopeTests

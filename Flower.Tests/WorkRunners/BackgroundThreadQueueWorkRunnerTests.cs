@@ -8,7 +8,6 @@ using FakeItEasy;
 using Flower.WorkRunners;
 using Flower.Works;
 using Xunit;
-using Xunit.Extensions;
 
 namespace Flower.Tests.WorkRunners
 {
