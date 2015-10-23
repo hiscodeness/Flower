@@ -50,24 +50,29 @@ namespace Flower
                 prototype.RegisterWorkBehavior,
                 prototype.TriggerErrorBehavior,
                 prototype.WorkRunnerFactory,
-                prototype.WorkerErrorBehavior) {}
+                prototype.WorkerErrorBehavior,
+                prototype.WorkDecoratorFactory) {}
         
         public RegisterOptions(
             RegisterWorkBehavior registerWorkBehavior = RegisterWorkBehavior.RegisterActivated,
             TriggerErrorBehavior triggerErrorBehavior = TriggerErrorBehavior.CompleteWorkAndThrow,
             Func<IWork, IWorkRunner> workRunnerFactory = null,
-            WorkerErrorBehavior workerErrorBehavior = WorkerErrorBehavior.CompleteWorkAndThrow)
+            WorkerErrorBehavior workerErrorBehavior = WorkerErrorBehavior.CompleteWorkAndThrow,
+            IWorkDecoratorFactory workDecoratorFactory = null)
         {
             RegisterWorkBehavior = registerWorkBehavior;
             TriggerErrorBehavior = triggerErrorBehavior;
             WorkRunnerFactory = workRunnerFactory ?? (_ => new ImmediateWorkRunner());
             WorkerErrorBehavior = workerErrorBehavior;
+            WorkDecoratorFactory = workDecoratorFactory;
         }
 
         public RegisterWorkBehavior RegisterWorkBehavior { get; }
         public TriggerErrorBehavior TriggerErrorBehavior { get; }
         public Func<IWork, IWorkRunner> WorkRunnerFactory { get; }
         public WorkerErrorBehavior WorkerErrorBehavior { get; }
+        public IWorkDecoratorFactory WorkDecoratorFactory { get; }
+        public bool IsWorkDecorated => WorkDecoratorFactory != null;
 
         public RegisterOptions With(RegisterWorkBehavior registerWorkBehavior)
         {

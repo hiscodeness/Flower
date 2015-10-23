@@ -36,11 +36,11 @@ namespace Flower.WorkRunners
 
         private void DequeueUntilAddingCompleted()
         {
-            foreach (var work in pendingWorks.GetConsumingEnumerable().TakeWhile(ContinueDequeuing)) 
+            foreach (var executableWork in pendingWorks.GetConsumingEnumerable().TakeWhile(ContinueDequeuing)) 
             {
                 Debug.Assert(executingWork == null, "Internal error, currently executing work should have been null.");
-                executingWork = work;
-                work.Execute();
+                executingWork = executableWork;
+                executableWork.Execute();
                 executingWork = null;
             }
         }

@@ -66,17 +66,25 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestDoubles\TestWorker.cs" />
+    <Compile Include="TestDoubles\TestWorkerInt.cs" />
+    <Compile Include="TestDoubles\TestWorkerIntToIntSquared.cs" />
+    <Compile Include="TestDoubles\TestWorkerIntToString.cs" />
+    <Compile Include="TestDoubles\TestWorkerStringToInt.cs" />
+    <Compile Include="TestDoubles\TestWorkerThrowsException.cs" />
     <Compile Include="TestDoubles\TestWorkRegistrations.cs" />
     <Compile Include="WorkRegistryOptionsTests.cs" />
     <Compile Include="WorkRegistryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestDoubles\TestWorkers.cs" />
+    <Compile Include="TestDoubles\TestWorkerIntToIntThrowOnEven.cs" />
     <Compile Include="TestDoubles\TestWorks.cs" />
     <Compile Include="TriggeringTests.cs" />
     <Compile Include="WorkRunners\BackgroundThreadQueueWorkRunnerTests.cs" />
     <Compile Include="WorkRunners\ImmediateWorkRunnerTests.cs" />
     <Compile Include="Works\ExecutableWorkTests.cs" />
+    <Compile Include="TestContexts\IntToIntWorkerThrowOnEvenContext.cs" />
     <Compile Include="Works\TriggeredWorkTests.cs" />
+    <Compile Include="Works\WorkDecoratorFactoryTests.cs" />
     <Compile Include="Works\WorkTests.cs" />
     <Compile Include="Works\WorkTests.Input.cs" />
     <Compile Include="Works\WorkTests.InputOutput.cs" />

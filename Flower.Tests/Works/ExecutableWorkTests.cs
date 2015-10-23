@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Subjects;
 using Flower.Tests.TestDoubles;
@@ -8,13 +7,15 @@ using Xunit;
 
 namespace Flower.Tests.Works
 {
+    using Flower.Tests.TestContexts;
+
     public class ExecutableWorkTests
     {
         [Fact]
         public void ExecutedWorkReferencesCorrectWork()
         {
             // Arrange
-            var context = new WorkerErrorBehaviorTestContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
 
             // Act
             context.Trigger(3);
@@ -27,7 +28,7 @@ namespace Flower.Tests.Works
         public void ExecutedWorkHasCorrectInput()
         {
             // Arrange
-            var context = new WorkerErrorBehaviorTestContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
 
             // Act
             context.Trigger(3, 5, 7);
@@ -40,7 +41,7 @@ namespace Flower.Tests.Works
         public void ExecutedWorkHasCorrectOutput()
         {
             // Arrange
-            var context = new WorkerErrorBehaviorTestContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
 
             // Act
             context.Trigger(3, 5, 7);
@@ -53,7 +54,7 @@ namespace Flower.Tests.Works
         public void ExecutedWorkHasWorkRunnerSet()
         {
             // Arrange
-            var context = new WorkerErrorBehaviorTestContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
 
             // Act
             context.Trigger(3);
@@ -66,7 +67,7 @@ namespace Flower.Tests.Works
         public void ExecutedWorkCannotBeExecutedAgain()
         {
             // Arrange
-            var context = new WorkerErrorBehaviorTestContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
             context.Trigger(3);
 
             // Act
@@ -80,7 +81,7 @@ namespace Flower.Tests.Works
         public void WorkerErrorExceptionIsSetOnExecuted()
         {
             // Arrange
-            var context = new WorkerErrorBehaviorTestContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
 
             // Act
             context.Trigger(3,4,5);
@@ -94,7 +95,7 @@ namespace Flower.Tests.Works
         public void WorkerErrorStateIsSetOnExecuted()
         {
             // Arrange
-            var context = new WorkerErrorBehaviorTestContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
 
             // Act
             context.Trigger(3, 4, 5);
@@ -108,7 +109,7 @@ namespace Flower.Tests.Works
         public void WorkerErrorOutputIsNotSetOnExecuted()
         {
             // Arrange
-            var context = new WorkerErrorBehaviorTestContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
 
             // Act
             context.Trigger(3, 4, 5);
@@ -122,7 +123,7 @@ namespace Flower.Tests.Works
         public void ContinuingAfterWorkerErrorLeavesWorkActive()
         {
             // Arrange
-            var context = new WorkerErrorBehaviorTestContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
 
             // Act
             context.Trigger(3, 4, 5);
@@ -135,7 +136,7 @@ namespace Flower.Tests.Works
         public void WorkerErrorIsIgnoredOnOutput()
         {
             // Arrange
-            var context = new WorkerErrorBehaviorTestContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
 
             // Act
             context.Trigger(3, 4, 5);
@@ -149,7 +150,7 @@ namespace Flower.Tests.Works
         public void WorkerErrorCanBeNotifiedOnExecutedBeforeCompletingWork()
         {
             // Arrange
-            var context = new WorkerErrorBehaviorTestContext(WorkerErrorBehavior.RaiseExecutedAndCompleteWork);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.RaiseExecutedAndCompleteWork);
 
             // Act
             context.Trigger(3, 4, 5);
@@ -166,7 +167,7 @@ namespace Flower.Tests.Works
         public void WorkerErrorCanBeSwallowedOnExecuted()
         {
             // Arrange
-            var context = new WorkerErrorBehaviorTestContext(WorkerErrorBehavior.SwallowErrorAndContinue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.SwallowErrorAndContinue);
 
             // Act
             context.Trigger(3, 4, 5);
@@ -180,7 +181,7 @@ namespace Flower.Tests.Works
         public void WorkerErrorCanBeSwallowedOnOutput()
         {
             // Arrange
-            var context = new WorkerErrorBehaviorTestContext(WorkerErrorBehavior.SwallowErrorAndContinue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.SwallowErrorAndContinue);
 
             // Act
             context.Trigger(3, 4, 5);
@@ -194,7 +195,7 @@ namespace Flower.Tests.Works
         public void WorkerErrorCanCompleteWork()
         {
             // Arrange
-            var context = new WorkerErrorBehaviorTestContext(WorkerErrorBehavior.SwallowErrorAndCompleteWork);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.SwallowErrorAndCompleteWork);
 
             // Act
             context.Trigger(3, 4, 5);
@@ -208,7 +209,7 @@ namespace Flower.Tests.Works
         public void WorkerErrorCanCompleteWorkAndThrow()
         {
             // Arrange
-            var context = new WorkerErrorBehaviorTestContext(WorkerErrorBehavior.CompleteWorkAndThrow);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.CompleteWorkAndThrow);
 
             // Act
             var ex = Record.Exception(() => context.Trigger(3, 4, 5));
@@ -237,40 +238,6 @@ namespace Flower.Tests.Works
 
             // Assert
             Assert.Equal(WorkState.WorkerError, result);
-        }
-
-        private sealed class WorkerErrorBehaviorTestContext : IDisposable
-        {
-            private readonly Subject<int> trigger;
-
-            public WorkerErrorBehaviorTestContext(WorkerErrorBehavior behavior)
-            {
-                var options = new RegisterOptions(RegisterWorkBehavior.RegisterActivated, workerErrorBehavior: behavior);
-                var workRegistry = new WorkRegistry(options);
-                trigger = new Subject<int>();
-                Work = workRegistry.RegisterWorker(trigger, new TestWorkerIntToIntThrowOnEven());
-                Executed = new List<IExecutableFuncWork<int, int>>();
-                Output = new List<int>();
-                Work.Executed.Subscribe(Executed.Add);
-                Work.Output.Subscribe(Output.Add);
-            }
-            
-            public IFuncWork<int, int> Work { get; }
-            public List<IExecutableFuncWork<int, int>> Executed { get; }
-            public List<int> Output { get; }
-
-            public void Trigger(params int[] values)
-            {
-                foreach (var value in values)
-                {
-                    trigger.OnNext(value);
-                }
-            }
-
-            public void Dispose()
-            {
-                trigger.Dispose();
-            }
         }
     }
 }
