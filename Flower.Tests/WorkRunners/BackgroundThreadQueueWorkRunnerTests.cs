@@ -14,8 +14,8 @@ namespace Flower.Tests.WorkRunners
     public class BackgroundThreadQueueWorkRunnerTests
     {
         [Theory]
-        [InlineData(5, 100)]
-        [InlineData(100, 5)]
+        [InlineData(20, 100)]
+        [InlineData(200, 10)]
         public async Task BackgroundThreadQueueExecutesOneWorkWhileOthersArePending(int delayInMilliseconds, int workCount)
         {
             // Arrange
