@@ -12,6 +12,8 @@ using Xunit;
 
 namespace Flower.Tests
 {
+    using System.Threading.Tasks;
+
     public class WorkRegistryTests
     {
         [Fact]
@@ -365,7 +367,7 @@ namespace Flower.Tests
             var trigger = new Subject<int>();
 
             // Act
-            var ex = Record.Exception(() => workRegistry.RegisterMethod(trigger, () => { }));
+            var ex = Record.Exception(() => workRegistry.RegisterMethod(trigger, () => Task.CompletedTask ));
 
             // Assert
             Assert.Null(ex);
@@ -379,7 +381,7 @@ namespace Flower.Tests
             var trigger = new Subject<int>();
 
             // Act
-            var ex = Record.Exception(() => workRegistry.RegisterMethod(trigger, i => { }));
+            var ex = Record.Exception(() => workRegistry.RegisterMethod(trigger, i => Task.CompletedTask));
 
             // Assert
             Assert.Null(ex);
@@ -393,7 +395,7 @@ namespace Flower.Tests
             var trigger = new Subject<int>();
 
             // Act
-            var ex = Record.Exception(() => workRegistry.RegisterMethod(trigger, i => i.ToString(CultureInfo.InvariantCulture)));
+            var ex = Record.Exception(() => workRegistry.RegisterMethod(trigger, i => Task.FromResult(i.ToString(CultureInfo.InvariantCulture))));
 
             // Assert
             Assert.Null(ex);

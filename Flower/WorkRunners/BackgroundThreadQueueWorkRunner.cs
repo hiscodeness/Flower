@@ -23,9 +23,10 @@ namespace Flower.WorkRunners
         public IEnumerable<IExecutableWork> PendingWorks => pendingWorks;
         public IEnumerable<IExecutableWork> ExecutingWorks => new[] { executingWork };
 
-        public void Submit(IExecutableWork executableWork)
+        public async Task Submit(IExecutableWork executableWork)
         {
             pendingWorks.Add(executableWork);
+            await Task.CompletedTask;
         }
 
         private void DequeuePendingWorksThread()

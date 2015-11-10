@@ -2,6 +2,7 @@ namespace Flower
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using Flower.Works;
     using Flower.Workers;
 
@@ -13,17 +14,17 @@ namespace Flower
 
         IActionWork RegisterMethod<TInput>(
             IObservable<TInput> trigger,
-            Action method,
+            Func<Task> method,
             RegisterOptions options = null);
 
         IActionWork<TInput> RegisterMethod<TInput>(
             IObservable<TInput> trigger,
-            Action<TInput> method,
+            Func<TInput, Task> method,
             RegisterOptions options = null);
 
         IFuncWork<TInput, TOutput> RegisterMethod<TInput, TOutput>(
             IObservable<TInput> trigger,
-            Func<TInput, TOutput> method,
+            Func<TInput, Task<TOutput>> method,
             RegisterOptions options = null);
 
         IActionWork RegisterWorker<TInput>(

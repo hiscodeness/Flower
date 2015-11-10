@@ -3,6 +3,8 @@ using Flower.WorkRunners;
 
 namespace Flower.Works
 {
+    using System.Threading.Tasks;
+
     internal abstract class ExecutableWork<TInput> : IExecutableWork<TInput>
     {
         private readonly IRegisteredWork<TInput> work; 
@@ -21,7 +23,7 @@ namespace Flower.Works
             State = ExecutableWorkState.Pending;
         }
 
-        public void Execute()
+        public async Task Execute()
         {
             if (State != ExecutableWorkState.Pending)
             {
@@ -32,7 +34,7 @@ namespace Flower.Works
             {
                 State = ExecutableWorkState.Executing;
                 CreateWorkerScope();
-                ExecuteWorker();
+                await ExecuteWorker();
                 DisposeWorkerScope();
                 State = ExecutableWorkState.Success;
                 WorkerExecuted();
@@ -84,7 +86,7 @@ namespace Flower.Works
         }
 
         protected abstract void CreateWorkerScope();
-        protected abstract void ExecuteWorker();
+        protected abstract Task ExecuteWorker();
         protected abstract void DisposeWorkerScope();
         protected abstract void WorkerExecuted();
     }
@@ -106,9 +108,9 @@ namespace Flower.Works
             WorkerScope = work.Registration.CreateWorkerScope();
         }
 
-        protected override void ExecuteWorker()
+        protected override async Task ExecuteWorker()
         {
-            WorkerScope.Worker.Execute();
+            await WorkerScope.Worker.Execute();
         }
 
         protected override void DisposeWorkerScope()
@@ -142,9 +144,9 @@ namespace Flower.Works
             WorkerScope = work.Registration.CreateWorkerScope();
         }
 
-        protected override void ExecuteWorker()
+        protected override async Task ExecuteWorker()
         {
-            WorkerScope.Worker.Execute(Input);
+            await WorkerScope.Worker.Execute(Input);
         }
 
         protected override void DisposeWorkerScope()
@@ -179,9 +181,9 @@ namespace Flower.Works
             WorkerScope = work.Registration.CreateWorkerScope();
         }
 
-        protected override void ExecuteWorker()
+        protected override async Task ExecuteWorker()
         {
-            Output = WorkerScope.Worker.Execute(Input);
+            Output = await WorkerScope.Worker.Execute(Input);
         }
 
         protected override void DisposeWorkerScope()

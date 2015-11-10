@@ -2,10 +2,12 @@
 
 namespace Flower.Works
 {
+    using System.Threading.Tasks;
+
     public interface IExecutableWork : ITriggeredWork
     {
         ExecutableWorkState State { get; }
-        void Execute();
+        Task Execute();
         Exception Error { get; }
     }
 

@@ -6,6 +6,7 @@ using Flower.Works;
 
 namespace Flower
 {
+    using System.Threading.Tasks;
     using Flower.Workers;
 
     public sealed class WorkRegistry : IWorkRegistry, IActivatable, ISuspendable
@@ -23,7 +24,7 @@ namespace Flower
 
         public IActionWork RegisterMethod<TInput>(
            IObservable<TInput> trigger,
-           Action worker,
+           Func<Task> worker,
            RegisterOptions options = null)
         {
             return RegisterFactory(trigger, () => WorkerScope.FromInstance(new Worker(worker)), options);
@@ -31,7 +32,7 @@ namespace Flower
 
         public IActionWork<TInput> RegisterMethod<TInput>(
             IObservable<TInput> trigger,
-            Action<TInput> worker,
+            Func<TInput, Task> worker,
             RegisterOptions options = null)
         {
             return RegisterFactory(trigger, WorkerScope.FromInstance(new Worker<TInput>(worker)), options);
@@ -39,7 +40,7 @@ namespace Flower
 
         public IFuncWork<TInput, TOutput> RegisterMethod<TInput, TOutput>(
             IObservable<TInput> trigger,
-            Func<TInput, TOutput> worker,
+            Func<TInput, Task<TOutput>> worker,
             RegisterOptions options = null)
         {
             return RegisterFactory(trigger, WorkerScope.FromInstance(new Worker<TInput, TOutput>(worker)), options);

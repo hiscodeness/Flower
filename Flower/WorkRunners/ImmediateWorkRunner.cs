@@ -5,6 +5,8 @@ using Flower.Works;
 
 namespace Flower.WorkRunners
 {
+    using System.Threading.Tasks;
+
     /// <summary>
     /// A work runner that executes a single work immediately after being submitted.
     /// </summary>
@@ -25,7 +27,7 @@ namespace Flower.WorkRunners
             }
         }
 
-        public void Submit(IExecutableWork executableWork)
+        public async Task Submit(IExecutableWork executableWork)
         {
             if (executingWork != null)
             {
@@ -33,7 +35,7 @@ namespace Flower.WorkRunners
             }
 
             executingWork = executableWork;
-            executingWork.Execute();
+            await executingWork.Execute();
             isExecuted = true;
         }
     }

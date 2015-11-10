@@ -16,7 +16,7 @@ namespace Flower.Tests.WorkRunners
         [Theory]
         [InlineData(5, 100)]
         [InlineData(100, 5)]
-        public void BackgroundThreadQueueExecutesOneWorkWhileOthersArePending(int delayInMilliseconds, int workCount)
+        public async Task BackgroundThreadQueueExecutesOneWorkWhileOthersArePending(int delayInMilliseconds, int workCount)
         {
             // Arrange
             var countdown = new CountdownEvent(workCount);
@@ -33,7 +33,7 @@ namespace Flower.Tests.WorkRunners
             // Act
             for (var i = 0; i < workCount; i++)
             {
-                workRunner.Submit(executableWork);
+                await workRunner.Submit(executableWork);
             }
 
             // Assert
@@ -45,7 +45,7 @@ namespace Flower.Tests.WorkRunners
         }
 
         [Fact]
-        public void BackgroundThreadQueueDoesntWaitForAllTriggeredWorksToExecute()
+        public async Task BackgroundThreadQueueDoesntWaitForAllTriggeredWorksToExecute()
         {
             // Arrange
             var manualResetEvent = new ManualResetEventSlim();
@@ -65,7 +65,7 @@ namespace Flower.Tests.WorkRunners
             // Act
             for (var i = 0; i < 5; i++)
             {
-                workRunner.Submit(executableWork);
+                await workRunner.Submit(executableWork);
             }
             manualResetEvent.Wait(TimeSpan.FromSeconds(10));
             manualResetEvent.Reset();
