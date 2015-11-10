@@ -73,6 +73,7 @@
     <Compile Include="TestDoubles\TestWorkerStringToInt.cs" />
     <Compile Include="TestDoubles\TestWorkerThrowsException.cs" />
     <Compile Include="TestDoubles\TestWorkRegistrations.cs" />
+    <Compile Include="Triggers\TriggerTests.cs" />
     <Compile Include="WorkRegistryOptionsTests.cs" />
     <Compile Include="WorkRegistryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
