@@ -83,6 +83,7 @@
     <Compile Include="TriggeringTests.cs" />
     <Compile Include="WorkRunners\BackgroundThreadQueueWorkRunnerTests.cs" />
     <Compile Include="WorkRunners\ImmediateWorkRunnerTests.cs" />
+    <Compile Include="WorkRunners\ThreadPoolWorkRunnerTests.cs" />
     <Compile Include="Works\ExecutableWorkTests.cs" />
     <Compile Include="TestContexts\IntToIntWorkerThrowOnEvenContext.cs" />
     <Compile Include="Works\TriggeredWorkTests.cs" />
