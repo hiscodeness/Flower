@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Subjects;
+    using System.Threading.Tasks;
     using Flower.Tests.TestDoubles;
     using Flower.WorkRunners;
     using Flower.Works;
@@ -69,10 +70,10 @@
             this.logOutput = logOutput;
         }
 
-        public override void Execute()
+        public override async Task Execute()
         {
             logInput(Input);
-            base.Execute();
+            await base.Execute();
             logOutput(Output);
         }
     }

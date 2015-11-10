@@ -72,7 +72,18 @@ namespace Flower.Works
             var workRunner = Registration.Options.WorkRunnerFactory(this);
             var triggeredWork = CreateExecutableWork(workRunner, input);
             WorkTriggered(triggeredWork);
-            workRunner.Submit(triggeredWork);
+            try
+            {
+                workRunner.Submit(triggeredWork).Wait();
+            }
+            catch (AggregateException ex)
+            {
+                if (ex.InnerExceptions.Count == 1)
+                {
+                    throw ex.InnerExceptions[0];
+                }
+                throw;
+            }
         }
 
         private void TriggerOnError(Exception exception)

@@ -2,48 +2,50 @@
 
 namespace Flower.Workers
 {
+    using System.Threading.Tasks;
+
     internal class Worker : IWorker
     {
-        private readonly Action worker;
+        private readonly Func<Task> worker;
 
-        public Worker(Action worker)
+        public Worker(Func<Task> worker)
         {
             this.worker = worker;
         }
 
-        public void Execute()
+        public async Task Execute()
         {
-            worker();
+            await worker();
         }
     }
 
     internal class Worker<TInput> : IWorker<TInput>
     {
-        private readonly Action<TInput> worker;
+        private readonly Func<TInput, Task> worker;
 
-        public Worker(Action<TInput> worker)
+        public Worker(Func<TInput, Task> worker)
         {
             this.worker = worker;
         }
 
-        public void Execute(TInput input)
+        public async Task Execute(TInput input)
         {
-            worker(input);
+            await worker(input);
         }
     }
 
     internal class Worker<TInput, TOutput> : IWorker<TInput, TOutput>
     {
-        private readonly Func<TInput, TOutput> worker;
+        private readonly Func<TInput, Task<TOutput>> worker;
 
-        public Worker(Func<TInput, TOutput> worker)
+        public Worker(Func<TInput, Task<TOutput>> worker)
         {
             this.worker = worker;
         }
 
-        public TOutput Execute(TInput input)
+        public async Task<TOutput> Execute(TInput input)
         {
-            return worker(input);
+            return await worker(input);
         }
     }
 }

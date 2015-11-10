@@ -23,7 +23,7 @@ namespace Flower.Works
         Func<IScope<IWorker<TInput>>> CreateWorkerScope { get; }
     }
 
-    public interface IFuncWorkRegistration<TInput, out TOutput> : IWorkRegistration<TInput>
+    public interface IFuncWorkRegistration<TInput, TOutput> : IWorkRegistration<TInput>
     {
         Func<IScope<IWorker<TInput, TOutput>>> CreateWorkerScope { get; }
     }
