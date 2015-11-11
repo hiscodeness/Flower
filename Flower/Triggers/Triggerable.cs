@@ -3,12 +3,12 @@
     using System;
     using System.Reactive.Linq;
 
-    public class TriggerBase<TInput> : ITrigger<TInput>
+    public class Triggerable<TInput> : ITriggerable<TInput>
     {
         private event Action<TInput> Triggered;
         private readonly IObservable<TInput> observable;
 
-        public TriggerBase()
+        public Triggerable()
         {
             observable = Observable.FromEvent<TInput>(
                 e => Triggered += e,

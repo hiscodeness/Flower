@@ -46,8 +46,8 @@
   <ItemGroup>
     <Compile Include="IScope.cs" />
     <Compile Include="IWorkDecoratorFactory.cs" />
-    <Compile Include="Triggers\ITrigger.cs" />
-    <Compile Include="Triggers\TriggerBase.cs" />
+    <Compile Include="Triggers\ITriggerable.cs" />
+    <Compile Include="Triggers\Triggerable.cs" />
     <Compile Include="WorkDecoratorFactory.cs" />
     <Compile Include="Workers\IWorkerResolver.cs" />
     <Compile Include="Workers\Worker.cs" />

@@ -13,16 +13,16 @@
         {
             // Arrange
             var workRegistry = new WorkRegistry();
-            ITrigger<int> trigger = new TriggerBase<int>();
-            var work1 = workRegistry.RegisterWorker(trigger, new TestWorkerIntToString());
+            ITriggerable<int> triggerable = new Triggerable<int>();
+            var work1 = workRegistry.RegisterWorker(triggerable, new TestWorkerIntToString());
             var work2 = work1.Pipe(new TestWorkerStringToInt());
             var work3 = work2.Pipe(new TestWorkerIntToIntSquared());
             var results = new List<int>();
             work3.Output.Subscribe(i => results.Add(i));
 
             // Act
-            trigger.Trigger(3);
-            trigger.Trigger(5);
+            triggerable.Trigger(3);
+            triggerable.Trigger(5);
 
             // Assert
             Assert.Equal(new []{3*3, 5*5}, results);
