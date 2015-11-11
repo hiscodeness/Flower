@@ -16,11 +16,10 @@
         public async Task Submit(IExecutableWork executableWork)
         {
             executingWorks.Add(executableWork);
-#pragma warning disable 4014 // Begin executing in the background thread, don't wait for it to complete
-            Task.Run(executableWork.Execute).ContinueWith(
-#pragma warning restore 4014
+            var finished = Task.Run(executableWork.Execute).ContinueWith(
                 _ =>
                 {
+                    // Work executed on a background thread has finished
                     executingWorks.TryTake(out executableWork);
                 });
             await Task.CompletedTask;
