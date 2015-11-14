@@ -1,8 +1,11 @@
 namespace Flower.Works
 {
+    using Flower.Workers;
+
     internal interface IRegisteredWork : IWork
     {
         ITriggerEvents TriggerEvents { get; }
+        void SetWorkerError(WorkerError workerError);
         void Complete(WorkState withState);
     }
 

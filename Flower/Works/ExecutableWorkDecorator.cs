@@ -25,6 +25,7 @@
         }
 
         public Exception Error => next.Error;
+        IScope<object> IExecutableWork.WorkerScope => WorkerScope;
         public IScope<IWorker> WorkerScope => next.WorkerScope;
     }
 
@@ -50,6 +51,7 @@
         }
 
         public Exception Error => next.Error;
+        IScope<object> IExecutableWork.WorkerScope => WorkerScope;
         public IScope<IWorker<TInput>> WorkerScope => next.WorkerScope;
     }
 
@@ -75,6 +77,7 @@
         }
 
         public Exception Error => next.Error;
+        IScope<object> IExecutableWork.WorkerScope => WorkerScope;
         public IScope<IWorker<TInput, TOutput>> WorkerScope => next.WorkerScope;
         public TOutput Output => next.Output;
     }

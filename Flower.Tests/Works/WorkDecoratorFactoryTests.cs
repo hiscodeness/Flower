@@ -2,11 +2,9 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Reactive.Subjects;
     using System.Threading.Tasks;
     using Flower.Tests.TestDoubles;
-    using Flower.WorkRunners;
     using Flower.Works;
     using Xunit;
 

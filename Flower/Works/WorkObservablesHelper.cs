@@ -31,17 +31,20 @@ namespace Flower.Works
     internal class WorkObservablesHelper<TWork, TTriggeredWork, TExecutableWork>
         where TWork : IRegisteredWork where TTriggeredWork : ITriggeredWork where TExecutableWork : IExecutableWork
     {
+        private readonly WorkCompletedHelper workCompletedHelper;
         private readonly WorkTriggeredHelper workTriggeredHelper;
         private readonly WorkExecutedHelper workExecutedHelper;
 
         protected WorkObservablesHelper(TWork work)
         {
+            workCompletedHelper = new WorkCompletedHelper();
             workTriggeredHelper = new WorkTriggeredHelper();
             workExecutedHelper = new WorkExecutedHelper(work);
         }
 
         public IObservable<TTriggeredWork> WorkTriggered => workTriggeredHelper.WorkTriggered;
         public IObservable<TExecutableWork> WorkExecuted => workExecutedHelper.WorkExecuted;
+        public IObservable<TWork> WorkCompleted => workCompletedHelper.WorkCompleted;
 
         public void RaiseWorkTriggered(TTriggeredWork triggeredWork)
         {
@@ -53,25 +56,48 @@ namespace Flower.Works
             workExecutedHelper.RaiseWorkExecuted(triggeredWork);
         }
 
-        public void RaiseWorkCompleted()
+        public void RaiseWorkCompleted(TWork work)
         {
-            workTriggeredHelper.RaiseWorkCompleted();
-            workExecutedHelper.RaiseWorkCompleted();
+            workCompletedHelper.RaiseWorkCompleted(work);
+            workTriggeredHelper.RaiseWorkCompleted(work);
+            workExecutedHelper.RaiseWorkCompleted(work);
         }
 
         private class WorkCompletedHelper
         {
-            protected event Action WorkCompleted;
-            
-            public void RaiseWorkCompleted()
+            protected event Action workCompleted;
+            private event Action<TWork> typedWorkCompleted;
+
+            public WorkCompletedHelper()
             {
-                OnWorkCompleted();
+                WorkCompleted = Observable.Create(CreateCompletedSubscription());
             }
 
-            private void OnWorkCompleted()
+            public IObservable<TWork> WorkCompleted { get; }
+
+            public void RaiseWorkCompleted(TWork work)
             {
-                var handler = WorkCompleted;
-                handler?.Invoke();
+                OnWorkCompleted(work);
+            }
+
+            private Func<IObserver<TWork>, IDisposable> CreateCompletedSubscription()
+            {
+                return CreateCompletedSubscription;
+            }
+
+            private IDisposable CreateCompletedSubscription(IObserver<TWork> observer)
+            {
+                typedWorkCompleted += observer.OnNext;
+                return Disposable.Create(() =>
+                {
+                    typedWorkCompleted -= observer.OnNext;
+                });
+            }
+
+            private void OnWorkCompleted(TWork work)
+            {
+                workCompleted?.Invoke();
+                typedWorkCompleted?.Invoke(work);
             }
         }
 
@@ -99,11 +125,11 @@ namespace Flower.Works
             private IDisposable CreateTriggeredSubscription(IObserver<TTriggeredWork> observer)
             {
                 workTriggered += observer.OnNext;
-                WorkCompleted += observer.OnCompleted;
+                workCompleted += observer.OnCompleted;
                 return Disposable.Create(() =>
                     {
                         workTriggered -= observer.OnNext;
-                        WorkCompleted -= observer.OnCompleted;
+                        workCompleted -= observer.OnCompleted;
                     });
             }
 
@@ -146,7 +172,7 @@ namespace Flower.Works
                 }
 
                 workExecuted += observer.OnNext;
-                WorkCompleted += observer.OnCompleted;
+                workCompleted += observer.OnCompleted;
                 if (ShouldForwardErrorToSubscribers())
                 {
                     work.TriggerEvents.TriggerErrored += observer.OnError;
@@ -157,7 +183,7 @@ namespace Flower.Works
                     () =>
                         {
                             workExecuted -= observer.OnNext;
-                            WorkCompleted -= observer.OnCompleted;
+                            workCompleted -= observer.OnCompleted;
                             work.TriggerEvents.TriggerCompleted -= observer.OnCompleted;
                             work.TriggerEvents.TriggerErrored -= observer.OnError;
                         });

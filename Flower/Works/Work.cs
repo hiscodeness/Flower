@@ -5,6 +5,8 @@ using Flower.WorkRunners;
 
 namespace Flower.Works
 {
+    using Flower.Workers;
+
     internal abstract class Work<TInput> : IRegisteredWork<TInput>
     {
         private IDisposable triggerSubscription;
@@ -17,7 +19,25 @@ namespace Flower.Works
         }
 
         public WorkState State { get; private set; }
+        public WorkerError LastError { get; private set; }
         IWorkRegistration IWork.Registration => Registration;
+
+        public virtual IObservable<IExecutableWork> Executed
+        {
+            get
+            {
+                throw new InvalidOperationException("Only subclass implementations should be callable.");
+            }
+        }
+
+        public virtual IObservable<IWork> Completed
+        {
+            get
+            {
+                throw new InvalidOperationException("Only subclass implementations should be callable.");
+            }
+        }
+
         public IWorkRegistration<TInput> Registration { get; }
         public ITriggerEvents TriggerEvents { get; }
 
@@ -41,6 +61,11 @@ namespace Flower.Works
             State = WorkState.Suspended;
             triggerSubscription.Dispose();
             triggerSubscription = null;
+        }
+
+        public void SetWorkerError(WorkerError workerError)
+        {
+            LastError = workerError;
         }
 
         public void Complete(WorkState withState)
@@ -110,9 +135,12 @@ namespace Flower.Works
             observables = new ActionWorkObservablesHelper(this);
         }
 
-        new public IActionWorkRegistration Registration { get; }
+        public new IActionWorkRegistration Registration { get; }
         public IObservable<ITriggeredActionWork> Triggered => observables.WorkTriggered;
-        public IObservable<IExecutableActionWork> Executed => observables.WorkExecuted;
+        IObservable<IExecutableWork> IWork.Executed => Executed.Select(executedWork => (IExecutableWork)executedWork);
+        public new IObservable<IExecutableActionWork> Executed => observables.WorkExecuted;
+        IObservable<IWork> IWork.Completed => Completed.Select(workCompleted => (IWork)workCompleted);
+        public new IObservable<IActionWork> Completed => observables.WorkCompleted;
 
         protected override IExecutableWork CreateExecutableWork(IWorkRunner workRunner, object input)
         {
@@ -134,7 +162,7 @@ namespace Flower.Works
 
         protected override void WorkCompleted()
         {
-            observables.RaiseWorkCompleted();
+            observables.RaiseWorkCompleted(this);
         }
     }
 
@@ -149,9 +177,12 @@ namespace Flower.Works
             observables = new ActionWorkObservablesHelper<TInput>(this);
         }
 
-        new public IActionWorkRegistration<TInput> Registration { get; }
+        public new IActionWorkRegistration<TInput> Registration { get; }
         public IObservable<ITriggeredActionWork<TInput>> Triggered => observables.WorkTriggered;
-        public IObservable<IExecutableActionWork<TInput>> Executed => observables.WorkExecuted;
+        IObservable<IExecutableWork> IWork.Executed => Executed.Select(executedWork => (IExecutableWork)executedWork);
+        public new IObservable<IExecutableActionWork<TInput>> Executed => observables.WorkExecuted;
+        IObservable<IWork> IWork.Completed => Completed.Select(workCompleted => (IWork)workCompleted);
+        public new IObservable<IActionWork<TInput>> Completed => observables.WorkCompleted;
 
         protected override IExecutableWork CreateExecutableWork(IWorkRunner workRunner, TInput input)
         {
@@ -173,7 +204,7 @@ namespace Flower.Works
         
         protected override void WorkCompleted()
         {
-            observables.RaiseWorkCompleted();
+            observables.RaiseWorkCompleted(this);
         }
     }
 
@@ -189,9 +220,12 @@ namespace Flower.Works
             Output = Executed.Where(WorkSucceeded).Select(executedWork => executedWork.Output);
         }        
 
-        new public IFuncWorkRegistration<TInput, TOutput> Registration { get; }
+        public new IFuncWorkRegistration<TInput, TOutput> Registration { get; }
         public IObservable<ITriggeredFuncWork<TInput, TOutput>> Triggered => observables.WorkTriggered;
-        public IObservable<IExecutableFuncWork<TInput, TOutput>> Executed => observables.WorkExecuted;
+        IObservable<IExecutableWork> IWork.Executed => Executed.Select(workCompleted => (IExecutableWork)workCompleted);
+        public new IObservable<IExecutableFuncWork<TInput, TOutput>> Executed => observables.WorkExecuted;
+        IObservable<IWork> IWork.Completed => Completed.Select(workCompleted => (IWork)workCompleted);
+        public new IObservable<IFuncWork<TInput, TOutput>> Completed => observables.WorkCompleted;
         public IObservable<TOutput> Output { get; }
 
         protected override IExecutableWork CreateExecutableWork(IWorkRunner workRunner, TInput input)
@@ -214,7 +248,7 @@ namespace Flower.Works
 
         protected override void WorkCompleted()
         {
-            observables.RaiseWorkCompleted();
+            observables.RaiseWorkCompleted(this);
         }
     
         private static bool WorkSucceeded(IExecutableFuncWork<TInput, TOutput> executedWork)

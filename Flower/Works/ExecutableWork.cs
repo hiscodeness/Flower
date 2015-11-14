@@ -4,6 +4,7 @@ using Flower.WorkRunners;
 namespace Flower.Works
 {
     using System.Threading.Tasks;
+    using Flower.Workers;
 
     internal abstract class ExecutableWork<TInput> : IExecutableWork<TInput>
     {
@@ -14,6 +15,7 @@ namespace Flower.Works
         IWork ITriggeredWork.Work => Work;
         public IWorkRunner WorkRunner { get; }
         public Exception Error { get; private set; }
+        public IScope<object> WorkerScope => GetWorkerScope();
 
         protected ExecutableWork(IWorkRunner workRunner, IRegisteredWork<TInput> work, TInput input)
         {
@@ -49,6 +51,8 @@ namespace Flower.Works
 
         private void WorkerErrored(Exception error)
         {
+            work.SetWorkerError(new WorkerError(error, WorkerScope.Worker));
+
             if (ShouldNotifyWorkerExecutedWhenWorkerErrored())
             {
                 WorkerExecuted();
@@ -86,6 +90,7 @@ namespace Flower.Works
         }
 
         protected abstract void CreateWorkerScope();
+        protected abstract IScope<object> GetWorkerScope(); 
         protected abstract Task ExecuteWorker();
         protected abstract void DisposeWorkerScope();
         protected abstract void WorkerExecuted();
@@ -100,12 +105,17 @@ namespace Flower.Works
         {
             this.work = work;
         }
-
-        public IScope<IWorker> WorkerScope { get; private set; }
+        
+        public new IScope<IWorker> WorkerScope { get; private set; }
 
         protected override void CreateWorkerScope()
         {
             WorkerScope = work.Registration.CreateWorkerScope();
+        }
+
+        protected override IScope<object> GetWorkerScope()
+        {
+            return WorkerScope;
         }
 
         protected override async Task ExecuteWorker()
@@ -137,11 +147,16 @@ namespace Flower.Works
         IWork ITriggeredWork.Work => Work;
         IWork<TInput> ITriggeredWork<TInput>.Work => Work;
         public new IActionWork<TInput> Work => work;
-        public IScope<IWorker<TInput>> WorkerScope { get; private set; }
+        public new IScope<IWorker<TInput>> WorkerScope { get; private set; }
 
         protected override void CreateWorkerScope()
         {
             WorkerScope = work.Registration.CreateWorkerScope();
+        }
+
+        protected override IScope<object> GetWorkerScope()
+        {
+            return WorkerScope;
         }
 
         protected override async Task ExecuteWorker()
@@ -173,12 +188,17 @@ namespace Flower.Works
         IWork ITriggeredWork.Work => Work;
         IWork<TInput> ITriggeredWork<TInput>.Work => Work;
         public new IFuncWork<TInput, TOutput> Work => work;
-        public IScope<IWorker<TInput, TOutput>> WorkerScope { get; private set; }
+        public new IScope<IWorker<TInput, TOutput>> WorkerScope { get; private set; }
         public TOutput Output { get; private set; }
 
         protected override void CreateWorkerScope()
         {
             WorkerScope = work.Registration.CreateWorkerScope();
+        }
+
+        protected override IScope<object> GetWorkerScope()
+        {
+            return WorkerScope;
         }
 
         protected override async Task ExecuteWorker()
