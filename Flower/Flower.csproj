@@ -49,6 +49,7 @@
     <Compile Include="Triggers\ITriggerable.cs" />
     <Compile Include="Triggers\Triggerable.cs" />
     <Compile Include="WorkDecoratorFactory.cs" />
+    <Compile Include="Workers\IWorkerError.cs" />
     <Compile Include="Workers\IWorkerResolver.cs" />
     <Compile Include="Workers\Worker.cs" />
     <Compile Include="Workers\WorkerResolverScope.cs" />

@@ -157,7 +157,7 @@ namespace Flower.Tests
             var registry =
                 new WorkRegistry(
                     new RegisterOptions(
-                        RegisterWorkBehavior.RegisterActivated, TriggerErrorBehavior.SwallowErrorAndCompleteWork));
+                        RegisterWorkBehavior.RegisterActivated, TriggerErrorBehavior.CompleteWork));
             var work = registry.RegisterWorker(trigger, new TestWorkerIntToIntSquared());
             Exception exception = null;
             work.Output.Subscribe(_ => { }, ex => exception = ex);

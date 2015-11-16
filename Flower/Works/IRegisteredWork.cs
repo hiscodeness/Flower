@@ -1,11 +1,11 @@
 namespace Flower.Works
 {
+    using System;
     using Flower.Workers;
 
     internal interface IRegisteredWork : IWork
     {
         ITriggerEvents TriggerEvents { get; }
-        void SetWorkerError(WorkerError workerError);
         void Complete(WorkState withState);
     }
 
@@ -15,16 +15,19 @@ namespace Flower.Works
 
     internal interface IRegisteredActionWork : IRegisteredWork<object>, IActionWork
     {
-        void WorkerExecuted(IExecutableActionWork triggeredWork);
+        void WorkerExecuted(IExecutableActionWork executedWork);
+        void WorkerErrored(IExecutableActionWork erroredWork, Exception error);
     }
 
     internal interface IRegisteredActionWork<TInput> : IRegisteredWork<TInput>, IActionWork<TInput>
     {
-        void WorkerExecuted(IExecutableActionWork<TInput> triggeredWork);
+        void WorkerExecuted(IExecutableActionWork<TInput> executedWork);
+        void WorkerErrored(IExecutableActionWork<TInput> erroredWork, Exception error);
     }
 
     internal interface IRegisteredFuncWork<TInput, TOutput> : IRegisteredWork<TInput>, IFuncWork<TInput, TOutput>
     {
-        void WorkerExecuted(IExecutableFuncWork<TInput, TOutput> triggeredWork);
+        void WorkerExecuted(IExecutableFuncWork<TInput, TOutput> executedWork);
+        void WorkerErrored(IExecutableFuncWork<TInput, TOutput> erroredWork, Exception error);
     }
 }

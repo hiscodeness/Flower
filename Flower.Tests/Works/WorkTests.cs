@@ -7,6 +7,7 @@ using Xunit;
 
 namespace Flower.Tests.Works
 {
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
     using Flower.Workers;
@@ -47,6 +48,22 @@ namespace Flower.Tests.Works
         }
 
         [Fact]
+        public void CanGetLastWorkerError()
+        {
+            // Arrange
+            var trigger = new Subject<int>();
+            var worker = new WorkRegistry().RegisterWorker(trigger, new TestWorkerIntToIntThrowOnEven());
+
+            // Act
+            var ex = Record.Exception(() => trigger.OnNext(42));
+
+            // Assert
+            Assert.NotNull(ex);
+            Assert.NotNull(worker.LastError);
+            Assert.Equal(ex, worker.LastError.Error);
+        }
+
+        [Fact]
         public void CanGetErrorIfWorkerErrorsAndWorkCompletes()
         {
             // Arrange
@@ -54,7 +71,7 @@ namespace Flower.Tests.Works
             var trigger = new Subject<int>();
             var registry = new WorkRegistry(RegisterOptions.Default.With(new ThreadPoolWorkRunner()));
             registry.RegisterWorker(trigger, new TestWorkerIntToIntThrowOnEven());
-            WorkerError workerError = null;
+            WorkerErrorBase workerError = null;
             registry.Works.Single().Completed.Subscribe(
                 completed =>
                 {
@@ -71,5 +88,27 @@ namespace Flower.Tests.Works
             Assert.NotNull(workerError.Worker);
         }
 
+
+        [Fact]
+        public void WorkerErrorCanBeIgnored()
+        {
+            // Arrange
+            var trigger = new Subject<int>();
+            var registry = new WorkRegistry(RegisterOptions.Default.With(WorkerErrorBehavior.Continue));
+            var work1 = registry.RegisterWorker(trigger, new TestWorkerIntToIntThrowOnEven());
+            var work2 = work1.Pipe(new TestWorkerIntToIntSquared());
+            var work2Output = new List<int>();
+            work2.Output.Subscribe(work2Output.Add);
+
+            // Act
+            trigger.OnNext(3);
+            var ex = Record.Exception(() => trigger.OnNext(4));
+            trigger.OnNext(5);
+
+            // Assert
+            Assert.Equal(WorkState.Active, work1.State);
+            Assert.Equal(WorkState.Active, work2.State);
+            Assert.Equal(new[] {3*3, 5*5}, work2Output);
+        }
     }
 }

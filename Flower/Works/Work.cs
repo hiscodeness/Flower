@@ -19,10 +19,26 @@ namespace Flower.Works
         }
 
         public WorkState State { get; private set; }
-        public WorkerError LastError { get; private set; }
+        public WorkerErrorBase LastError { get; protected set; }
         IWorkRegistration IWork.Registration => Registration;
 
+        public virtual IObservable<ITriggeredWork> Triggered
+        {
+            get
+            {
+                throw new InvalidOperationException("Only subclass implementations should be callable.");
+            }
+        }
+
         public virtual IObservable<IExecutableWork> Executed
+        {
+            get
+            {
+                throw new InvalidOperationException("Only subclass implementations should be callable.");
+            }
+        }
+
+        public virtual IObservable<IExecutableWork> Errored
         {
             get
             {
@@ -61,11 +77,6 @@ namespace Flower.Works
             State = WorkState.Suspended;
             triggerSubscription.Dispose();
             triggerSubscription = null;
-        }
-
-        public void SetWorkerError(WorkerError workerError)
-        {
-            LastError = workerError;
         }
 
         public void Complete(WorkState withState)
@@ -136,9 +147,12 @@ namespace Flower.Works
         }
 
         public new IActionWorkRegistration Registration { get; }
-        public IObservable<ITriggeredActionWork> Triggered => observables.WorkTriggered;
+        IObservable<ITriggeredWork> IWork.Triggered => Triggered.Select(triggeredWork => (ITriggeredWork)triggeredWork);
+        public new IObservable<ITriggeredActionWork> Triggered => observables.WorkTriggered;
         IObservable<IExecutableWork> IWork.Executed => Executed.Select(executedWork => (IExecutableWork)executedWork);
         public new IObservable<IExecutableActionWork> Executed => observables.WorkExecuted;
+        IObservable<IExecutableWork> IWork.Errored => Errored.Select(erroredWork => (IExecutableWork)erroredWork);
+        public new IObservable<IExecutableActionWork> Errored => observables.WorkExecuted;
         IObservable<IWork> IWork.Completed => Completed.Select(workCompleted => (IWork)workCompleted);
         public new IObservable<IActionWork> Completed => observables.WorkCompleted;
 
@@ -155,9 +169,15 @@ namespace Flower.Works
             observables.RaiseWorkTriggered(triggeredWork as ITriggeredActionWork);
         }
 
-        public void WorkerExecuted(IExecutableActionWork triggeredWork)
+        public void WorkerExecuted(IExecutableActionWork executedWork)
         {
-            observables.RaiseWorkExecuted(triggeredWork);
+            observables.RaiseWorkExecuted(executedWork);
+        }
+        
+        public void WorkerErrored(IExecutableActionWork erroredWork, Exception error)
+        {
+            LastError = new WorkerError(error, erroredWork.WorkerScope.Worker);
+            observables.RaiseWorkErrored(erroredWork);
         }
 
         protected override void WorkCompleted()
@@ -178,9 +198,12 @@ namespace Flower.Works
         }
 
         public new IActionWorkRegistration<TInput> Registration { get; }
-        public IObservable<ITriggeredActionWork<TInput>> Triggered => observables.WorkTriggered;
+        IObservable<ITriggeredWork> IWork.Triggered => Triggered.Select(triggeredWork => (ITriggeredWork)triggeredWork);
+        public new IObservable<ITriggeredActionWork<TInput>> Triggered => observables.WorkTriggered;
         IObservable<IExecutableWork> IWork.Executed => Executed.Select(executedWork => (IExecutableWork)executedWork);
         public new IObservable<IExecutableActionWork<TInput>> Executed => observables.WorkExecuted;
+        IObservable<IExecutableWork> IWork.Errored => Errored.Select(erroredWork => (IExecutableWork)erroredWork);
+        public new IObservable<IExecutableActionWork<TInput>> Errored => observables.WorkExecuted;
         IObservable<IWork> IWork.Completed => Completed.Select(workCompleted => (IWork)workCompleted);
         public new IObservable<IActionWork<TInput>> Completed => observables.WorkCompleted;
 
@@ -197,11 +220,17 @@ namespace Flower.Works
             observables.RaiseWorkTriggered(triggeredWork as ITriggeredActionWork<TInput>);
         }
 
-        public void WorkerExecuted(IExecutableActionWork<TInput> triggeredWork)
+        public void WorkerExecuted(IExecutableActionWork<TInput> executedWork)
         {
-            observables.RaiseWorkExecuted(triggeredWork);
+            observables.RaiseWorkExecuted(executedWork);
         }
-        
+
+        public void WorkerErrored(IExecutableActionWork<TInput> erroredWork, Exception error)
+        {
+            LastError = new WorkerError<TInput>(error, erroredWork.WorkerScope.Worker);
+            observables.RaiseWorkErrored(erroredWork);
+        }
+
         protected override void WorkCompleted()
         {
             observables.RaiseWorkCompleted(this);
@@ -217,13 +246,15 @@ namespace Flower.Works
         {
             Registration = registration;
             observables = new FuncWorkObservablesHelper<TInput, TOutput>(this);
-            Output = Executed.Where(WorkSucceeded).Select(executedWork => executedWork.Output);
+            Output = Executed.Select(executedWork => executedWork.Output);
         }        
 
         public new IFuncWorkRegistration<TInput, TOutput> Registration { get; }
-        public IObservable<ITriggeredFuncWork<TInput, TOutput>> Triggered => observables.WorkTriggered;
-        IObservable<IExecutableWork> IWork.Executed => Executed.Select(workCompleted => (IExecutableWork)workCompleted);
+        public new IObservable<ITriggeredFuncWork<TInput, TOutput>> Triggered => observables.WorkTriggered;
+        IObservable<IExecutableWork> IWork.Executed => Executed.Select(executedWork => (IExecutableWork)executedWork);
         public new IObservable<IExecutableFuncWork<TInput, TOutput>> Executed => observables.WorkExecuted;
+        IObservable<IExecutableWork> IWork.Errored => Errored.Select(erroredWork => (IExecutableWork)erroredWork);
+        public new IObservable<IExecutableFuncWork<TInput, TOutput>> Errored => observables.WorkErrored;
         IObservable<IWork> IWork.Completed => Completed.Select(workCompleted => (IWork)workCompleted);
         public new IObservable<IFuncWork<TInput, TOutput>> Completed => observables.WorkCompleted;
         public IObservable<TOutput> Output { get; }
@@ -241,19 +272,20 @@ namespace Flower.Works
             observables.RaiseWorkTriggered(triggeredWork as ITriggeredFuncWork<TInput, TOutput>);
         }
 
-        public void WorkerExecuted(IExecutableFuncWork<TInput, TOutput> triggeredWork)
+        public void WorkerExecuted(IExecutableFuncWork<TInput, TOutput> executedWork)
         {
-            observables.RaiseWorkExecuted(triggeredWork);
+            observables.RaiseWorkExecuted(executedWork);
         }
 
         protected override void WorkCompleted()
         {
             observables.RaiseWorkCompleted(this);
         }
-    
-        private static bool WorkSucceeded(IExecutableFuncWork<TInput, TOutput> executedWork)
+
+        public void WorkerErrored(IExecutableFuncWork<TInput, TOutput> erroredWork, Exception error)
         {
-            return executedWork.State == ExecutableWorkState.Success;
+            LastError = new WorkerError<TInput, TOutput>(error, erroredWork.WorkerScope.Worker);
+            observables.RaiseWorkErrored(erroredWork);
         }
     }
 }

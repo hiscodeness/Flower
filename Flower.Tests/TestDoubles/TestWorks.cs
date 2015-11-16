@@ -33,13 +33,18 @@ namespace Flower.Tests.TestDoubles
         }
 
         public IFuncWorkRegistration<int, int> Registration => registration;
+        public IObservable<ITriggeredWork> Triggered => null;
         public WorkState State { get; }
         IWorkRegistration<int> IWork<int>.Registration => Registration;
         IWorkRegistration IWork.Registration => Registration;
         IObservable<IExecutableWork> IWork.Executed => null;
+        public IObservable<IExecutableFuncWork<int, int>> Errored => null;
+
+        IObservable<IExecutableWork> IWork.Errored => Errored;
+
         IObservable<IExecutableFuncWork<int, int>> IFuncWork<int, int>.Executed => null;
         IObservable<IWork> IWork.Completed => null;
-        public WorkerError LastError => null;
+        public WorkerErrorBase LastError => null;
         IObservable<IFuncWork<int, int>> IFuncWork<int, int>.Completed => null;
         public IObservable<int> Output => output;
         IObservable<ITriggeredFuncWork<int, int>> IFuncWork<int, int>.Triggered => null;
