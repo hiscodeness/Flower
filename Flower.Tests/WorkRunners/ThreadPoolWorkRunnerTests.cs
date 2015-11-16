@@ -31,7 +31,7 @@
             }
 
             // Assert
-            countdown.Wait(TimeSpan.FromSeconds(10));
+            countdown.Wait(TimeSpan.FromSeconds(20));
             Assert.Equal(workCount, workRunnerSnapshots.Count);
             Assert.True(workRunnerSnapshots.Select(state => state.PendingWorks.Count).All(count => count == 0));
             foreach (var executingWorkCount in workRunnerSnapshots.Select(state => state.ExecutingWorks.Count))
