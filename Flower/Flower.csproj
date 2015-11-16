@@ -49,6 +49,7 @@
     <Compile Include="Triggers\ITriggerable.cs" />
     <Compile Include="Triggers\Triggerable.cs" />
     <Compile Include="WorkDecoratorFactory.cs" />
+    <Compile Include="Workers\IWorkerError.cs" />
     <Compile Include="Workers\IWorkerResolver.cs" />
     <Compile Include="Workers\Worker.cs" />
     <Compile Include="Workers\WorkerResolverScope.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WorkRegistry.cs" />
     <Compile Include="WorkState.cs" />
+    <Compile Include="Workers\WorkerError.cs" />
     <Compile Include="Works\WorkObservablesHelper.cs" />
     <Compile Include="Works\WorkRegistration.cs" />
   </ItemGroup>

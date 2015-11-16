@@ -16,7 +16,7 @@ namespace Flower.Tests.Works
         public void ExecutedWorkReferencesCorrectWork()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.Continue);
 
             // Act
             context.Trigger(3);
@@ -29,7 +29,7 @@ namespace Flower.Tests.Works
         public void ExecutedWorkHasCorrectInput()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.Continue);
 
             // Act
             context.Trigger(3, 5, 7);
@@ -42,7 +42,7 @@ namespace Flower.Tests.Works
         public void ExecutedWorkHasCorrectOutput()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.Continue);
 
             // Act
             context.Trigger(3, 5, 7);
@@ -55,7 +55,7 @@ namespace Flower.Tests.Works
         public void ExecutedWorkHasWorkRunnerSet()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.Continue);
 
             // Act
             context.Trigger(3);
@@ -68,7 +68,7 @@ namespace Flower.Tests.Works
         public async Task ExecutedWorkCannotBeExecutedAgain()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.Continue);
             context.Trigger(3);
 
             // Act
@@ -82,13 +82,13 @@ namespace Flower.Tests.Works
         public void WorkerErrorExceptionIsSetOnExecuted()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.Continue);
 
             // Act
             context.Trigger(3,4,5);
 
             // Assert
-            var result = context.Executed.Skip(1).Take(1).Single();
+            var result = context.Errored.Single();
             Assert.Equal(TestWorkerIntToIntThrowOnEven.ErrorMessage, result.Error.Message);
         }
 
@@ -96,13 +96,13 @@ namespace Flower.Tests.Works
         public void WorkerErrorStateIsSetOnExecuted()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.Continue);
 
             // Act
             context.Trigger(3, 4, 5);
 
             // Assert
-            var result = context.Executed.Skip(1).Take(1).Single();
+            var result = context.Errored.Single();
             Assert.Equal(ExecutableWorkState.Error, result.State);
         }
 
@@ -110,13 +110,13 @@ namespace Flower.Tests.Works
         public void WorkerErrorOutputIsNotSetOnExecuted()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.Continue);
 
             // Act
             context.Trigger(3, 4, 5);
 
             // Assert
-            var result = context.Executed.Skip(1).Take(1).Single();
+            var result = context.Errored.Single();
             Assert.Equal(default(int), result.Output);
         }
 
@@ -124,7 +124,7 @@ namespace Flower.Tests.Works
         public void ContinuingAfterWorkerErrorLeavesWorkActive()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.Continue);
 
             // Act
             context.Trigger(3, 4, 5);
@@ -137,7 +137,7 @@ namespace Flower.Tests.Works
         public void WorkerErrorIsIgnoredOnOutput()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.RaiseExecutedAndContinue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.Continue);
 
             // Act
             context.Trigger(3, 4, 5);
@@ -151,7 +151,7 @@ namespace Flower.Tests.Works
         public void WorkerErrorCanBeNotifiedOnExecutedBeforeCompletingWork()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.RaiseExecutedAndCompleteWork);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.CompleteWork);
 
             // Act
             context.Trigger(3, 4, 5);
@@ -159,30 +159,32 @@ namespace Flower.Tests.Works
             // Assert
             Assert.Equal(WorkState.WorkerError, context.Work.State);
             Assert.Equal(new[] { 3 }, context.Output);
-            Assert.Equal(new[] { 3, 0 }, context.Executed.Select(w => w.Output));
-            Assert.Equal(ExecutableWorkState.Error, context.Executed.Last().State);
-            Assert.Equal(TestWorkerIntToIntThrowOnEven.ErrorMessage, context.Executed.Last().Error.Message);
+            Assert.Equal(new[] { 3 }, context.Executed.Select(w => w.Output));
+            Assert.Equal(new[] { 0 }, context.Errored.Select(w => w.Output));
+            Assert.NotNull(context.Work.LastError);
+            Assert.Equal(ExecutableWorkState.Error, context.Errored.Single().State);
+            Assert.Equal(TestWorkerIntToIntThrowOnEven.ErrorMessage, context.Errored.Single().Error.Message);
         }
 
         [Fact]
         public void WorkerErrorCanBeSwallowedOnExecuted()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.SwallowErrorAndContinue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.Continue);
 
             // Act
             context.Trigger(3, 4, 5);
 
             // Assert
             Assert.Equal(WorkState.Active, context.Work.State);
-            Assert.Equal(new[] { 3, 5 }, context.Executed.Select(w => w.Output));
+            Assert.Equal(new[] { 3, 5 }, context.Executed.Where(executed => executed.Error == null).Select(w => w.Output));
         }
 
         [Fact]
         public void WorkerErrorCanBeSwallowedOnOutput()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.SwallowErrorAndContinue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.Continue);
 
             // Act
             context.Trigger(3, 4, 5);
@@ -196,7 +198,7 @@ namespace Flower.Tests.Works
         public void WorkerErrorCanCompleteWork()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.SwallowErrorAndCompleteWork);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.CompleteWork);
 
             // Act
             context.Trigger(3, 4, 5);
@@ -225,7 +227,7 @@ namespace Flower.Tests.Works
         public void WorkerErrorShownAsSuchWhenWorkCompletes()
         {
             // Arrange
-            var options = new RegisterOptions(RegisterWorkBehavior.RegisterActivated, workerErrorBehavior: WorkerErrorBehavior.SwallowErrorAndCompleteWork);
+            var options = new RegisterOptions(RegisterWorkBehavior.RegisterActivated, workerErrorBehavior: WorkerErrorBehavior.CompleteWork);
             var workRegistry = new WorkRegistry(options);
             var trigger = new Subject<int>();
             var work = workRegistry.RegisterWorker(trigger, new TestWorkerIntToIntThrowOnEven());

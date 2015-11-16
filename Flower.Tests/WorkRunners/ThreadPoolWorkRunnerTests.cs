@@ -6,7 +6,6 @@
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using FakeItEasy;
     using Flower.WorkRunners;
     using Flower.Works;
     using Xunit;
@@ -67,6 +66,7 @@
             }
 
             public Exception Error { get; }
+            public IScope<object> WorkerScope { get; }
         }
 
         private static WorkRunnerSnapshot GetSnapshot(IWorkRunner workRunner)

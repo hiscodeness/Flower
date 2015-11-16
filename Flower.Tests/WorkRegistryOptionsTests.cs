@@ -67,10 +67,10 @@ namespace Flower.Tests
             var options = new RegisterOptions();
 
             // Act
-            options = options.With(TriggerErrorBehavior.SwallowErrorAndCompleteWork);
+            options = options.With(TriggerErrorBehavior.CompleteWork);
 
             // Assert
-            Assert.Equal(TriggerErrorBehavior.SwallowErrorAndCompleteWork, options.TriggerErrorBehavior);
+            Assert.Equal(TriggerErrorBehavior.CompleteWork, options.TriggerErrorBehavior);
         }
 
         [Fact]
@@ -95,10 +95,10 @@ namespace Flower.Tests
             var options = new RegisterOptions();
 
             // Act
-            options = options.With(WorkerErrorBehavior.RaiseExecutedAndContinue);
+            options = options.With(WorkerErrorBehavior.Continue);
 
             // Assert
-            Assert.Equal(WorkerErrorBehavior.RaiseExecutedAndContinue, options.WorkerErrorBehavior);
+            Assert.Equal(WorkerErrorBehavior.Continue, options.WorkerErrorBehavior);
         }
     }
 }

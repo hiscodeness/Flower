@@ -4,6 +4,7 @@ using Flower.WorkRunners;
 namespace Flower.Works
 {
     using System.Threading.Tasks;
+    using Flower.Workers;
 
     internal abstract class ExecutableWork<TInput> : IExecutableWork<TInput>
     {
@@ -14,6 +15,7 @@ namespace Flower.Works
         IWork ITriggeredWork.Work => Work;
         public IWorkRunner WorkRunner { get; }
         public Exception Error { get; private set; }
+        public IScope<object> WorkerScope => GetWorkerScope();
 
         protected ExecutableWork(IWorkRunner workRunner, IRegisteredWork<TInput> work, TInput input)
         {
@@ -37,31 +39,26 @@ namespace Flower.Works
                 await ExecuteWorker();
                 DisposeWorkerScope();
                 State = ExecutableWorkState.Success;
-                WorkerExecuted();
+                OnWorkerExecuted();
             }
             catch (Exception e)
             {
                 State = ExecutableWorkState.Error;
-                Error = e;
                 WorkerErrored(e);
             }
         }
 
         private void WorkerErrored(Exception error)
         {
-            if (ShouldNotifyWorkerExecutedWhenWorkerErrored())
-            {
-                WorkerExecuted();
-            }
+            Error = error;
+            OnWorkerErrored(error);
 
             switch (work.Registration.WorkRegistry.DefaultOptions.WorkerErrorBehavior)
             {
-                case WorkerErrorBehavior.SwallowErrorAndContinue:
-                case WorkerErrorBehavior.RaiseExecutedAndContinue:
+                case WorkerErrorBehavior.Continue:
                     // Log.Warning("Continue on worker error: {0}.", error);
                     break;
-                case WorkerErrorBehavior.RaiseExecutedAndCompleteWork:
-                case WorkerErrorBehavior.SwallowErrorAndCompleteWork:
+                case WorkerErrorBehavior.CompleteWork:
                     work.Complete(WorkState.WorkerError);
                     break;
                 case WorkerErrorBehavior.CompleteWorkAndThrow:
@@ -70,25 +67,12 @@ namespace Flower.Works
             }
         }
 
-        private bool ShouldNotifyWorkerExecutedWhenWorkerErrored()
-        {
-            switch (State)
-            {
-                case ExecutableWorkState.Success:
-                    return true;
-                case ExecutableWorkState.Error:
-                    return
-                        work.Registration.Options.WorkerErrorBehavior == WorkerErrorBehavior.RaiseExecutedAndContinue ||
-                        work.Registration.Options.WorkerErrorBehavior == WorkerErrorBehavior.RaiseExecutedAndCompleteWork;
-                default:
-                    return false;
-            }
-        }
-
         protected abstract void CreateWorkerScope();
+        protected abstract IScope<object> GetWorkerScope(); 
         protected abstract Task ExecuteWorker();
         protected abstract void DisposeWorkerScope();
-        protected abstract void WorkerExecuted();
+        protected abstract void OnWorkerExecuted();
+        protected abstract void OnWorkerErrored(Exception error);
     }
 
     internal class ExecutableActionWork : ExecutableWork<object>, IExecutableActionWork
@@ -100,12 +84,17 @@ namespace Flower.Works
         {
             this.work = work;
         }
-
-        public IScope<IWorker> WorkerScope { get; private set; }
+        
+        public new IScope<IWorker> WorkerScope { get; private set; }
 
         protected override void CreateWorkerScope()
         {
             WorkerScope = work.Registration.CreateWorkerScope();
+        }
+
+        protected override IScope<object> GetWorkerScope()
+        {
+            return WorkerScope;
         }
 
         protected override async Task ExecuteWorker()
@@ -118,9 +107,14 @@ namespace Flower.Works
             WorkerScope.Dispose();
         }
 
-        protected override void WorkerExecuted()
+        protected override void OnWorkerExecuted()
         {
             work.WorkerExecuted(this);
+        }
+
+        protected override void OnWorkerErrored(Exception error)
+        {
+            work.WorkerErrored(this, error);
         }
     }
 
@@ -137,11 +131,16 @@ namespace Flower.Works
         IWork ITriggeredWork.Work => Work;
         IWork<TInput> ITriggeredWork<TInput>.Work => Work;
         public new IActionWork<TInput> Work => work;
-        public IScope<IWorker<TInput>> WorkerScope { get; private set; }
+        public new IScope<IWorker<TInput>> WorkerScope { get; private set; }
 
         protected override void CreateWorkerScope()
         {
             WorkerScope = work.Registration.CreateWorkerScope();
+        }
+
+        protected override IScope<object> GetWorkerScope()
+        {
+            return WorkerScope;
         }
 
         protected override async Task ExecuteWorker()
@@ -154,9 +153,14 @@ namespace Flower.Works
             WorkerScope.Dispose();
         }
 
-        protected override void WorkerExecuted()
+        protected override void OnWorkerExecuted()
         {
             work.WorkerExecuted(this);
+        }
+
+        protected override void OnWorkerErrored(Exception error)
+        {
+            work.WorkerErrored(this, error);
         }
     }
 
@@ -173,12 +177,17 @@ namespace Flower.Works
         IWork ITriggeredWork.Work => Work;
         IWork<TInput> ITriggeredWork<TInput>.Work => Work;
         public new IFuncWork<TInput, TOutput> Work => work;
-        public IScope<IWorker<TInput, TOutput>> WorkerScope { get; private set; }
+        public new IScope<IWorker<TInput, TOutput>> WorkerScope { get; private set; }
         public TOutput Output { get; private set; }
 
         protected override void CreateWorkerScope()
         {
             WorkerScope = work.Registration.CreateWorkerScope();
+        }
+
+        protected override IScope<object> GetWorkerScope()
+        {
+            return WorkerScope;
         }
 
         protected override async Task ExecuteWorker()
@@ -191,9 +200,14 @@ namespace Flower.Works
             WorkerScope.Dispose();
         }
 
-        protected override void WorkerExecuted()
+        protected override void OnWorkerExecuted()
         {
             work.WorkerExecuted(this);
+        }
+
+        protected override void OnWorkerErrored(Exception error)
+        {
+            work.WorkerErrored(this, error);
         }
     }
 }

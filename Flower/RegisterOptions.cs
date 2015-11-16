@@ -13,16 +13,14 @@ namespace Flower
     public enum TriggerErrorBehavior
     {
         CompleteWorkAndThrow,
-        SwallowErrorAndCompleteWork
+        CompleteWork
     }
 
     public enum WorkerErrorBehavior
     {
         CompleteWorkAndThrow,
-        SwallowErrorAndCompleteWork,
-        RaiseExecutedAndCompleteWork,
-        RaiseExecutedAndContinue,
-        SwallowErrorAndContinue
+        CompleteWork,
+        Continue,
     }
 
     public class RegisterOptions
