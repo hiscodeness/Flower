@@ -10,9 +10,9 @@ namespace Flower.Tests.TestContexts
     {
         private readonly Subject<int> trigger;
 
-        public IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior behavior)
+        public IntToIntWorkerThrowOnEvenContext(WorkerErrorMode mode)
         {
-            var options = new RegisterOptions(RegisterWorkBehavior.RegisterActivated, workerErrorBehavior: behavior);
+            var options = new WorkOptions(WorkRegisterMode.Activated, workerErrorMode: mode);
             var workRegistry = new WorkRegistry(options);
             trigger = new Subject<int>();
             Work = workRegistry.RegisterWorker(trigger, new TestWorkerIntToIntThrowOnEven());

@@ -16,7 +16,7 @@ namespace Flower.Tests.Works
         public void ExecutedWorkReferencesCorrectWork()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.Continue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorMode.Continue);
 
             // Act
             context.Trigger(3);
@@ -29,7 +29,7 @@ namespace Flower.Tests.Works
         public void ExecutedWorkHasCorrectInput()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.Continue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorMode.Continue);
 
             // Act
             context.Trigger(3, 5, 7);
@@ -42,7 +42,7 @@ namespace Flower.Tests.Works
         public void ExecutedWorkHasCorrectOutput()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.Continue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorMode.Continue);
 
             // Act
             context.Trigger(3, 5, 7);
@@ -55,7 +55,7 @@ namespace Flower.Tests.Works
         public void ExecutedWorkHasWorkRunnerSet()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.Continue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorMode.Continue);
 
             // Act
             context.Trigger(3);
@@ -68,7 +68,7 @@ namespace Flower.Tests.Works
         public async Task ExecutedWorkCannotBeExecutedAgain()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.Continue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorMode.Continue);
             context.Trigger(3);
 
             // Act
@@ -82,7 +82,7 @@ namespace Flower.Tests.Works
         public void WorkerErrorExceptionIsSetOnExecuted()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.Continue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorMode.Continue);
 
             // Act
             context.Trigger(3,4,5);
@@ -96,7 +96,7 @@ namespace Flower.Tests.Works
         public void WorkerErrorStateIsSetOnExecuted()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.Continue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorMode.Continue);
 
             // Act
             context.Trigger(3, 4, 5);
@@ -110,7 +110,7 @@ namespace Flower.Tests.Works
         public void WorkerErrorOutputIsNotSetOnExecuted()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.Continue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorMode.Continue);
 
             // Act
             context.Trigger(3, 4, 5);
@@ -124,7 +124,7 @@ namespace Flower.Tests.Works
         public void ContinuingAfterWorkerErrorLeavesWorkActive()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.Continue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorMode.Continue);
 
             // Act
             context.Trigger(3, 4, 5);
@@ -137,7 +137,7 @@ namespace Flower.Tests.Works
         public void WorkerErrorIsIgnoredOnOutput()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.Continue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorMode.Continue);
 
             // Act
             context.Trigger(3, 4, 5);
@@ -151,7 +151,7 @@ namespace Flower.Tests.Works
         public void WorkerErrorCanBeNotifiedOnExecutedBeforeCompletingWork()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.CompleteWork);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorMode.CompleteWork);
 
             // Act
             context.Trigger(3, 4, 5);
@@ -170,7 +170,7 @@ namespace Flower.Tests.Works
         public void WorkerErrorCanBeSwallowedOnExecuted()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.Continue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorMode.Continue);
 
             // Act
             context.Trigger(3, 4, 5);
@@ -184,7 +184,7 @@ namespace Flower.Tests.Works
         public void WorkerErrorCanBeSwallowedOnOutput()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.Continue);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorMode.Continue);
 
             // Act
             context.Trigger(3, 4, 5);
@@ -198,7 +198,7 @@ namespace Flower.Tests.Works
         public void WorkerErrorCanCompleteWork()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.CompleteWork);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorMode.CompleteWork);
 
             // Act
             context.Trigger(3, 4, 5);
@@ -212,7 +212,7 @@ namespace Flower.Tests.Works
         public void WorkerErrorCanCompleteWorkAndThrow()
         {
             // Arrange
-            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorBehavior.CompleteWorkAndThrow);
+            var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorMode.CompleteWorkAndThrow);
 
             // Act
             var ex = Record.Exception(() => context.Trigger(3, 4, 5));
@@ -227,7 +227,7 @@ namespace Flower.Tests.Works
         public void WorkerErrorShownAsSuchWhenWorkCompletes()
         {
             // Arrange
-            var options = new RegisterOptions(RegisterWorkBehavior.RegisterActivated, workerErrorBehavior: WorkerErrorBehavior.CompleteWork);
+            var options = new WorkOptions(WorkRegisterMode.Activated, workerErrorMode: WorkerErrorMode.CompleteWork);
             var workRegistry = new WorkRegistry(options);
             var trigger = new Subject<int>();
             var work = workRegistry.RegisterWorker(trigger, new TestWorkerIntToIntThrowOnEven());

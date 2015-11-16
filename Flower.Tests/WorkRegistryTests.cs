@@ -23,7 +23,7 @@ namespace Flower.Tests
             var workRunner = new BackgroundThreadQueueWorkRunner();
 
             // Assert
-            var workRegistry = new WorkRegistry(new RegisterOptions(workRunner));
+            var workRegistry = new WorkRegistry(new WorkOptions(workRunner));
         }
 
         [Fact]
@@ -32,7 +32,7 @@ namespace Flower.Tests
             // Arrange
             IList<int> expected = Enumerable.Range(0, 3).ToList();
             IList<int> result = new List<int>();
-            var workRegistry = new WorkRegistry(new RegisterOptions(RegisterWorkBehavior.RegisterSuspended));
+            var workRegistry = new WorkRegistry(new WorkOptions(WorkRegisterMode.Suspended));
 
             // Act
             var output = workRegistry.RegisterWorker(expected.ToObservable(), new TestWorkerIntToString())
@@ -196,7 +196,7 @@ namespace Flower.Tests
         {
             // Arrange
             var subject = new Subject<int>();
-            var workRegistry = new WorkRegistry(new RegisterOptions(RegisterWorkBehavior.RegisterSuspended));
+            var workRegistry = new WorkRegistry(new WorkOptions(WorkRegisterMode.Suspended));
             workRegistry.RegisterWorker(subject, new TestWorkerIntToIntSquared())
                         .Pipe(new TestWorkerIntToString())
                         .Pipe(new TestWorkerStringToInt());
@@ -214,7 +214,7 @@ namespace Flower.Tests
         {
             // Arrange
             var subject = new Subject<int>();
-            var workRegistry = new WorkRegistry(new RegisterOptions(RegisterWorkBehavior.RegisterSuspended));
+            var workRegistry = new WorkRegistry(new WorkOptions(WorkRegisterMode.Suspended));
             var work1 = workRegistry.RegisterWorker(subject, new TestWorkerIntToIntSquared());
             var work2 = work1.Pipe(new TestWorkerIntToString());
             var work3 = work2.Pipe(new TestWorkerStringToInt());
@@ -233,7 +233,7 @@ namespace Flower.Tests
         {
             // Arrange
             var subject = new Subject<int>();
-            var workRegistry = new WorkRegistry(new RegisterOptions(RegisterWorkBehavior.RegisterSuspended));
+            var workRegistry = new WorkRegistry(new WorkOptions(WorkRegisterMode.Suspended));
             var work1 = workRegistry.RegisterWorker(subject, new TestWorkerIntToIntSquared());
             var work2 = work1.Pipe(new TestWorkerIntToString());
             var work3 = work2.Pipe(new TestWorkerStringToInt());
@@ -351,11 +351,11 @@ namespace Flower.Tests
             // Act
             var work1 = workRegistry.RegisterWorker(trigger, new TestWorkerInt());
             var work2 = workRegistry.RegisterWorker(
-                trigger, new TestWorkerInt(), new RegisterOptions(RegisterWorkBehavior.RegisterSuspended));
+                trigger, new TestWorkerInt(), new WorkOptions(WorkRegisterMode.Suspended));
 
             // Assert
-            Assert.NotEqual(workRegistry.DefaultOptions, work1.Registration.Options);
-            Assert.NotEqual(workRegistry.DefaultOptions, work2.Registration.Options);
+            Assert.NotEqual(workRegistry.Options, work1.Registration.Options);
+            Assert.NotEqual(workRegistry.Options, work2.Registration.Options);
             Assert.NotEqual(work1.Registration.Options, work2.Registration.Options);
         }
 

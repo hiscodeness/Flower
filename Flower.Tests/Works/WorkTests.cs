@@ -1,17 +1,16 @@
-﻿using System;
-using System.Reactive.Subjects;
-using FakeItEasy;
-using Flower.Tests.TestDoubles;
-using Flower.Works;
-using Xunit;
-
-namespace Flower.Tests.Works
+﻿namespace Flower.Tests.Works
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Subjects;
     using System.Threading;
+    using FakeItEasy;
+    using Flower.Tests.TestDoubles;
+    using Flower.Works;
     using Flower.Workers;
     using Flower.WorkRunners;
+    using Xunit;
 
     public partial class WorkTests
     {
@@ -52,15 +51,14 @@ namespace Flower.Tests.Works
         {
             // Arrange
             var trigger = new Subject<int>();
-            var worker = new WorkRegistry().RegisterWorker(trigger, new TestWorkerIntToIntThrowOnEven());
+            var work = new WorkRegistry().RegisterWorker(trigger, new TestWorkerIntToIntThrowOnEven());
 
             // Act
-            var ex = Record.Exception(() => trigger.OnNext(42));
+            trigger.OnNext(42);
 
             // Assert
-            Assert.NotNull(ex);
-            Assert.NotNull(worker.LastError);
-            Assert.Equal(ex, worker.LastError.Error);
+            Assert.NotNull(work.LastError);
+            Assert.Equal(TestWorkerIntToIntThrowOnEven.ErrorMessage, work.LastError.Error.Message);
         }
 
         [Fact]
@@ -69,7 +67,7 @@ namespace Flower.Tests.Works
             // Arrange
             var countdown = new CountdownEvent(1);
             var trigger = new Subject<int>();
-            var registry = new WorkRegistry(RegisterOptions.Default.With(new ThreadPoolWorkRunner()));
+            var registry = new WorkRegistry(WorkOptions.Default.With(WorkerErrorMode.CompleteWorkAndThrow).With(new ThreadPoolWorkRunner()));
             registry.RegisterWorker(trigger, new TestWorkerIntToIntThrowOnEven());
             WorkerErrorBase workerError = null;
             registry.Works.Single().Completed.Subscribe(
@@ -94,7 +92,7 @@ namespace Flower.Tests.Works
         {
             // Arrange
             var trigger = new Subject<int>();
-            var registry = new WorkRegistry(RegisterOptions.Default.With(WorkerErrorBehavior.Continue));
+            var registry = new WorkRegistry(WorkOptions.Default.With(WorkerErrorMode.Continue));
             var work1 = registry.RegisterWorker(trigger, new TestWorkerIntToIntThrowOnEven());
             var work2 = work1.Pipe(new TestWorkerIntToIntSquared());
             var work2Output = new List<int>();

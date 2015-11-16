@@ -116,7 +116,7 @@ namespace Flower.Tests
         public void TriggerErrorsThrowIfSubscribersDoNotHandleThem()
         {
             // Arrange
-            var options = new RegisterOptions();
+            var options = new WorkOptions();
             var registry = new WorkRegistry(options);
             var trigger = new Subject<int>();
             var work = registry.RegisterWorker(trigger, new TestWorkerIntToIntSquared());
@@ -135,7 +135,7 @@ namespace Flower.Tests
         {
             // Arrange
             var trigger = new Subject<int>();
-            var options = new RegisterOptions();
+            var options = new WorkOptions();
             var registry = new WorkRegistry(options);
             var work = registry.RegisterWorker(trigger, new TestWorkerIntToIntSquared());
             Exception exception = null;
@@ -156,8 +156,8 @@ namespace Flower.Tests
             var trigger = new Subject<int>();
             var registry =
                 new WorkRegistry(
-                    new RegisterOptions(
-                        RegisterWorkBehavior.RegisterActivated, TriggerErrorBehavior.CompleteWork));
+                    new WorkOptions(
+                        WorkRegisterMode.Activated, TriggerErrorMode.CompleteWork));
             var work = registry.RegisterWorker(trigger, new TestWorkerIntToIntSquared());
             Exception exception = null;
             work.Output.Subscribe(_ => { }, ex => exception = ex);
