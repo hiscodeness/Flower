@@ -181,10 +181,12 @@ namespace Flower.Works
 
                 workExecuted += observer.OnNext;
                 workCompleted += observer.OnCompleted;
-                if (ShouldForwardErrorToSubscribers())
+                Action<Exception> triggerErrorHandler = observer.OnError;
+                if (!ShouldForwardErrorToSubscribers())
                 {
-                    work.TriggerEvents.TriggerErrored += observer.OnError;
+                    triggerErrorHandler = ex => observer.OnCompleted();
                 }
+                work.TriggerEvents.TriggerErrored += triggerErrorHandler;
                 work.TriggerEvents.TriggerCompleted += observer.OnCompleted;
 
                 return Disposable.Create(
@@ -192,8 +194,8 @@ namespace Flower.Works
                         {
                             workExecuted -= observer.OnNext;
                             workCompleted -= observer.OnCompleted;
+                            work.TriggerEvents.TriggerErrored -= triggerErrorHandler;
                             work.TriggerEvents.TriggerCompleted -= observer.OnCompleted;
-                            work.TriggerEvents.TriggerErrored -= observer.OnError;
                         });
             }
 
@@ -209,8 +211,8 @@ namespace Flower.Works
 
             private bool ShouldForwardErrorToSubscribers()
             {
-                return work.Registration.WorkRegistry.DefaultOptions.TriggerErrorBehavior
-                       == TriggerErrorBehavior.CompleteWorkAndThrow;
+                return work.Registration.WorkRegistry.Options.TriggerErrorMode
+                       == TriggerErrorMode.ErrorWork;
             }
 
             private void OnWorkExecuted(TExecutableWork executedWork)
@@ -252,10 +254,12 @@ namespace Flower.Works
 
                 workErrored += observer.OnNext;
                 workCompleted += observer.OnCompleted;
-                if (ShouldForwardErrorToSubscribers())
+                Action<Exception> triggerErrorHandler = observer.OnError;
+                if (!ShouldForwardErrorToSubscribers())
                 {
-                    work.TriggerEvents.TriggerErrored += observer.OnError;
+                    triggerErrorHandler = ex => observer.OnCompleted();
                 }
+                work.TriggerEvents.TriggerErrored += triggerErrorHandler;
                 work.TriggerEvents.TriggerCompleted += observer.OnCompleted;
 
                 return Disposable.Create(
@@ -263,8 +267,8 @@ namespace Flower.Works
                     {
                         workErrored -= observer.OnNext;
                         workCompleted -= observer.OnCompleted;
+                        work.TriggerEvents.TriggerErrored -= triggerErrorHandler;
                         work.TriggerEvents.TriggerCompleted -= observer.OnCompleted;
-                        work.TriggerEvents.TriggerErrored -= observer.OnError;
                     });
             }
 
@@ -280,8 +284,8 @@ namespace Flower.Works
 
             private bool ShouldForwardErrorToSubscribers()
             {
-                return work.Registration.WorkRegistry.DefaultOptions.TriggerErrorBehavior
-                       == TriggerErrorBehavior.CompleteWorkAndThrow;
+                return work.Registration.WorkRegistry.Options.TriggerErrorMode
+                       == TriggerErrorMode.ErrorWork;
             }
 
             private void OnWorkErrored(TExecutableWork erroredWork)

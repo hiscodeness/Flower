@@ -13,7 +13,7 @@ namespace Flower.Tests.TestDoubles
             Workers.WorkerScope.FromInstance(new TestWorkerIntToIntSquared());
 
         public IWorkRegistry WorkRegistry => workRegistry;
-        public RegisterOptions Options => workRegistry.DefaultOptions;
+        public WorkOptions Options => workRegistry.Options;
         public IObservable<int> Trigger => trigger;
         public Func<IScope<IWorker<int, int>>> CreateWorkerScope => createWorkerScope;
 

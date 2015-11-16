@@ -5,7 +5,7 @@ namespace Flower.Works
     public interface IWorkRegistration
     {
         IWorkRegistry WorkRegistry { get; }
-        RegisterOptions Options { get; }
+        WorkOptions Options { get; }
     }
 
     public interface IWorkRegistration<out TInput> : IWorkRegistration

@@ -53,15 +53,15 @@ namespace Flower.Works
             Error = error;
             OnWorkerErrored(error);
 
-            switch (work.Registration.WorkRegistry.DefaultOptions.WorkerErrorBehavior)
+            switch (work.Registration.WorkRegistry.Options.WorkerErrorMode)
             {
-                case WorkerErrorBehavior.Continue:
+                case WorkerErrorMode.Continue:
                     // Log.Warning("Continue on worker error: {0}.", error);
                     break;
-                case WorkerErrorBehavior.CompleteWork:
+                case WorkerErrorMode.CompleteWork:
                     work.Complete(WorkState.WorkerError);
                     break;
-                case WorkerErrorBehavior.CompleteWorkAndThrow:
+                case WorkerErrorMode.CompleteWorkAndThrow:
                     work.Complete(WorkState.WorkerError);
                     throw error;
             }

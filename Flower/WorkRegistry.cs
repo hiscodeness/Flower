@@ -13,19 +13,19 @@ namespace Flower
     {
         private readonly IList<IWork> works = new List<IWork>();
 
-        public WorkRegistry(RegisterOptions options = null)
+        public WorkRegistry(WorkOptions options = null)
         {
-            DefaultOptions = options ?? RegisterOptions.Default;
+            Options = options ?? WorkOptions.Default;
         }
 
         public IEnumerable<IWork> Works => works;
 
-        public RegisterOptions DefaultOptions { get; }
+        public WorkOptions Options { get; }
 
         public IActionWork RegisterMethod<TInput>(
            IObservable<TInput> trigger,
            Func<Task> worker,
-           RegisterOptions options = null)
+           WorkOptions options = null)
         {
             return RegisterFactory(trigger, () => WorkerScope.FromInstance(new Worker(worker)), options);
         }
@@ -33,7 +33,7 @@ namespace Flower
         public IActionWork<TInput> RegisterMethod<TInput>(
             IObservable<TInput> trigger,
             Func<TInput, Task> worker,
-            RegisterOptions options = null)
+            WorkOptions options = null)
         {
             return RegisterFactory(trigger, WorkerScope.FromInstance(new Worker<TInput>(worker)), options);
         }
@@ -41,7 +41,7 @@ namespace Flower
         public IFuncWork<TInput, TOutput> RegisterMethod<TInput, TOutput>(
             IObservable<TInput> trigger,
             Func<TInput, Task<TOutput>> worker,
-            RegisterOptions options = null)
+            WorkOptions options = null)
         {
             return RegisterFactory(trigger, WorkerScope.FromInstance(new Worker<TInput, TOutput>(worker)), options);
         }
@@ -49,7 +49,7 @@ namespace Flower
         public IActionWork RegisterWorker<TInput>(
             IObservable<TInput> trigger,
             IWorker worker,
-            RegisterOptions options = null)
+            WorkOptions options = null)
         {
             return RegisterFactory(trigger, () => WorkerScope.FromInstance(worker), options);
         }
@@ -57,7 +57,7 @@ namespace Flower
         public IActionWork<TInput> RegisterWorker<TInput>(
             IObservable<TInput> trigger,
             IWorker<TInput> worker,
-            RegisterOptions options = null)
+            WorkOptions options = null)
         {
             return RegisterFactory(trigger, WorkerScope.FromInstance(worker), options);
         }
@@ -65,7 +65,7 @@ namespace Flower
         public IFuncWork<TInput, TOutput> RegisterWorker<TInput, TOutput>(
             IObservable<TInput> trigger,
             IWorker<TInput, TOutput> worker,
-            RegisterOptions options = null)
+            WorkOptions options = null)
         {
             return RegisterFactory(trigger, WorkerScope.FromInstance(worker), options);
         }
@@ -73,7 +73,7 @@ namespace Flower
         public IActionWork RegisterResolver<TInput>(
            IObservable<TInput> trigger,
            IWorkerResolver resolver,
-           RegisterOptions options = null)
+           WorkOptions options = null)
         {
             return RegisterFactory(trigger, () => WorkerScope.FromResolver(resolver), options);
         }
@@ -81,7 +81,7 @@ namespace Flower
         public IActionWork<TInput> RegisterResolver<TInput>(
            IObservable<TInput> trigger,
            IWorkerResolver<TInput> resolver,
-           RegisterOptions options = null)
+           WorkOptions options = null)
         {
             return RegisterFactory(trigger, () => WorkerScope.FromResolver(resolver), options);
         }
@@ -89,7 +89,7 @@ namespace Flower
         public IFuncWork<TInput, TOutput> RegisterResolver<TInput, TOutput>(
            IObservable<TInput> trigger,
            IWorkerResolver<TInput, TOutput> resolver,
-           RegisterOptions options = null)
+           WorkOptions options = null)
         {
             return RegisterFactory(trigger, () => WorkerScope.FromResolver(resolver), options);
         }
@@ -136,7 +136,7 @@ namespace Flower
         public IActionWork RegisterFactory<TInput>(
             IObservable<TInput> trigger,
             Func<IScope<IWorker>> factory,
-            RegisterOptions options = null)
+            WorkOptions options = null)
         {
             options = CreateRegisterOptions(options);
             var registration = CreateRegistration(trigger, factory, options);
@@ -148,7 +148,7 @@ namespace Flower
         public IActionWork<TInput> RegisterFactory<TInput>(
             IObservable<TInput> trigger,
             Func<IScope<IWorker<TInput>>> factory,
-            RegisterOptions options = null)
+            WorkOptions options = null)
         {
             options = CreateRegisterOptions(options);
             var registration = CreateRegistration(trigger, factory, options);
@@ -160,7 +160,7 @@ namespace Flower
         public IFuncWork<TInput, TOutput> RegisterFactory<TInput, TOutput>(
             IObservable<TInput> trigger,
             Func<IScope<IWorker<TInput, TOutput>>> factory,
-            RegisterOptions options = null)
+            WorkOptions options = null)
         {
             options = CreateRegisterOptions(options);
             var registration = CreateRegistration(trigger, factory, options);
@@ -169,20 +169,20 @@ namespace Flower
             return work;
         }
 
-        private RegisterOptions CreateRegisterOptions(RegisterOptions options)
+        private WorkOptions CreateRegisterOptions(WorkOptions options)
         {
-            return options ?? new RegisterOptions(DefaultOptions);
+            return options ?? new WorkOptions(Options);
         }
 
         private ActionWorkRegistration CreateRegistration<TInput>(
-            IObservable<TInput> trigger, Func<IScope<IWorker>> createWorkerScope, RegisterOptions options)
+            IObservable<TInput> trigger, Func<IScope<IWorker>> createWorkerScope, WorkOptions options)
         {
             return new ActionWorkRegistration(
                 this, trigger.Select(input => (object)input), createWorkerScope, options);
         }
 
         private ActionWorkRegistration<TInput> CreateRegistration<TInput>(
-            IObservable<TInput> trigger, Func<IScope<IWorker<TInput>>> createWorkerScope, RegisterOptions options)
+            IObservable<TInput> trigger, Func<IScope<IWorker<TInput>>> createWorkerScope, WorkOptions options)
         {
             return new ActionWorkRegistration<TInput>(this, trigger, createWorkerScope, options);
         }
@@ -190,7 +190,7 @@ namespace Flower
         private FuncWorkRegistration<TInput, TOutput> CreateRegistration<TInput, TOutput>(
             IObservable<TInput> trigger,
             Func<IScope<IWorker<TInput, TOutput>>> createWorkerScope,
-            RegisterOptions options)
+            WorkOptions options)
         {
             return new FuncWorkRegistration<TInput, TOutput>(this, trigger, createWorkerScope, options);
         }
@@ -198,7 +198,7 @@ namespace Flower
         private void Register(IWork work)
         {
             Add(work);
-            if (DefaultOptions.RegisterWorkBehavior == RegisterWorkBehavior.RegisterActivated)
+            if (Options.WorkRegisterMode == WorkRegisterMode.Activated)
             {
                 work.Activate();
             }

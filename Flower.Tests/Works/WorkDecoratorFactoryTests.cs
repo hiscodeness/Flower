@@ -19,8 +19,8 @@
             var logginWorkDecoratorFactory = new LoggingWorkDecoratorFactory(
                 input => inputLog.Add(input),
                 output => outputLog.Add(output));
-            var options = new RegisterOptions(
-                RegisterWorkBehavior.RegisterActivated,
+            var options = new WorkOptions(
+                WorkRegisterMode.Activated,
                 workDecoratorFactory: logginWorkDecoratorFactory);
             var workRegistry = new WorkRegistry(options);
             var trigger = new Subject<int>();

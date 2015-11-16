@@ -12,20 +12,21 @@ namespace Flower.Tests
         public void SensibleDefaultOptions()
         {
             // Act
-            var options = new RegisterOptions();
+            var options = new WorkOptions();
 
             // Assert
-            Assert.Equal(RegisterWorkBehavior.RegisterActivated, options.RegisterWorkBehavior);
-            Assert.Equal(TriggerErrorBehavior.CompleteWorkAndThrow, options.TriggerErrorBehavior);
+            Assert.Equal(WorkRegisterMode.Activated, options.WorkRegisterMode);
+            Assert.Equal(TriggerErrorMode.ErrorWork, options.TriggerErrorMode);
+            Assert.Equal(WorkerErrorMode.Continue, options.WorkerErrorMode);
             Assert.NotNull(options.WorkRunnerFactory);
-            Assert.Equal(WorkerErrorBehavior.CompleteWorkAndThrow, options.WorkerErrorBehavior);
+            Assert.Null(options.WorkDecoratorFactory);
         }
 
         [Fact]
         public void CannotChangeWorkRunnerFactoryToNull()
         {
             // Arrange
-            var options = new RegisterOptions();
+            var options = new WorkOptions();
 
             // Act
             var ex = Record.Exception(() => options = options.With((Func<IWork, IWorkRunner>)null));
@@ -38,7 +39,7 @@ namespace Flower.Tests
         public void CannotChangeWorkRunnerToNull()
         {
             // Arrange
-            var options = new RegisterOptions();
+            var options = new WorkOptions();
 
             // Act
             var ex = Record.Exception(() => options = options.With((IWorkRunner)null));
@@ -51,33 +52,33 @@ namespace Flower.Tests
         public void CanChangeRegisterWorkerBehavior()
         {
             // Arrange
-            var options = new RegisterOptions();
+            var options = new WorkOptions();
 
             // Act
-            options = options.With(RegisterWorkBehavior.RegisterActivated);
+            options = options.With(WorkRegisterMode.Activated);
 
             // Assert
-            Assert.Equal(RegisterWorkBehavior.RegisterActivated, options.RegisterWorkBehavior);
+            Assert.Equal(WorkRegisterMode.Activated, options.WorkRegisterMode);
         }
 
         [Fact]
         public void CanChangeTriggerErrorBehavior()
         {
             // Arrange
-            var options = new RegisterOptions();
+            var options = new WorkOptions();
 
             // Act
-            options = options.With(TriggerErrorBehavior.CompleteWork);
+            options = options.With(TriggerErrorMode.CompleteWork);
 
             // Assert
-            Assert.Equal(TriggerErrorBehavior.CompleteWork, options.TriggerErrorBehavior);
+            Assert.Equal(TriggerErrorMode.CompleteWork, options.TriggerErrorMode);
         }
 
         [Fact]
         public void CanChangeWorkRunnerFactory()
         {
             // Arrange
-            var options = new RegisterOptions();
+            var options = new WorkOptions();
             var workRunner = A.Fake<IWorkRunner>();
             Func<IWork, IWorkRunner> workRunnerFactory = _ => workRunner;
 
@@ -92,13 +93,13 @@ namespace Flower.Tests
         public void CanChangeWorkerErrorBehavior()
         {
             // Arrange
-            var options = new RegisterOptions();
+            var options = new WorkOptions();
 
             // Act
-            options = options.With(WorkerErrorBehavior.Continue);
+            options = options.With(WorkerErrorMode.Continue);
 
             // Assert
-            Assert.Equal(WorkerErrorBehavior.Continue, options.WorkerErrorBehavior);
+            Assert.Equal(WorkerErrorMode.Continue, options.WorkerErrorMode);
         }
     }
 }
