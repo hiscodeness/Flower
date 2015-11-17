@@ -203,7 +203,7 @@ namespace Flower.Works
         IObservable<IExecutableWork> IWork.Executed => Executed.Select(executedWork => (IExecutableWork)executedWork);
         public new IObservable<IExecutableActionWork<TInput>> Executed => observables.WorkExecuted;
         IObservable<IExecutableWork> IWork.Errored => Errored.Select(erroredWork => (IExecutableWork)erroredWork);
-        public new IObservable<IExecutableActionWork<TInput>> Errored => observables.WorkExecuted;
+        public new IObservable<IExecutableActionWork<TInput>> Errored => observables.WorkErrored;
         IObservable<IWork> IWork.Completed => Completed.Select(workCompleted => (IWork)workCompleted);
         public new IObservable<IActionWork<TInput>> Completed => observables.WorkCompleted;
 

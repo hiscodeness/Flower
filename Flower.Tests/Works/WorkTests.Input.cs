@@ -7,7 +7,9 @@ using Xunit;
 
 namespace Flower.Tests.Works
 {
-    public partial class WorkTests
+    using System.Collections.Generic;
+
+    public class InputWorkTests
     {
         [Fact]
         public void CanRegisterWorkAcceptingInput()
@@ -40,6 +42,47 @@ namespace Flower.Tests.Works
 
             // Assert
             Assert.NotNull(triggeredWork);
+        }
+
+
+        [Fact]
+        public void ErroredDoNotShowUpInExecuted()
+        {
+            // Arrange
+            var trigger = new Subject<int>();
+            var registry = new WorkRegistry();
+            var work = registry.RegisterWorker(trigger, new TestWorkerIntThrowOnEven());
+            var executedWorks = new List<IExecutableWork>();
+            work.Executed.Subscribe(executedWork => executedWorks.Add(executedWork));
+
+            // Act
+            trigger.OnNext(3);
+            trigger.OnNext(4);
+
+            // Assert
+            Assert.Equal(WorkState.Active, work.State);
+            Assert.Equal(1, executedWorks.Count);
+            Assert.All(executedWorks, executedWork => Assert.Null(executedWork.Error));
+        }
+
+        [Fact]
+        public void ExecutedDoNotShowUpInErrored()
+        {
+            // Arrange
+            var trigger = new Subject<int>();
+            var registry = new WorkRegistry();
+            var work = registry.RegisterWorker(trigger, new TestWorkerIntThrowOnEven());
+            var erroredWorks = new List<IExecutableWork>();
+            work.Errored.Subscribe(erroredWork => erroredWorks.Add(erroredWork));
+
+            // Act
+            trigger.OnNext(3);
+            trigger.OnNext(4);
+
+            // Assert
+            Assert.Equal(WorkState.Active, work.State);
+            Assert.Equal(1, erroredWorks.Count);
+            Assert.All(erroredWorks, erroredWork => Assert.NotNull(erroredWork.Error));
         }
     }
 }

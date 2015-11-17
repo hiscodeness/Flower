@@ -12,7 +12,7 @@
     using Flower.WorkRunners;
     using Xunit;
 
-    public partial class WorkTests
+    public class WorkTests
     {
         [Fact]
         public void CanRegisterWorkerWithoutInput()
@@ -92,7 +92,7 @@
         {
             // Arrange
             var trigger = new Subject<int>();
-            var registry = new WorkRegistry(WorkOptions.Default.With(WorkerErrorMode.Continue));
+            var registry = new WorkRegistry();
             var work1 = registry.RegisterWorker(trigger, new TestWorkerIntToIntThrowOnEven());
             var work2 = work1.Pipe(new TestWorkerIntToIntSquared());
             var work2Output = new List<int>();
@@ -100,7 +100,7 @@
 
             // Act
             trigger.OnNext(3);
-            var ex = Record.Exception(() => trigger.OnNext(4));
+            trigger.OnNext(4);
             trigger.OnNext(5);
 
             // Assert
@@ -108,5 +108,45 @@
             Assert.Equal(WorkState.Active, work2.State);
             Assert.Equal(new[] {3*3, 5*5}, work2Output);
         }
+        [Fact]
+        public void ErroredDoNotShowUpInExecuted()
+        {
+            // Arrange
+            var trigger = new Subject<int>();
+            var registry = new WorkRegistry();
+            var work = registry.RegisterWorker(trigger, new TestWorkerThrowOnSecondInput());
+            var executedWorks = new List<IExecutableWork>();
+            work.Executed.Subscribe(executedWork => executedWorks.Add(executedWork));
+
+            // Act
+            trigger.OnNext(3);
+            trigger.OnNext(4);
+
+            // Assert
+            Assert.Equal(WorkState.Active, work.State);
+            Assert.Equal(1, executedWorks.Count);
+            Assert.All(executedWorks, executedWork => Assert.Null(executedWork.Error));
+        }
+
+        [Fact]
+        public void ExecutedDoNotShowUpInErrored()
+        {
+            // Arrange
+            var trigger = new Subject<int>();
+            var registry = new WorkRegistry();
+            var work = registry.RegisterWorker(trigger, new TestWorkerThrowOnSecondInput());
+            var erroredWorks = new List<IExecutableWork>();
+            work.Errored.Subscribe(erroredWork => erroredWorks.Add(erroredWork));
+
+            // Act
+            trigger.OnNext(3);
+            trigger.OnNext(4);
+
+            // Assert
+            Assert.Equal(WorkState.Active, work.State);
+            Assert.Equal(1, erroredWorks.Count);
+            Assert.All(erroredWorks, erroredWork => Assert.NotNull(erroredWork.Error));
+        }
+
     }
 }

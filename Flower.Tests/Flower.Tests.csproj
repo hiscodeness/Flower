@@ -69,9 +69,11 @@
   <ItemGroup>
     <Compile Include="TestDoubles\TestWorker.cs" />
     <Compile Include="TestDoubles\TestWorkerInt.cs" />
+    <Compile Include="TestDoubles\TestWorkerIntThrowOnEven.cs" />
     <Compile Include="TestDoubles\TestWorkerIntToIntSquared.cs" />
     <Compile Include="TestDoubles\TestWorkerIntToString.cs" />
     <Compile Include="TestDoubles\TestWorkerStringToInt.cs" />
+    <Compile Include="TestDoubles\TestWorkerThrowOnSecondInput.cs" />
     <Compile Include="TestDoubles\TestWorkerThrowsException.cs" />
     <Compile Include="TestDoubles\TestWorkRegistrations.cs" />
     <Compile Include="Triggers\TriggerTests.cs" />
