@@ -32,6 +32,7 @@
 
             // Assert
             countdown.Wait(TimeSpan.FromSeconds(20));
+            await Task.Delay(100); // Allow background thread to remove the work from workRunner
             Assert.Equal(workCount, workRunnerSnapshots.Count);
             Assert.True(workRunnerSnapshots.Select(state => state.PendingWorks.Count).All(count => count == 0));
             foreach (var executingWorkCount in workRunnerSnapshots.Select(state => state.ExecutingWorks.Count))
