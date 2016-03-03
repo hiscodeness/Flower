@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using FakeItEasy;
 using Flower.WorkRunners;
 using Flower.Works;
 using Xunit;
@@ -22,50 +21,37 @@ namespace Flower.Tests.WorkRunners
             var countdown = new CountdownEvent(workCount);
             var workRunner = new BackgroundThreadQueueWorkRunner();
             var workRunnerSnapshots = new List<WorkRunnerSnapshot>();
-            var executableWork = A.Fake<IExecutableWork>();
-            A.CallTo(() => executableWork.Execute()).Invokes(_ =>
-                {
-                    Task.Delay(delayInMilliseconds).Wait();
-                    workRunnerSnapshots.Add(GetSnapshot(workRunner));
-                    countdown.Signal();
-                });
+            var threadIds = new List<int>();
 
             // Act
             for (var i = 0; i < workCount; i++)
             {
-                await workRunner.Submit(executableWork);
+                await workRunner.Submit(new SnapshottingExecutableWork(countdown, delayInMilliseconds, workRunnerSnapshots, threadIds, workRunner));
             }
 
             // Assert
             countdown.Wait(TimeSpan.FromSeconds(10));
             Assert.Equal(workCount, workRunnerSnapshots.Count);
-            Assert.True(workRunnerSnapshots.Select(state => state.ExecutingWorks.Count).All(count => count == 1));
+            Assert.All(workRunnerSnapshots, snapshot => Assert.Equal(1, snapshot.ExecutingWorks.Count));
+            Assert.All(threadIds, threadId => Assert.Equal(workRunner.ThreadId, threadId));
             var maxPendingCount = Enumerable.Range(1, workCount-1).Aggregate((acc, x) => acc + x);
             Assert.InRange(workRunnerSnapshots.Sum(state => state.PendingWorks.Count), workCount, maxPendingCount);
         }
 
         [Fact]
-        public async Task BackgroundThreadQueueDoesntWaitForAllTriggeredWorksToExecute()
+        public async Task DisposedBackgroundThreadQueueDoesntWaitForAllTriggeredWorksToExecute()
         {
             // Arrange
             var manualResetEvent = new ManualResetEventSlim();
             var workRunner = new BackgroundThreadQueueWorkRunner();
-            var executableWork = A.Fake<IExecutableWork>();
-            var executedWorkCount = 0;
-            A.CallTo(() => executableWork.Execute()).Invokes(
-                _ =>
-                    {
-                        executedWorkCount++;
-                        manualResetEvent.Set();
-                        Task.Delay(100).Wait();
-                    });
+            var executableWorks = new List<IExecutableWork>();
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
             // Act
             for (var i = 0; i < 5; i++)
             {
-                await workRunner.Submit(executableWork);
+                await workRunner.Submit(new CountingExecutableWork(executableWorks, manualResetEvent));
             }
             manualResetEvent.Wait(TimeSpan.FromSeconds(10));
             manualResetEvent.Reset();
@@ -74,7 +60,7 @@ namespace Flower.Tests.WorkRunners
 
             // Assert
             Assert.InRange(stopwatch.ElapsedMilliseconds, 0, 299);
-            Assert.Equal(2, executedWorkCount);
+            Assert.Equal(2, executableWorks.Count);
         }
         
         private static WorkRunnerSnapshot GetSnapshot(IWorkRunner workRunner)
@@ -91,6 +77,67 @@ namespace Flower.Tests.WorkRunners
         {
             public List<IExecutableWork> PendingWorks { get; set; }
             public List<IExecutableWork> ExecutingWorks { get; set; }
+        }
+
+        private class SnapshottingExecutableWork : IExecutableWork
+        {
+            private readonly CountdownEvent countdown;
+            private readonly int delayInMilliseconds;
+            private readonly IList<WorkRunnerSnapshot> workRunnerSnapshots;
+            private readonly IWorkRunner workRunner;
+            private readonly IList<int> threadIds; 
+
+            public SnapshottingExecutableWork(
+                CountdownEvent countdown,
+                int delayInMilliseconds,
+                IList<WorkRunnerSnapshot> workRunnerSnapshots,
+                IList<int> threadIds,
+                IWorkRunner workRunner)
+            {
+                this.countdown = countdown;
+                this.delayInMilliseconds = delayInMilliseconds;
+                this.workRunnerSnapshots = workRunnerSnapshots;
+                this.threadIds = threadIds;
+                this.workRunner = workRunner;
+            }
+            public IWork Work { get; }
+            public IWorkRunner WorkRunner { get; }
+            public ExecutableWorkState State { get; }
+            public async Task Execute()
+            {
+                await Task.Delay(delayInMilliseconds);
+                workRunnerSnapshots.Add(GetSnapshot(workRunner));
+                countdown.Signal();
+                threadIds.Add(Thread.CurrentThread.ManagedThreadId);
+            }
+
+            public Exception Error { get; }
+            public IScope<object> WorkerScope { get; }
+        }
+
+        private class CountingExecutableWork : IExecutableWork
+        {
+            private readonly List<IExecutableWork> executableWorks;
+            private readonly ManualResetEventSlim manualResetEvent;
+
+            public CountingExecutableWork(List<IExecutableWork> executableWorks, ManualResetEventSlim manualResetEvent)
+            {
+                this.executableWorks = executableWorks;
+                this.manualResetEvent = manualResetEvent;
+            }
+
+            public IWork Work { get; }
+            public IWorkRunner WorkRunner { get; }
+            public ExecutableWorkState State { get; }
+            public async Task Execute()
+            {
+                executableWorks.Add(this);
+                manualResetEvent.Set();
+                await Task.Delay(100);
+            }
+
+            public Exception Error { get; }
+            public IScope<object> WorkerScope { get; }
         }
     }
 }
