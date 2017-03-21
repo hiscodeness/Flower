@@ -33,7 +33,7 @@ namespace Flower
         /// </summary>
         /// <remarks>
         /// Works are completed when the trigger completes or errors. Workers can also be completed
-        /// manually by calling <see cref="IWorkRegistry.Complete"/>.
+        /// manually by calling <see cref="IWorkRegistry.Complete" />.
         /// </remarks>
         Completed
     }

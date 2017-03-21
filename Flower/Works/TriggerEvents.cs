@@ -1,7 +1,7 @@
-using System;
-
 namespace Flower.Works
 {
+    using System;
+
     internal class TriggerEvents : ITriggerEvents
     {
         public event Action<Exception> TriggerErrored;

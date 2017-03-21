@@ -1,12 +1,11 @@
-﻿using System.Linq;
-using FakeItEasy;
-using Flower.WorkRunners;
-using Flower.Works;
-using Xunit;
-
-namespace Flower.Tests.WorkRunners
+﻿namespace Flower.Tests.WorkRunners
 {
+    using System.Linq;
     using System.Threading.Tasks;
+    using FakeItEasy;
+    using Flower.WorkRunners;
+    using Flower.Works;
+    using Xunit;
 
     public class ImmediateWorkRunnerTests
     {
@@ -22,19 +21,18 @@ namespace Flower.Tests.WorkRunners
         }
 
         [Fact]
-        public void RunningTaskExistsDuringWorkerRun()
+        public async Task RunningTaskExistsDuringWorkerRun()
         {
             // Arrange
             var workRunner = new ImmediateWorkRunner();
             var result = workRunner.ExecutingWorks;
             var work = A.Fake<IExecutableActionWork>();
-            A.CallTo(() => work.Execute()).Invokes(() =>
-                {
-                    result = workRunner.ExecutingWorks.ToList();
-                });
+            A.CallTo(() => work.Execute())
+                .Invokes(() => { result = workRunner.ExecutingWorks.ToList(); })
+                .Returns(Task.CompletedTask);
 
             // Act
-            workRunner.Submit(work);
+            await workRunner.Submit(work);
 
             // Assert
             Assert.Equal(work, result.Single());

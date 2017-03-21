@@ -7,9 +7,9 @@
     {
         public static readonly Func<int, int> WorkerFunc = i => i * i;
 
-        public int Execute(int input)
+        public async Task<int> Execute(int input)
         {
-            return WorkerFunc(input);
+            return await Task.FromResult(WorkerFunc(input));
         }
     }
 }

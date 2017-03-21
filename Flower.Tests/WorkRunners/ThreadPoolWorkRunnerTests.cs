@@ -10,12 +10,12 @@
     using Flower.Works;
     using Xunit;
 
-    public class ThreadPoolWorkRunnerTests 
+    public class ThreadPoolWorkRunnerTests
     {
         [Theory]
         [InlineData(200, 100)]
         [InlineData(1000, 5)]
-        public void ThreadPoolRunnerExecutesAllWorksInParallel(int delayInMilliseconds, int workCount)
+        public async void ThreadPoolRunnerExecutesAllWorksInParallel(int delayInMilliseconds, int workCount)
         {
             // Arrange
             var countdown = new CountdownEvent(workCount);
@@ -25,12 +25,14 @@
             // Act
             for (var i = 0; i < workCount; i++)
             {
-                workRunner.Submit(new MockExecutableWork(countdown, delayInMilliseconds, workRunnerSnapshots, workRunner));
+                await
+                    workRunner.Submit(
+                        new MockExecutableWork(countdown, delayInMilliseconds, workRunnerSnapshots, workRunner));
             }
 
             // Assert
             countdown.Wait(TimeSpan.FromSeconds(20));
-            Thread.Sleep(100); // Allow background thread to remove the work from workRunner
+            await Task.Delay(100); // Allow background thread to remove the work from workRunner
             Assert.Equal(workCount, workRunnerSnapshots.Count);
             Assert.True(workRunnerSnapshots.Select(state => state.PendingWorks.Count).All(count => count == 0));
             foreach (var executingWorkCount in workRunnerSnapshots.Select(state => state.ExecutingWorks.Count))
@@ -46,7 +48,11 @@
             private readonly int delayInMilliseconds;
             private readonly ConcurrentBag<WorkRunnerSnapshot> workRunnerSnapshots;
 
-            public MockExecutableWork(CountdownEvent countdown, int delayInMilliseconds, ConcurrentBag<WorkRunnerSnapshot> workRunnerSnapshots, IWorkRunner workRunner)
+            public MockExecutableWork(
+                CountdownEvent countdown,
+                int delayInMilliseconds,
+                ConcurrentBag<WorkRunnerSnapshot> workRunnerSnapshots,
+                IWorkRunner workRunner)
             {
                 this.countdown = countdown;
                 this.delayInMilliseconds = delayInMilliseconds;
@@ -57,9 +63,10 @@
             public IWork Work { get; }
             public IWorkRunner WorkRunner { get; }
             public ExecutableWorkState State { get; }
-            public void Execute()
+
+            public async Task Execute()
             {
-                Thread.Sleep(delayInMilliseconds);
+                await Task.Delay(delayInMilliseconds);
                 workRunnerSnapshots.Add(GetSnapshot(WorkRunner));
                 countdown.Signal();
             }

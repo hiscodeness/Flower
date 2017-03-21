@@ -7,9 +7,9 @@
     using System.Threading;
     using FakeItEasy;
     using Flower.Tests.TestDoubles;
-    using Flower.Works;
     using Flower.Workers;
     using Flower.WorkRunners;
+    using Flower.Works;
     using Xunit;
 
     public class WorkTests
@@ -67,7 +67,9 @@
             // Arrange
             var countdown = new CountdownEvent(1);
             var trigger = new Subject<int>();
-            var registry = new WorkRegistry(WorkOptions.Default.With(WorkerErrorMode.CompleteWorkAndThrow).With(new ThreadPoolWorkRunner()));
+            var registry =
+                new WorkRegistry(
+                    WorkOptions.Default.With(WorkerErrorMode.CompleteWorkAndThrow).With(new ThreadPoolWorkRunner()));
             registry.RegisterWorker(trigger, new TestWorkerIntToIntThrowOnEven());
             WorkerErrorBase workerError = null;
             registry.Works.Single().Completed.Subscribe(
@@ -106,8 +108,9 @@
             // Assert
             Assert.Equal(WorkState.Active, work1.State);
             Assert.Equal(WorkState.Active, work2.State);
-            Assert.Equal(new[] {3*3, 5*5}, work2Output);
+            Assert.Equal(new[] {3 * 3, 5 * 5}, work2Output);
         }
+
         [Fact]
         public void ErroredDoNotShowUpInExecuted()
         {
@@ -147,6 +150,5 @@
             Assert.Equal(1, erroredWorks.Count);
             Assert.All(erroredWorks, erroredWork => Assert.NotNull(erroredWork.Error));
         }
-
     }
 }

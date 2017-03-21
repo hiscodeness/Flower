@@ -4,9 +4,9 @@
 
     internal class TestWorkerStringToInt : IWorker<string, int>
     {
-        public int Execute(string input)
+        public async Task<int> Execute(string input)
         {
-            return int.Parse(input);
+            return await Task.FromResult(int.Parse(input));
         }
     }
 }

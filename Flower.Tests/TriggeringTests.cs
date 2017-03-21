@@ -1,13 +1,13 @@
-﻿using System;
-using System.Linq;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using Flower.Tests.TestDoubles;
-using Flower.Works;
-using Xunit;
-
-namespace Flower.Tests
+﻿namespace Flower.Tests
 {
+    using System;
+    using System.Linq;
+    using System.Reactive.Linq;
+    using System.Reactive.Subjects;
+    using Flower.Tests.TestDoubles;
+    using Flower.Works;
+    using Xunit;
+
     public class TriggeringTests
     {
         [Fact]
@@ -129,7 +129,7 @@ namespace Flower.Tests
             // Assert
             Assert.IsType<Exception>(ex);
         }
-        
+
         [Fact]
         public void TriggerErrorsAreForwardedToOutputSubscribers()
         {
@@ -157,7 +157,8 @@ namespace Flower.Tests
             var registry =
                 new WorkRegistry(
                     new WorkOptions(
-                        WorkRegisterMode.Activated, TriggerErrorMode.CompleteWork));
+                        WorkRegisterMode.Activated,
+                        TriggerErrorMode.CompleteWork));
             var work = registry.RegisterWorker(trigger, new TestWorkerIntToIntSquared());
             Exception exception = null;
             work.Output.Subscribe(_ => { }, ex => exception = ex);
@@ -177,7 +178,7 @@ namespace Flower.Tests
             var registry = new WorkRegistry();
             var work = registry.RegisterWorker(trigger, new TestWorkerIntToIntSquared());
             int? result = null;
-            work.Output.Subscribe(i => result = i, _ => {});
+            work.Output.Subscribe(i => result = i, _ => { });
 
             // Act
             trigger.OnError(new Exception());
@@ -193,7 +194,7 @@ namespace Flower.Tests
             var trigger = new Subject<int>();
             var registry = new WorkRegistry();
             var work = registry.RegisterWorker(trigger, new TestWorkerIntToIntSquared());
-            work.Output.Subscribe(i => { }, _ => {});
+            work.Output.Subscribe(i => { }, _ => { });
 
             // Act
             trigger.OnError(new Exception());
@@ -209,7 +210,7 @@ namespace Flower.Tests
             var trigger = new Subject<int>();
             var registry = new WorkRegistry();
             var work = registry.RegisterWorker(trigger, new TestWorkerIntToIntSquared());
-            work.Output.Subscribe(i => { }, _ => {});
+            work.Output.Subscribe(i => { }, _ => { });
 
             // Act
             trigger.OnError(new Exception());

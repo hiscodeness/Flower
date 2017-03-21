@@ -1,8 +1,8 @@
-﻿using System;
-using Autofac.Features.OwnedInstances;
-
-namespace Flower.Autofac
+﻿namespace Flower.Autofac
 {
+    using System;
+    using global::Autofac.Features.OwnedInstances;
+
     public sealed class OwnedScope<T> : IScope<T>
     {
         private readonly Owned<T> owned;

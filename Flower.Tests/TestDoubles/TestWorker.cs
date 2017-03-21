@@ -4,9 +4,10 @@ namespace Flower.Tests.TestDoubles
 
     internal class TestWorker : IWorker
     {
-        public void Execute()
+        public async Task Execute()
         {
             ExecuteCount++;
+            await Task.CompletedTask;
         }
 
         public int ExecuteCount { get; private set; }

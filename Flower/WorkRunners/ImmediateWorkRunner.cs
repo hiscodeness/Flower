@@ -1,11 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Flower.Works;
-
 namespace Flower.WorkRunners
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
+    using Flower.Works;
 
     /// <summary>
     /// A work runner that executes a single work immediately after being submitted.
@@ -15,19 +14,22 @@ namespace Flower.WorkRunners
         private IExecutableWork executingWork;
         private bool isExecuted;
 
-        public IEnumerable<IExecutableWork> PendingWorks { get { yield break; } }
+        public IEnumerable<IExecutableWork> PendingWorks
+        {
+            get { yield break; }
+        }
 
         public IEnumerable<IExecutableWork> ExecutingWorks
         {
             get
             {
                 return !isExecuted && executingWork != null
-                           ? new[] { executingWork }
-                           : Enumerable.Empty<IExecutableWork>();
+                    ? new[] {executingWork}
+                    : Enumerable.Empty<IExecutableWork>();
             }
         }
 
-        public void Submit(IExecutableWork executableWork)
+        public async Task Submit(IExecutableWork executableWork)
         {
             if (executingWork != null)
             {
@@ -35,7 +37,7 @@ namespace Flower.WorkRunners
             }
 
             executingWork = executableWork;
-            executingWork.Execute();
+            await executingWork.Execute();
             isExecuted = true;
         }
     }

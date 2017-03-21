@@ -14,7 +14,8 @@
             return work;
         }
 
-        public virtual IExecutableFuncWork<TInput, TOutput> Decorate<TInput, TOutput>(IExecutableFuncWork<TInput, TOutput> work)
+        public virtual IExecutableFuncWork<TInput, TOutput> Decorate<TInput, TOutput>(
+            IExecutableFuncWork<TInput, TOutput> work)
         {
             return work;
         }

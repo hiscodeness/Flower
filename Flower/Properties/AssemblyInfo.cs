@@ -5,13 +5,14 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Flower")]
 [assembly: AssemblyDescription(
     "Flower is a library for registering workers " +
-    "that are submitted for execution on a work " + 
+    "that are submitted for execution on a work " +
     "runner when triggered by an observable.")]
 [assembly: AssemblyProduct("Flower")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyCompany("None")]
 
 #if DEBUG
+
 [assembly: AssemblyConfiguration("Debug")]
 #else
 [assembly: AssemblyConfiguration("Release")]
@@ -20,5 +21,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("0.0.0.1")]
 [assembly: AssemblyFileVersion("0.0.0.1")]
 [assembly: AssemblyInformationalVersion("0.0.0.1")]
-
 [assembly: ComVisible(false)]

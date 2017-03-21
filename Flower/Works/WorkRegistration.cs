@@ -1,11 +1,13 @@
-﻿using System;
-
-namespace Flower.Works
+﻿namespace Flower.Works
 {
+    using System;
+
     internal abstract class WorkRegistration<TInput>
     {
         protected WorkRegistration(
-            IWorkRegistry workRegistry, IObservable<TInput> trigger, WorkOptions options)
+            IWorkRegistry workRegistry,
+            IObservable<TInput> trigger,
+            WorkOptions options)
         {
             WorkRegistry = workRegistry;
             Trigger = trigger;
@@ -19,7 +21,11 @@ namespace Flower.Works
 
     internal class ActionWorkRegistration : WorkRegistration<object>, IActionWorkRegistration
     {
-        public ActionWorkRegistration(IWorkRegistry workRegistry, IObservable<object> trigger, Func<IScope<IWorker>> createWorkerScope, WorkOptions options)
+        public ActionWorkRegistration(
+            IWorkRegistry workRegistry,
+            IObservable<object> trigger,
+            Func<IScope<IWorker>> createWorkerScope,
+            WorkOptions options)
             : base(workRegistry, trigger, options)
         {
             CreateWorkerScope = createWorkerScope;
@@ -27,11 +33,14 @@ namespace Flower.Works
 
         public Func<IScope<IWorker>> CreateWorkerScope { get; }
     }
-    
+
     internal class ActionWorkRegistration<TInput> : WorkRegistration<TInput>, IActionWorkRegistration<TInput>
     {
         public ActionWorkRegistration(
-            IWorkRegistry workRegistry, IObservable<TInput> trigger, Func<IScope<IWorker<TInput>>> createWorkerScope, WorkOptions options)
+            IWorkRegistry workRegistry,
+            IObservable<TInput> trigger,
+            Func<IScope<IWorker<TInput>>> createWorkerScope,
+            WorkOptions options)
             : base(workRegistry, trigger, options)
         {
             CreateWorkerScope = createWorkerScope;
@@ -40,10 +49,14 @@ namespace Flower.Works
         public Func<IScope<IWorker<TInput>>> CreateWorkerScope { get; }
     }
 
-    internal class FuncWorkRegistration<TInput, TOutput> : WorkRegistration<TInput>, IFuncWorkRegistration<TInput, TOutput>
+    internal class FuncWorkRegistration<TInput, TOutput> : WorkRegistration<TInput>,
+        IFuncWorkRegistration<TInput, TOutput>
     {
         public FuncWorkRegistration(
-            IWorkRegistry workRegistry, IObservable<TInput> trigger, Func<IScope<IWorker<TInput, TOutput>>> createWorkerScope, WorkOptions options)
+            IWorkRegistry workRegistry,
+            IObservable<TInput> trigger,
+            Func<IScope<IWorker<TInput, TOutput>>> createWorkerScope,
+            WorkOptions options)
             : base(workRegistry, trigger, options)
         {
             CreateWorkerScope = createWorkerScope;

@@ -1,7 +1,7 @@
-﻿using Flower.WorkRunners;
-
-namespace Flower.Works
+﻿namespace Flower.Works
 {
+    using Flower.WorkRunners;
+
     public interface ITriggeredWork
     {
         IWork Work { get; }

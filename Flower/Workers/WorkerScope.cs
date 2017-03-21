@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace Flower.Workers
+﻿namespace Flower.Workers
 {
+    using System;
+
     public static class WorkerScope
     {
         public static IScope<IWorker> FromResolver(IWorkerResolver resolver)
@@ -14,7 +14,8 @@ namespace Flower.Workers
             return new WorkerResolverScope<TInput>(resolver);
         }
 
-        public static IScope<IWorker<TInput, TOutput>> FromResolver<TInput, TOutput>(IWorkerResolver<TInput, TOutput> resolver)
+        public static IScope<IWorker<TInput, TOutput>> FromResolver<TInput, TOutput>(
+            IWorkerResolver<TInput, TOutput> resolver)
         {
             return new WorkerResolverScope<TInput, TOutput>(resolver);
         }

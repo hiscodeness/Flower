@@ -1,13 +1,13 @@
-﻿using System;
-using System.Globalization;
-using System.Reactive.Subjects;
-using Autofac;
-using Autofac.Features.OwnedInstances;
-using Flower.Works;
-using Xunit;
-
-namespace Flower.Autofac.Tests
+﻿namespace Flower.Autofac.Tests
 {
+    using System;
+    using System.Globalization;
+    using System.Reactive.Subjects;
+    using Flower.Works;
+    using global::Autofac;
+    using global::Autofac.Features.OwnedInstances;
+    using Xunit;
+
     public class AutofacOwnedTests
     {
         [Fact]

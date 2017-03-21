@@ -1,8 +1,9 @@
-﻿ // ReSharper disable once CheckNamespace Extension methods can be in original namespace
+﻿// ReSharper disable once CheckNamespace Extension methods can be in original namespace
+
 namespace Autofac
 {
     using System;
-    using Features.OwnedInstances;
+    using Autofac.Features.OwnedInstances;
     using Flower;
 
     public static class ComponentContextExtensionMethods

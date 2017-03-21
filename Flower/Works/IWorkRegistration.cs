@@ -1,7 +1,7 @@
-using System;
-
 namespace Flower.Works
 {
+    using System;
+
     public interface IWorkRegistration
     {
         IWorkRegistry WorkRegistry { get; }

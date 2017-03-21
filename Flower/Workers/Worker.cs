@@ -1,7 +1,6 @@
-﻿using System;
-
-namespace Flower.Workers
+﻿namespace Flower.Workers
 {
+    using System;
     using System.Threading.Tasks;
 
     internal class Worker : IWorker
@@ -13,9 +12,9 @@ namespace Flower.Workers
             this.worker = worker;
         }
 
-        public void Execute()
+        public async Task Execute()
         {
-            worker();
+            await worker();
         }
     }
 
@@ -28,24 +27,24 @@ namespace Flower.Workers
             this.worker = worker;
         }
 
-        public void Execute(TInput input)
+        public async Task Execute(TInput input)
         {
-            worker(input);
+            await worker(input);
         }
     }
 
     internal class Worker<TInput, TOutput> : IWorker<TInput, TOutput>
     {
-        private readonly Func<TInput, TOutput> worker;
+        private readonly Func<TInput, Task<TOutput>> worker;
 
-        public Worker(Func<TInput, TOutput> worker)
+        public Worker(Func<TInput, Task<TOutput>> worker)
         {
             this.worker = worker;
         }
 
-        public TOutput Execute(TInput input)
+        public async Task<TOutput> Execute(TInput input)
         {
-            return worker(input);
+            return await worker(input);
         }
     }
 }

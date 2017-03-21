@@ -18,7 +18,9 @@
             var container = containerBuilder.Build();
             var workRegistry = new WorkRegistry();
             var trigger = new Subject<int>();
-            var work = workRegistry.RegisterFactory(trigger, container.ResolveFactory<TestWorkerIntToStringDisposable>());
+            var work = workRegistry.RegisterFactory(
+                trigger,
+                container.ResolveFactory<TestWorkerIntToStringDisposable>());
             IExecutableFuncWork<int, string> executedWork = null;
             work.Executed.Subscribe(w => executedWork = w);
 
@@ -41,7 +43,9 @@
             var container = containerBuilder.Build();
             var workRegistry = new WorkRegistry();
             var trigger = new Subject<int>();
-            var work1 = workRegistry.RegisterFactory(trigger, container.ResolveFactory<TestWorkerIntToStringDisposable>());
+            var work1 = workRegistry.RegisterFactory(
+                trigger,
+                container.ResolveFactory<TestWorkerIntToStringDisposable>());
             var work2 = work1.Pipe(container.ResolveFactory<TestWorkerStringToIntDisposable>());
             IExecutableFuncWork<string, int> executedWork = null;
             work2.Executed.Subscribe(w => executedWork = w);
@@ -65,7 +69,9 @@
             var container = containerBuilder.Build();
             var workRegistry = new WorkRegistry();
             var trigger = new Subject<int>();
-            var work1 = workRegistry.RegisterFactory(trigger, container.ResolveFactory<TestWorkerIntToStringDisposable>());
+            var work1 = workRegistry.RegisterFactory(
+                trigger,
+                container.ResolveFactory<TestWorkerIntToStringDisposable>());
             var work2 = work1.Pipe(container.ResolveFactory<TestWorkerStringDisposable>());
             IExecutableActionWork<string> executedWork = null;
             work2.Executed.Subscribe(w => executedWork = w);
@@ -89,7 +95,9 @@
             var container = containerBuilder.Build();
             var workRegistry = new WorkRegistry();
             var trigger = new Subject<int>();
-            var work1 = workRegistry.RegisterFactory(trigger, container.ResolveFactory<TestWorkerIntToStringDisposable>());
+            var work1 = workRegistry.RegisterFactory(
+                trigger,
+                container.ResolveFactory<TestWorkerIntToStringDisposable>());
             var work2 = work1.Pipe(container.ResolveFactory<TestWorkerDisposable>());
             IExecutableActionWork executedWork = null;
             work2.Executed.Subscribe(w => executedWork = w);

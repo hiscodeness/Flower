@@ -1,10 +1,9 @@
-using System;
-
 namespace Flower.Works
 {
+    using System;
     using Flower.Workers;
 
-    public interface IWork: IActivatable, ISuspendable
+    public interface IWork : IActivatable, ISuspendable
     {
         WorkState State { get; }
         IWorkRegistration Registration { get; }

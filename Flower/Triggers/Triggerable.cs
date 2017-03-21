@@ -13,7 +13,7 @@
             observable = Observable.FromEvent<TInput>(
                 e => Triggered += e,
                 e => Triggered -= e);
-        }  
+        }
 
         public IDisposable Subscribe(IObserver<TInput> observer)
         {

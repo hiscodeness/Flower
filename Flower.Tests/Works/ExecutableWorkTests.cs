@@ -1,14 +1,13 @@
-﻿using System;
-using System.Linq;
-using System.Reactive.Subjects;
-using Flower.Tests.TestDoubles;
-using Flower.Works;
-using Xunit;
-
-namespace Flower.Tests.Works
+﻿namespace Flower.Tests.Works
 {
+    using System;
+    using System.Linq;
+    using System.Reactive.Subjects;
     using System.Threading.Tasks;
     using Flower.Tests.TestContexts;
+    using Flower.Tests.TestDoubles;
+    using Flower.Works;
+    using Xunit;
 
     public class ExecutableWorkTests
     {
@@ -35,7 +34,7 @@ namespace Flower.Tests.Works
             context.Trigger(3, 5, 7);
 
             // Assert
-            Assert.Equal(new [] {3, 5, 7}, context.Executed.Select(w => w.Input));
+            Assert.Equal(new[] {3, 5, 7}, context.Executed.Select(w => w.Input));
         }
 
         [Fact]
@@ -48,7 +47,7 @@ namespace Flower.Tests.Works
             context.Trigger(3, 5, 7);
 
             // Assert
-            Assert.Equal(new[] { 3, 5, 7 }, context.Executed.Select(w => w.Output));
+            Assert.Equal(new[] {3, 5, 7}, context.Executed.Select(w => w.Output));
         }
 
         [Fact]
@@ -65,14 +64,14 @@ namespace Flower.Tests.Works
         }
 
         [Fact]
-        public void ExecutedWorkCannotBeExecutedAgain()
+        public async Task ExecutedWorkCannotBeExecutedAgain()
         {
             // Arrange
             var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorMode.Continue);
             context.Trigger(3);
 
             // Act
-            var ex = Record.Exception(() => context.Executed.Single().Execute());
+            var ex = await Record.ExceptionAsync(() => context.Executed.Single().Execute());
 
             // Assert
             Assert.IsType<InvalidOperationException>(ex);
@@ -85,7 +84,7 @@ namespace Flower.Tests.Works
             var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorMode.Continue);
 
             // Act
-            context.Trigger(3,4,5);
+            context.Trigger(3, 4, 5);
 
             // Assert
             var result = context.Errored.Single();
@@ -144,7 +143,7 @@ namespace Flower.Tests.Works
 
             // Assert
             Assert.Equal(WorkState.Active, context.Work.State);
-            Assert.Equal(new[] { 3, 5 }, context.Output);
+            Assert.Equal(new[] {3, 5}, context.Output);
         }
 
         [Fact]
@@ -158,9 +157,9 @@ namespace Flower.Tests.Works
 
             // Assert
             Assert.Equal(WorkState.WorkerError, context.Work.State);
-            Assert.Equal(new[] { 3 }, context.Output);
-            Assert.Equal(new[] { 3 }, context.Executed.Select(w => w.Output));
-            Assert.Equal(new[] { 0 }, context.Errored.Select(w => w.Output));
+            Assert.Equal(new[] {3}, context.Output);
+            Assert.Equal(new[] {3}, context.Executed.Select(w => w.Output));
+            Assert.Equal(new[] {0}, context.Errored.Select(w => w.Output));
             Assert.NotNull(context.Work.LastError);
             Assert.Equal(ExecutableWorkState.Error, context.Errored.Single().State);
             Assert.Equal(TestWorkerIntToIntThrowOnEven.ErrorMessage, context.Errored.Single().Error.Message);
@@ -177,7 +176,7 @@ namespace Flower.Tests.Works
 
             // Assert
             Assert.Equal(WorkState.Active, context.Work.State);
-            Assert.Equal(new[] { 3, 5 }, context.Executed.Where(executed => executed.Error == null).Select(w => w.Output));
+            Assert.Equal(new[] {3, 5}, context.Executed.Where(executed => executed.Error == null).Select(w => w.Output));
         }
 
         [Fact]
@@ -191,7 +190,7 @@ namespace Flower.Tests.Works
 
             // Assert
             Assert.Equal(WorkState.Active, context.Work.State);
-            Assert.Equal(new[] { 3, 5 }, context.Output);
+            Assert.Equal(new[] {3, 5}, context.Output);
         }
 
         [Fact]
@@ -205,9 +204,9 @@ namespace Flower.Tests.Works
 
             // Assert
             Assert.Equal(WorkState.WorkerError, context.Work.State);
-            Assert.Equal(new[] { 3 }, context.Executed.Select(w => w.Output));
+            Assert.Equal(new[] {3}, context.Executed.Select(w => w.Output));
         }
-        
+
         [Fact]
         public void WorkerErrorCanCompleteWorkAndThrow()
         {
@@ -220,7 +219,7 @@ namespace Flower.Tests.Works
             // Assert
             Assert.IsType<ArgumentException>(ex);
             Assert.Equal(WorkState.WorkerError, context.Work.State);
-            Assert.Equal(new[] { 3 }, context.Executed.Select(w => w.Output));
+            Assert.Equal(new[] {3}, context.Executed.Select(w => w.Output));
         }
 
         [Fact]

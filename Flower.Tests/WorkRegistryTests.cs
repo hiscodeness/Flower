@@ -1,18 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using FakeItEasy;
-using Flower.Tests.TestDoubles;
-using Flower.WorkRunners;
-using Flower.Works;
-using Xunit;
-
-namespace Flower.Tests
+﻿namespace Flower.Tests
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
+    using System.Reactive.Linq;
+    using System.Reactive.Subjects;
     using System.Threading.Tasks;
+    using FakeItEasy;
+    using Flower.Tests.TestDoubles;
+    using Flower.WorkRunners;
+    using Flower.Works;
+    using Xunit;
 
     public class WorkRegistryTests
     {
@@ -36,16 +35,16 @@ namespace Flower.Tests
 
             // Act
             var output = workRegistry.RegisterWorker(expected.ToObservable(), new TestWorkerIntToString())
-                                    .Pipe(new TestWorkerStringToInt())
-                                    .Output
-                                    .ToList();
+                .Pipe(new TestWorkerStringToInt())
+                .Output
+                .ToList();
             output.Subscribe(r => result = r);
             workRegistry.Activate();
 
             // Assert
             Assert.Equal(expected, result);
         }
-        
+
         [Fact]
         public void ManuallyCompletingWorkCompletesPipedWorks()
         {
@@ -180,8 +179,8 @@ namespace Flower.Tests
             var subject = new Subject<int>();
             var workRegistry = new WorkRegistry();
             workRegistry.RegisterWorker(subject, new TestWorkerIntToIntSquared())
-                        .Pipe(new TestWorkerIntToString())
-                        .Pipe(new TestWorkerStringToInt());
+                .Pipe(new TestWorkerIntToString())
+                .Pipe(new TestWorkerStringToInt());
 
             // Act 
             workRegistry.Suspend();
@@ -190,7 +189,7 @@ namespace Flower.Tests
             Assert.Equal(3, workRegistry.Works.Count());
             Assert.True(workRegistry.Works.All(work => work.State == WorkState.Suspended));
         }
-        
+
         [Fact]
         public void AllWorksCanBeActivated()
         {
@@ -198,8 +197,8 @@ namespace Flower.Tests
             var subject = new Subject<int>();
             var workRegistry = new WorkRegistry(new WorkOptions(WorkRegisterMode.Suspended));
             workRegistry.RegisterWorker(subject, new TestWorkerIntToIntSquared())
-                        .Pipe(new TestWorkerIntToString())
-                        .Pipe(new TestWorkerStringToInt());
+                .Pipe(new TestWorkerIntToString())
+                .Pipe(new TestWorkerStringToInt());
 
             // Act 
             workRegistry.Activate();
@@ -264,13 +263,13 @@ namespace Flower.Tests
             work2.Complete();
 
             // Assert
-            Assert.Equal(new[] { work1, work4 }, workRegistry.Works);
+            Assert.Equal(new[] {work1, work4}, workRegistry.Works);
             Assert.Equal(WorkState.Active, work1.State);
             Assert.Equal(WorkState.Completed, work2.State);
             Assert.Equal(WorkState.Completed, work3.State);
             Assert.Equal(WorkState.Active, work4.State);
         }
-        
+
         [Fact]
         public void CompletingAllWorksIsPossibleAfterManuallyCompletingAWork()
         {
@@ -301,8 +300,8 @@ namespace Flower.Tests
             var subject = new Subject<int>();
             var workRegistry = new WorkRegistry();
             workRegistry.RegisterWorker(subject, new TestWorkerIntToIntSquared())
-                        .Pipe(new TestWorkerIntToString())
-                        .Pipe(new TestWorkerStringToInt());
+                .Pipe(new TestWorkerIntToString())
+                .Pipe(new TestWorkerStringToInt());
             workRegistry.RegisterWorker(subject, new TestWorkerIntToIntSquared());
             var works = workRegistry.Works.ToList();
 
@@ -347,11 +346,13 @@ namespace Flower.Tests
             // Arrange
             var workRegistry = new WorkRegistry();
             var trigger = new Subject<int>();
-            
+
             // Act
             var work1 = workRegistry.RegisterWorker(trigger, new TestWorkerInt());
             var work2 = workRegistry.RegisterWorker(
-                trigger, new TestWorkerInt(), new WorkOptions(WorkRegisterMode.Suspended));
+                trigger,
+                new TestWorkerInt(),
+                new WorkOptions(WorkRegisterMode.Suspended));
 
             // Assert
             Assert.NotEqual(workRegistry.Options, work1.Registration.Options);
@@ -367,7 +368,7 @@ namespace Flower.Tests
             var trigger = new Subject<int>();
 
             // Act
-            var ex = Record.Exception(() => workRegistry.RegisterMethod(trigger, () => Task.CompletedTask ));
+            var ex = Record.Exception(() => workRegistry.RegisterMethod(trigger, () => Task.CompletedTask));
 
             // Assert
             Assert.Null(ex);
@@ -395,7 +396,12 @@ namespace Flower.Tests
             var trigger = new Subject<int>();
 
             // Act
-            var ex = Record.Exception(() => workRegistry.RegisterMethod(trigger, i => Task.FromResult(i.ToString(CultureInfo.InvariantCulture))));
+            var ex =
+                Record.Exception(
+                    () =>
+                        workRegistry.RegisterMethod(
+                            trigger,
+                            i => Task.FromResult(i.ToString(CultureInfo.InvariantCulture))));
 
             // Assert
             Assert.Null(ex);
