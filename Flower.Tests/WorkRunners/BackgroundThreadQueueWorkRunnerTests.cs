@@ -15,7 +15,7 @@ namespace Flower.Tests.WorkRunners
         [Theory]
         [InlineData(20, 100)]
         [InlineData(200, 10)]
-        public async Task BackgroundThreadQueueExecutesOneWorkWhileOthersArePending(int delayInMilliseconds, int workCount)
+        public void BackgroundThreadQueueExecutesOneWorkWhileOthersArePending(int delayInMilliseconds, int workCount)
         {
             // Arrange
             var countdown = new CountdownEvent(workCount);
@@ -26,7 +26,7 @@ namespace Flower.Tests.WorkRunners
             // Act
             for (var i = 0; i < workCount; i++)
             {
-                await workRunner.Submit(new SnapshottingExecutableWork(countdown, delayInMilliseconds, workRunnerSnapshots, threadIds, workRunner));
+                workRunner.Submit(new SnapshottingExecutableWork(countdown, delayInMilliseconds, workRunnerSnapshots, threadIds, workRunner));
             }
 
             // Assert
@@ -39,7 +39,7 @@ namespace Flower.Tests.WorkRunners
         }
 
         [Fact]
-        public async Task DisposedBackgroundThreadQueueDoesntWaitForAllTriggeredWorksToExecute()
+        public void DisposedBackgroundThreadQueueDoesntWaitForAllTriggeredWorksToExecute()
         {
             // Arrange
             var manualResetEvent = new ManualResetEventSlim();
@@ -51,7 +51,7 @@ namespace Flower.Tests.WorkRunners
             // Act
             for (var i = 0; i < 5; i++)
             {
-                await workRunner.Submit(new CountingExecutableWork(executableWorks, manualResetEvent));
+                workRunner.Submit(new CountingExecutableWork(executableWorks, manualResetEvent));
             }
             manualResetEvent.Wait(TimeSpan.FromSeconds(10));
             manualResetEvent.Reset();
@@ -103,9 +103,9 @@ namespace Flower.Tests.WorkRunners
             public IWork Work { get; }
             public IWorkRunner WorkRunner { get; }
             public ExecutableWorkState State { get; }
-            public async Task Execute()
+            public void Execute()
             {
-                await Task.Delay(delayInMilliseconds);
+                Thread.Sleep(delayInMilliseconds);
                 workRunnerSnapshots.Add(GetSnapshot(workRunner));
                 countdown.Signal();
                 threadIds.Add(Thread.CurrentThread.ManagedThreadId);
@@ -129,11 +129,11 @@ namespace Flower.Tests.WorkRunners
             public IWork Work { get; }
             public IWorkRunner WorkRunner { get; }
             public ExecutableWorkState State { get; }
-            public async Task Execute()
+            public void Execute()
             {
                 executableWorks.Add(this);
                 manualResetEvent.Set();
-                await Task.Delay(100);
+                Thread.Sleep(100);
             }
 
             public Exception Error { get; }

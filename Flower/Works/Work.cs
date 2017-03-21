@@ -110,7 +110,7 @@ namespace Flower.Works
             WorkTriggered(triggeredWork);
             try
             {
-                workRunner.Submit(triggeredWork).Wait();
+                workRunner.Submit(triggeredWork);
             }
             catch (AggregateException ex)
             {

@@ -1,5 +1,6 @@
 ﻿namespace Flower.WorkRunners
 {
+    using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
@@ -13,16 +14,15 @@
     {
         private readonly BlockingCollection<IExecutableWork> executingWorks = new BlockingCollection<IExecutableWork>();
         
-        public async Task Submit(IExecutableWork executableWork)
+        public void Submit(IExecutableWork executableWork)
         {
             executingWorks.Add(executableWork);
-            var finished = Task.Run(executableWork.Execute).ContinueWith(
+            var finished = Task.Run((Action)executableWork.Execute).ContinueWith(
                 _ =>
                 {
                     // Work executed on a background thread has finished
                     executingWorks.TryTake(out executableWork);
                 });
-            await Task.CompletedTask;
         }
 
         public IEnumerable<IExecutableWork> PendingWorks { get; } = Enumerable.Empty<IExecutableWork>();

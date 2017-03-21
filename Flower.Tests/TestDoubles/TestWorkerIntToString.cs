@@ -5,9 +5,9 @@
 
     internal class TestWorkerIntToString : IWorker<int, string>
     {
-        public async Task<string> Execute(int input)
+        public string Execute(int input)
         {
-            return await Task.FromResult(input.ToString(CultureInfo.InvariantCulture));
+            return input.ToString(CultureInfo.InvariantCulture);
         }
     }
 }

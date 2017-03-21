@@ -17,6 +17,6 @@ namespace Flower.WorkRunners
         /// Submit a work to be executed by this runner at the next opportunity.
         /// </summary>
         /// <param name="executableWork">The work to execute at the next opportunity.</param>
-        Task Submit(IExecutableWork executableWork);
+        void Submit(IExecutableWork executableWork);
     }
 }

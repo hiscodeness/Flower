@@ -5,9 +5,8 @@
 
     internal class TestWorkerThrowsException : IWorker
     {
-        public async Task Execute()
+        public void Execute()
         {
-            await Task.CompletedTask;
             throw new Exception(ErrorMessage);
         }
 
