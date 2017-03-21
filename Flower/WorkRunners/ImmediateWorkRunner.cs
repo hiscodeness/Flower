@@ -27,7 +27,7 @@ namespace Flower.WorkRunners
             }
         }
 
-        public async Task Submit(IExecutableWork executableWork)
+        public void Submit(IExecutableWork executableWork)
         {
             if (executingWork != null)
             {
@@ -35,7 +35,7 @@ namespace Flower.WorkRunners
             }
 
             executingWork = executableWork;
-            await executingWork.Execute();
+            executingWork.Execute();
             isExecuted = true;
         }
     }

@@ -65,14 +65,14 @@ namespace Flower.Tests.Works
         }
 
         [Fact]
-        public async Task ExecutedWorkCannotBeExecutedAgain()
+        public void ExecutedWorkCannotBeExecutedAgain()
         {
             // Arrange
             var context = new IntToIntWorkerThrowOnEvenContext(WorkerErrorMode.Continue);
             context.Trigger(3);
 
             // Act
-            var ex = await Record.ExceptionAsync(() => context.Executed.Single().Execute());
+            var ex = Record.Exception(() => context.Executed.Single().Execute());
 
             // Assert
             Assert.IsType<InvalidOperationException>(ex);

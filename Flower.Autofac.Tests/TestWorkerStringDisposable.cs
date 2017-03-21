@@ -9,10 +9,9 @@ namespace Flower.Autofac.Tests
         public int Result { get; private set; }
         public bool IsDisposed { get; private set; }
 
-        public async Task Execute(string input)
+        public void Execute(string input)
         {
             Result = int.Parse(input, CultureInfo.InvariantCulture);
-            await Task.CompletedTask;
         }
 
         public void Dispose()

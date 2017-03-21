@@ -15,7 +15,7 @@
         [Theory]
         [InlineData(200, 100)]
         [InlineData(1000, 5)]
-        public async void ThreadPoolRunnerExecutesAllWorksInParallel(int delayInMilliseconds, int workCount)
+        public void ThreadPoolRunnerExecutesAllWorksInParallel(int delayInMilliseconds, int workCount)
         {
             // Arrange
             var countdown = new CountdownEvent(workCount);
@@ -25,14 +25,12 @@
             // Act
             for (var i = 0; i < workCount; i++)
             {
-                await
-                    workRunner.Submit(
-                        new MockExecutableWork(countdown, delayInMilliseconds, workRunnerSnapshots, workRunner));
+                workRunner.Submit(new MockExecutableWork(countdown, delayInMilliseconds, workRunnerSnapshots, workRunner));
             }
 
             // Assert
             countdown.Wait(TimeSpan.FromSeconds(20));
-            await Task.Delay(100); // Allow background thread to remove the work from workRunner
+            Thread.Sleep(100); // Allow background thread to remove the work from workRunner
             Assert.Equal(workCount, workRunnerSnapshots.Count);
             Assert.True(workRunnerSnapshots.Select(state => state.PendingWorks.Count).All(count => count == 0));
             foreach (var executingWorkCount in workRunnerSnapshots.Select(state => state.ExecutingWorks.Count))
@@ -59,9 +57,9 @@
             public IWork Work { get; }
             public IWorkRunner WorkRunner { get; }
             public ExecutableWorkState State { get; }
-            public async Task Execute()
+            public void Execute()
             {
-                await Task.Delay(delayInMilliseconds);
+                Thread.Sleep(delayInMilliseconds);
                 workRunnerSnapshots.Add(GetSnapshot(WorkRunner));
                 countdown.Signal();
             }

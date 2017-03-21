@@ -25,7 +25,7 @@ namespace Flower.Works
             State = ExecutableWorkState.Pending;
         }
 
-        public async Task Execute()
+        public void Execute()
         {
             if (State != ExecutableWorkState.Pending)
             {
@@ -36,7 +36,7 @@ namespace Flower.Works
             {
                 State = ExecutableWorkState.Executing;
                 CreateWorkerScope();
-                await ExecuteWorker();
+                ExecuteWorker();
                 DisposeWorkerScope();
                 State = ExecutableWorkState.Success;
                 OnWorkerExecuted();
@@ -69,7 +69,7 @@ namespace Flower.Works
 
         protected abstract void CreateWorkerScope();
         protected abstract IScope<object> GetWorkerScope(); 
-        protected abstract Task ExecuteWorker();
+        protected abstract void ExecuteWorker();
         protected abstract void DisposeWorkerScope();
         protected abstract void OnWorkerExecuted();
         protected abstract void OnWorkerErrored(Exception error);
@@ -97,9 +97,9 @@ namespace Flower.Works
             return WorkerScope;
         }
 
-        protected override async Task ExecuteWorker()
+        protected override void ExecuteWorker()
         {
-            await WorkerScope.Worker.Execute();
+            WorkerScope.Worker.Execute();
         }
 
         protected override void DisposeWorkerScope()
@@ -143,9 +143,9 @@ namespace Flower.Works
             return WorkerScope;
         }
 
-        protected override async Task ExecuteWorker()
+        protected override void ExecuteWorker()
         {
-            await WorkerScope.Worker.Execute(Input);
+            WorkerScope.Worker.Execute(Input);
         }
 
         protected override void DisposeWorkerScope()
@@ -190,9 +190,9 @@ namespace Flower.Works
             return WorkerScope;
         }
 
-        protected override async Task ExecuteWorker()
+        protected override void ExecuteWorker()
         {
-            Output = await WorkerScope.Worker.Execute(Input);
+            Output = WorkerScope.Worker.Execute(Input);
         }
 
         protected override void DisposeWorkerScope()

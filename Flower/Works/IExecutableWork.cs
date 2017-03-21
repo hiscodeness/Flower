@@ -7,7 +7,7 @@ namespace Flower.Works
     public interface IExecutableWork : ITriggeredWork
     {
         ExecutableWorkState State { get; }
-        Task Execute();
+        void Execute();
         Exception Error { get; }
         IScope<object> WorkerScope { get; } 
     }

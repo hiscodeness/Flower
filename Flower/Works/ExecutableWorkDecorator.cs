@@ -19,9 +19,9 @@
         public IWorkRunner WorkRunner => next.WorkRunner;
         public ExecutableWorkState State => next.State;
 
-        public virtual async Task Execute()
+        public virtual void Execute()
         {
-            await next.Execute();
+            next.Execute();
         }
 
         public Exception Error => next.Error;
@@ -45,9 +45,9 @@
         public IWorkRunner WorkRunner => next.WorkRunner;
         public ExecutableWorkState State => next.State;
 
-        public virtual async Task Execute()
+        public virtual void Execute()
         {
-            await next.Execute();
+            next.Execute();
         }
 
         public Exception Error => next.Error;
@@ -71,9 +71,9 @@
         public IWorkRunner WorkRunner => next.WorkRunner;
         public ExecutableWorkState State => next.State;
 
-        public virtual async Task Execute()
+        public virtual void Execute()
         {
-            await next.Execute();
+            next.Execute();
         }
 
         public Exception Error => next.Error;

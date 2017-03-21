@@ -13,9 +13,9 @@ namespace Flower.Workers
             this.worker = worker;
         }
 
-        public async Task Execute()
+        public void Execute()
         {
-            await worker();
+            worker();
         }
     }
 
@@ -28,24 +28,24 @@ namespace Flower.Workers
             this.worker = worker;
         }
 
-        public async Task Execute(TInput input)
+        public void Execute(TInput input)
         {
-            await worker(input);
+            worker(input);
         }
     }
 
     internal class Worker<TInput, TOutput> : IWorker<TInput, TOutput>
     {
-        private readonly Func<TInput, Task<TOutput>> worker;
+        private readonly Func<TInput, TOutput> worker;
 
-        public Worker(Func<TInput, Task<TOutput>> worker)
+        public Worker(Func<TInput, TOutput> worker)
         {
             this.worker = worker;
         }
 
-        public async Task<TOutput> Execute(TInput input)
+        public TOutput Execute(TInput input)
         {
-            return await worker(input);
+            return worker(input);
         }
     }
 }
