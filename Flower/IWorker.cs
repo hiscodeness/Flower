@@ -4,16 +4,16 @@
 
     public interface IWorker
     {
-        void Execute();
+        Task Execute();
     }
 
     public interface IWorker<in TInput>
     {
-        void Execute(TInput input);
+        Task Execute(TInput input);
     }
 
     public interface IWorker<in TInput, TOutput>
     {
-        TOutput Execute(TInput input);
+        Task<TOutput> Execute(TInput input);
     }
 }

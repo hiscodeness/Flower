@@ -40,7 +40,7 @@ namespace Flower
 
         public IFuncWork<TInput, TOutput> RegisterMethod<TInput, TOutput>(
             IObservable<TInput> trigger,
-            Func<TInput, TOutput> worker,
+            Func<TInput, Task<TOutput>> worker,
             WorkOptions options = null)
         {
             return RegisterFactory(trigger, WorkerScope.FromInstance(new Worker<TInput, TOutput>(worker)), options);

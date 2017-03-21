@@ -7,9 +7,10 @@
     {
         readonly List<int> inputs = new List<int>(); 
 
-        public void Execute(int input)
+        public async Task Execute(int input)
         {
             inputs.Add(input);
+            await Task.CompletedTask;
         }
 
         public IEnumerable<int> Inputs => inputs;

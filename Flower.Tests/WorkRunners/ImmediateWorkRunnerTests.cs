@@ -22,7 +22,7 @@ namespace Flower.Tests.WorkRunners
         }
 
         [Fact]
-        public void RunningTaskExistsDuringWorkerRun()
+        public async Task RunningTaskExistsDuringWorkerRun()
         {
             // Arrange
             var workRunner = new ImmediateWorkRunner();
@@ -31,10 +31,10 @@ namespace Flower.Tests.WorkRunners
             A.CallTo(() => work.Execute()).Invokes(() =>
                 {
                     result = workRunner.ExecutingWorks.ToList();
-                });
+                }).Returns(Task.CompletedTask);
 
             // Act
-            workRunner.Submit(work);
+            await workRunner.Submit(work);
 
             // Assert
             Assert.Equal(work, result.Single());

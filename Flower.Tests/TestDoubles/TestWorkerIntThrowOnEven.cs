@@ -8,12 +8,14 @@ namespace Flower.Tests.TestDoubles
     {
         public const string ErrorMessage = "Even numbers throw exception.";
 
-        public void Execute(int input)
+        public async Task Execute(int input)
         {
             if (input % 2 == 0)
             {
                 throw new ArgumentException(ErrorMessage);
             }
+
+            await Task.CompletedTask;
         }
     }
 }

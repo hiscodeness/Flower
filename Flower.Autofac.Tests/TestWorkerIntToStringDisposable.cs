@@ -8,9 +8,9 @@ namespace Flower.Autofac.Tests
     {
         public bool IsDisposed { get; private set; }
 
-        public string Execute(int input)
+        public Task<string> Execute(int input)
         {
-            return input.ToString(CultureInfo.InvariantCulture);
+            return Task.FromResult(input.ToString(CultureInfo.InvariantCulture));
         }
 
         public void Dispose()

@@ -10,13 +10,15 @@ namespace Flower.Tests.TestDoubles
         private int inputCount;
 
 
-        public void Execute()
+        public async Task Execute()
         {
             inputCount++;
             if (inputCount == 2)
             {
                 throw new ArgumentException(ErrorMessage);
             }
+
+            await Task.CompletedTask;
         }
     }
 }

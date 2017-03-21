@@ -68,10 +68,10 @@
             this.logOutput = logOutput;
         }
 
-        public override void Execute()
+        public override async Task Execute()
         {
             logInput(Input);
-            base.Execute();
+            await base.Execute();
             logOutput(Output);
         }
     }

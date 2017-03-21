@@ -24,7 +24,7 @@ namespace Flower
 
         IFuncWork<TInput, TOutput> RegisterMethod<TInput, TOutput>(
             IObservable<TInput> trigger,
-            Func<TInput, TOutput> method,
+            Func<TInput, Task<TOutput>> method,
             WorkOptions options = null);
 
         IActionWork RegisterWorker<TInput>(
