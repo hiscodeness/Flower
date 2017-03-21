@@ -27,7 +27,7 @@ namespace Flower.Tests.TestContexts
         }
 
         public IFuncWork<int, int> Work { get; }
-        public List<ITriggeredFuncWork<int, int>> Triggered { get; } 
+        public List<ITriggeredFuncWork<int, int>> Triggered { get; }
         public List<IExecutableFuncWork<int, int>> Executed { get; }
         public List<IExecutableFuncWork<int, int>> Errored { get; }
         public List<int> Output { get; }

@@ -1,9 +1,9 @@
-using System;
-using Flower.WorkRunners;
-using Flower.Works;
-
 namespace Flower
 {
+    using System;
+    using Flower.WorkRunners;
+    using Flower.Works;
+
     public enum WorkRegisterMode
     {
         Activated,
@@ -16,6 +16,7 @@ namespace Flower
         /// Trigger error appears on the works error stream.
         /// </summary>
         ErrorWork,
+
         /// <summary>
         /// Trigger error does not appear on the works error stream, instead the worker is only completed.
         /// </summary>
@@ -34,20 +35,28 @@ namespace Flower
         public static readonly WorkOptions Default = new WorkOptions();
 
         public WorkOptions(TriggerErrorMode triggerErrorMode)
-            : this(Default.WorkRegisterMode, triggerErrorMode) {}
+            : this(Default.WorkRegisterMode, triggerErrorMode)
+        {
+        }
 
         public WorkOptions(Func<IWork, IWorkRunner> workRunnerFactory)
-            : this(Default.WorkRegisterMode, Default.TriggerErrorMode, workRunnerFactory) {}
+            : this(Default.WorkRegisterMode, Default.TriggerErrorMode, workRunnerFactory)
+        {
+        }
 
         public WorkOptions(IWorkRunner workRunner)
-            : this(Default.WorkRegisterMode, Default.TriggerErrorMode, _ => workRunner) { }
+            : this(Default.WorkRegisterMode, Default.TriggerErrorMode, _ => workRunner)
+        {
+        }
 
         public WorkOptions(WorkerErrorMode workerErrorMode)
             : this(
                 Default.WorkRegisterMode,
                 Default.TriggerErrorMode,
                 Default.WorkRunnerFactory,
-                workerErrorMode) {}
+                workerErrorMode)
+        {
+        }
 
         public WorkOptions(WorkOptions prototype)
             : this(
@@ -55,8 +64,10 @@ namespace Flower
                 prototype.TriggerErrorMode,
                 prototype.WorkRunnerFactory,
                 prototype.WorkerErrorMode,
-                prototype.WorkDecoratorFactory) {}
-        
+                prototype.WorkDecoratorFactory)
+        {
+        }
+
         public WorkOptions(
             WorkRegisterMode workRegisterMode = WorkRegisterMode.Activated,
             TriggerErrorMode triggerErrorMode = TriggerErrorMode.ErrorWork,
@@ -109,7 +120,7 @@ namespace Flower
                 workRunnerFactory,
                 WorkerErrorMode);
         }
-        
+
         public WorkOptions With(IWorkRunner workRunner)
         {
             if (workRunner == null)

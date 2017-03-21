@@ -1,14 +1,12 @@
-﻿using System;
-using Flower.WorkRunners;
-
-namespace Flower.Works
+﻿namespace Flower.Works
 {
+    using System;
     using System.Threading.Tasks;
-    using Flower.Workers;
+    using Flower.WorkRunners;
 
     internal abstract class ExecutableWork<TInput> : IExecutableWork<TInput>
     {
-        private readonly IRegisteredWork<TInput> work; 
+        private readonly IRegisteredWork<TInput> work;
         public ExecutableWorkState State { get; private set; }
         public IWork<TInput> Work => work;
         public TInput Input { get; }
@@ -68,7 +66,7 @@ namespace Flower.Works
         }
 
         protected abstract void CreateWorkerScope();
-        protected abstract IScope<object> GetWorkerScope(); 
+        protected abstract IScope<object> GetWorkerScope();
         protected abstract Task ExecuteWorker();
         protected abstract void DisposeWorkerScope();
         protected abstract void OnWorkerExecuted();
@@ -84,7 +82,7 @@ namespace Flower.Works
         {
             this.work = work;
         }
-        
+
         public new IScope<IWorker> WorkerScope { get; private set; }
 
         protected override void CreateWorkerScope()

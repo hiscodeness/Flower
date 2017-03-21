@@ -10,7 +10,7 @@
     using Flower.Works;
     using Xunit;
 
-    public class ThreadPoolWorkRunnerTests 
+    public class ThreadPoolWorkRunnerTests
     {
         [Theory]
         [InlineData(200, 100)]
@@ -48,7 +48,11 @@
             private readonly int delayInMilliseconds;
             private readonly ConcurrentBag<WorkRunnerSnapshot> workRunnerSnapshots;
 
-            public MockExecutableWork(CountdownEvent countdown, int delayInMilliseconds, ConcurrentBag<WorkRunnerSnapshot> workRunnerSnapshots, IWorkRunner workRunner)
+            public MockExecutableWork(
+                CountdownEvent countdown,
+                int delayInMilliseconds,
+                ConcurrentBag<WorkRunnerSnapshot> workRunnerSnapshots,
+                IWorkRunner workRunner)
             {
                 this.countdown = countdown;
                 this.delayInMilliseconds = delayInMilliseconds;
@@ -59,6 +63,7 @@
             public IWork Work { get; }
             public IWorkRunner WorkRunner { get; }
             public ExecutableWorkState State { get; }
+
             public async Task Execute()
             {
                 await Task.Delay(delayInMilliseconds);

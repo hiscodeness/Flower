@@ -1,7 +1,6 @@
-﻿using System;
-
-namespace Flower.Tests.TestDoubles
+﻿namespace Flower.Tests.TestDoubles
 {
+    using System;
     using System.Threading.Tasks;
 
     internal class TestWorkerIntToIntThrowOnEven : IWorker<int, int>
@@ -11,7 +10,7 @@ namespace Flower.Tests.TestDoubles
 
         public async Task<int> Execute(int input)
         {
-            if (input%2 == 0)
+            if (input % 2 == 0)
             {
                 throw new ArgumentException(ErrorMessage);
             }

@@ -1,11 +1,11 @@
-﻿using System;
-using FakeItEasy;
-using Flower.WorkRunners;
-using Flower.Works;
-using Xunit;
-
-namespace Flower.Tests
+﻿namespace Flower.Tests
 {
+    using System;
+    using FakeItEasy;
+    using Flower.WorkRunners;
+    using Flower.Works;
+    using Xunit;
+
     public class WorkRegistryOptionsTests
     {
         [Fact]
@@ -29,12 +29,12 @@ namespace Flower.Tests
             var options = new WorkOptions();
 
             // Act
-            var ex = Record.Exception(() => options = options.With((Func<IWork, IWorkRunner>)null));
+            var ex = Record.Exception(() => options = options.With((Func<IWork, IWorkRunner>) null));
 
             // Assert
             Assert.IsType<ArgumentNullException>(ex);
         }
-        
+
         [Fact]
         public void CannotChangeWorkRunnerToNull()
         {
@@ -42,7 +42,7 @@ namespace Flower.Tests
             var options = new WorkOptions();
 
             // Act
-            var ex = Record.Exception(() => options = options.With((IWorkRunner)null));
+            var ex = Record.Exception(() => options = options.With((IWorkRunner) null));
 
             // Assert
             Assert.IsType<ArgumentNullException>(ex);

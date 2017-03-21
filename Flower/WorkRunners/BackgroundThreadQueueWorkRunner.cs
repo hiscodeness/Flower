@@ -96,7 +96,10 @@
                 threadContext.RunOnCurrentThread();
                 task.GetAwaiter().GetResult();
             }
-            finally { SynchronizationContext.SetSynchronizationContext(previousContext); }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(previousContext);
+            }
         }
 
         /// <summary>

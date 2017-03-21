@@ -25,7 +25,7 @@
             triggerable.Trigger(5);
 
             // Assert
-            Assert.Equal(new []{3*3, 5*5}, results);
+            Assert.Equal(new[] {3 * 3, 5 * 5}, results);
             Assert.Equal(WorkState.Active, work1.State);
             Assert.Equal(WorkState.Active, work2.State);
             Assert.Equal(WorkState.Active, work3.State);

@@ -1,7 +1,6 @@
-﻿using System;
-
-namespace Flower.Works
+﻿namespace Flower.Works
 {
+    using System;
     using System.Threading.Tasks;
 
     public interface IExecutableWork : ITriggeredWork
@@ -9,12 +8,11 @@ namespace Flower.Works
         ExecutableWorkState State { get; }
         Task Execute();
         Exception Error { get; }
-        IScope<object> WorkerScope { get; } 
+        IScope<object> WorkerScope { get; }
     }
 
     public interface IExecutableWork<out TInput> : ITriggeredWork<TInput>, IExecutableWork
     {
-
     }
 
     public interface IExecutableActionWork : ITriggeredActionWork, IExecutableWork<object>

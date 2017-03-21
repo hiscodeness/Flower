@@ -1,7 +1,6 @@
-﻿using System;
-
-namespace Flower.Workers
+﻿namespace Flower.Workers
 {
+    using System;
     using System.Threading.Tasks;
 
     internal class Worker : IWorker

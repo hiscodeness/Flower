@@ -1,16 +1,15 @@
-﻿using System;
-using System.Reactive.Subjects;
-using Flower.Works;
-
-namespace Flower.Tests.TestDoubles
+﻿namespace Flower.Tests.TestDoubles
 {
+    using System;
+    using System.Reactive.Subjects;
     using Flower.Workers;
+    using Flower.Works;
 
     internal class TestWorkIntToIntSquared : IFuncWork<int, int>, IDisposable
     {
         private readonly TestWorkRegistration registration = new TestWorkRegistration();
-        private readonly Subject<int> output = new Subject<int>(); 
-        
+        private readonly Subject<int> output = new Subject<int>();
+
         internal TestWorkIntToIntSquared()
         {
             State = WorkState.Suspended;

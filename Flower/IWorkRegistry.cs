@@ -3,8 +3,8 @@ namespace Flower
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using Flower.Works;
     using Flower.Workers;
+    using Flower.Works;
 
     public interface IWorkRegistry
     {
@@ -31,7 +31,7 @@ namespace Flower
             IObservable<TInput> trigger,
             IWorker worker,
             WorkOptions options = null);
-        
+
         IActionWork<TInput> RegisterWorker<TInput>(
             IObservable<TInput> trigger,
             IWorker<TInput> worker,

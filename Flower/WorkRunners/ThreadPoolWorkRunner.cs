@@ -7,12 +7,12 @@
     using Flower.Works;
 
     /// <summary>
-    /// An <see cref="IWorkRunner"/> that executes the submitted works on background threads from the thread pool.
+    /// An <see cref="IWorkRunner" /> that executes the submitted works on background threads from the thread pool.
     /// </summary>
     public class ThreadPoolWorkRunner : IWorkRunner
     {
         private readonly BlockingCollection<IExecutableWork> executingWorks = new BlockingCollection<IExecutableWork>();
-        
+
         public async Task Submit(IExecutableWork executableWork)
         {
             executingWorks.Add(executableWork);

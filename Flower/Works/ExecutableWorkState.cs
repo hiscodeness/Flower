@@ -1,7 +1,7 @@
-using Flower.WorkRunners;
-
 namespace Flower.Works
 {
+    using Flower.WorkRunners;
+
     /// <summary>
     /// State of a work that has been triggered.
     /// </summary>

@@ -1,13 +1,12 @@
-﻿using System;
-using System.Linq;
-using System.Reactive.Subjects;
-using Flower.Tests.TestDoubles;
-using Flower.Works;
-using Xunit;
-
-namespace Flower.Tests.Works
+﻿namespace Flower.Tests.Works
 {
+    using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Reactive.Subjects;
+    using Flower.Tests.TestDoubles;
+    using Flower.Works;
+    using Xunit;
 
     public class InputWorkTests
     {

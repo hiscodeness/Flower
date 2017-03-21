@@ -1,10 +1,11 @@
-using System;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
-
 namespace Flower.Works
 {
-    internal class ActionWorkObservablesHelper : WorkObservablesHelper<IRegisteredActionWork, ITriggeredActionWork, IExecutableActionWork>
+    using System;
+    using System.Reactive.Disposables;
+    using System.Reactive.Linq;
+
+    internal class ActionWorkObservablesHelper :
+        WorkObservablesHelper<IRegisteredActionWork, ITriggeredActionWork, IExecutableActionWork>
     {
         public ActionWorkObservablesHelper(IRegisteredActionWork work)
             : base(work)
@@ -12,7 +13,9 @@ namespace Flower.Works
         }
     }
 
-    internal class ActionWorkObservablesHelper<TInput> : WorkObservablesHelper<IRegisteredActionWork<TInput>, ITriggeredActionWork<TInput>, IExecutableActionWork<TInput>>
+    internal class ActionWorkObservablesHelper<TInput> :
+        WorkObservablesHelper
+        <IRegisteredActionWork<TInput>, ITriggeredActionWork<TInput>, IExecutableActionWork<TInput>>
     {
         public ActionWorkObservablesHelper(IRegisteredActionWork<TInput> work)
             : base(work)
@@ -20,12 +23,15 @@ namespace Flower.Works
         }
     }
 
-    internal class FuncWorkObservablesHelper<TInput, TOutput> : WorkObservablesHelper<IRegisteredFuncWork<TInput, TOutput>, ITriggeredFuncWork<TInput, TOutput>, IExecutableFuncWork<TInput, TOutput>>
+    internal class FuncWorkObservablesHelper<TInput, TOutput> :
+        WorkObservablesHelper
+        <IRegisteredFuncWork<TInput, TOutput>, ITriggeredFuncWork<TInput, TOutput>, IExecutableFuncWork<TInput, TOutput>
+        >
     {
         public FuncWorkObservablesHelper(IRegisteredFuncWork<TInput, TOutput> work)
             : base(work)
         {
-        } 
+        }
     }
 
     internal class WorkObservablesHelper<TWork, TTriggeredWork, TExecutableWork>
@@ -97,10 +103,7 @@ namespace Flower.Works
             private IDisposable CreateCompletedSubscription(IObserver<TWork> observer)
             {
                 typedWorkCompleted += observer.OnNext;
-                return Disposable.Create(() =>
-                {
-                    typedWorkCompleted -= observer.OnNext;
-                });
+                return Disposable.Create(() => { typedWorkCompleted -= observer.OnNext; });
             }
 
             private void OnWorkCompleted(TWork work)
@@ -135,7 +138,8 @@ namespace Flower.Works
             {
                 workTriggered += observer.OnNext;
                 workCompleted += observer.OnCompleted;
-                return Disposable.Create(() =>
+                return Disposable.Create(
+                    () =>
                     {
                         workTriggered -= observer.OnNext;
                         workCompleted -= observer.OnCompleted;
@@ -191,12 +195,12 @@ namespace Flower.Works
 
                 return Disposable.Create(
                     () =>
-                        {
-                            workExecuted -= observer.OnNext;
-                            workCompleted -= observer.OnCompleted;
-                            work.TriggerEvents.TriggerErrored -= triggerErrorHandler;
-                            work.TriggerEvents.TriggerCompleted -= observer.OnCompleted;
-                        });
+                    {
+                        workExecuted -= observer.OnNext;
+                        workCompleted -= observer.OnCompleted;
+                        work.TriggerEvents.TriggerErrored -= triggerErrorHandler;
+                        work.TriggerEvents.TriggerCompleted -= observer.OnCompleted;
+                    });
             }
 
             private bool IsWorkCompleted

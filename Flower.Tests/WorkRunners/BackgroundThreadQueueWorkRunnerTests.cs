@@ -1,21 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Flower.WorkRunners;
-using Flower.Works;
-using Xunit;
-
-namespace Flower.Tests.WorkRunners
+﻿namespace Flower.Tests.WorkRunners
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Flower.WorkRunners;
+    using Flower.Works;
+    using Xunit;
+
     public class BackgroundThreadQueueWorkRunnerTests
     {
         [Theory]
         [InlineData(20, 100)]
         [InlineData(200, 10)]
-        public async Task BackgroundThreadQueueExecutesOneWorkWhileOthersArePending(int delayInMilliseconds, int workCount)
+        public async Task BackgroundThreadQueueExecutesOneWorkWhileOthersArePending(
+            int delayInMilliseconds,
+            int workCount)
         {
             // Arrange
             var countdown = new CountdownEvent(workCount);
@@ -26,7 +28,13 @@ namespace Flower.Tests.WorkRunners
             // Act
             for (var i = 0; i < workCount; i++)
             {
-                await workRunner.Submit(new SnapshottingExecutableWork(countdown, delayInMilliseconds, workRunnerSnapshots, threadIds, workRunner));
+                await workRunner.Submit(
+                    new SnapshottingExecutableWork(
+                        countdown,
+                        delayInMilliseconds,
+                        workRunnerSnapshots,
+                        threadIds,
+                        workRunner));
             }
 
             // Assert
@@ -34,7 +42,7 @@ namespace Flower.Tests.WorkRunners
             Assert.Equal(workCount, workRunnerSnapshots.Count);
             Assert.All(workRunnerSnapshots, snapshot => Assert.Equal(1, snapshot.ExecutingWorks.Count));
             Assert.All(threadIds, threadId => Assert.Equal(workRunner.ThreadId, threadId));
-            var maxPendingCount = Enumerable.Range(1, workCount-1).Aggregate((acc, x) => acc + x);
+            var maxPendingCount = Enumerable.Range(1, workCount - 1).Aggregate((acc, x) => acc + x);
             Assert.InRange(workRunnerSnapshots.Sum(state => state.PendingWorks.Count), workCount, maxPendingCount);
         }
 
@@ -62,15 +70,15 @@ namespace Flower.Tests.WorkRunners
             Assert.InRange(stopwatch.ElapsedMilliseconds, 0, 299);
             Assert.Equal(2, executableWorks.Count);
         }
-        
+
         private static WorkRunnerSnapshot GetSnapshot(IWorkRunner workRunner)
         {
-            return 
+            return
                 new WorkRunnerSnapshot
-                    {
-                        PendingWorks = workRunner.PendingWorks.ToList(),
-                        ExecutingWorks = workRunner.ExecutingWorks.ToList()
-                    };
+                {
+                    PendingWorks = workRunner.PendingWorks.ToList(),
+                    ExecutingWorks = workRunner.ExecutingWorks.ToList()
+                };
         }
 
         private struct WorkRunnerSnapshot
@@ -85,7 +93,7 @@ namespace Flower.Tests.WorkRunners
             private readonly int delayInMilliseconds;
             private readonly IList<WorkRunnerSnapshot> workRunnerSnapshots;
             private readonly IWorkRunner workRunner;
-            private readonly IList<int> threadIds; 
+            private readonly IList<int> threadIds;
 
             public SnapshottingExecutableWork(
                 CountdownEvent countdown,
@@ -100,9 +108,11 @@ namespace Flower.Tests.WorkRunners
                 this.threadIds = threadIds;
                 this.workRunner = workRunner;
             }
+
             public IWork Work { get; }
             public IWorkRunner WorkRunner { get; }
             public ExecutableWorkState State { get; }
+
             public async Task Execute()
             {
                 await Task.Delay(delayInMilliseconds);
@@ -129,6 +139,7 @@ namespace Flower.Tests.WorkRunners
             public IWork Work { get; }
             public IWorkRunner WorkRunner { get; }
             public ExecutableWorkState State { get; }
+
             public async Task Execute()
             {
                 executableWorks.Add(this);

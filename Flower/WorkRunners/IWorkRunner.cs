@@ -1,9 +1,8 @@
-using System.Collections.Generic;
-using Flower.Works;
-
 namespace Flower.WorkRunners
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Flower.Works;
 
     /// <summary>
     /// Executes triggered works.

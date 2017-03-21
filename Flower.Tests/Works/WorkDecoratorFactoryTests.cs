@@ -35,7 +35,7 @@
             // Assert
             Assert.Equal(WorkState.Completed, work.State);
             Assert.Equal(new[] {3, 4, 5}, inputLog);
-            Assert.Equal(new[] {3*3, 4*4, 5*5}, outputLog);
+            Assert.Equal(new[] {3 * 3, 4 * 4, 5 * 5}, outputLog);
         }
     }
 
@@ -49,8 +49,9 @@
             this.logInput = logInput;
             this.logOutput = logOutput;
         }
-        
-        public override IExecutableFuncWork<TInput, TOutput> Decorate<TInput, TOutput>(IExecutableFuncWork<TInput, TOutput> work)
+
+        public override IExecutableFuncWork<TInput, TOutput> Decorate<TInput, TOutput>(
+            IExecutableFuncWork<TInput, TOutput> work)
         {
             return new LoggingFuncWork<TInput, TOutput>(work, logInput as Action<TInput>, logOutput as Action<TOutput>);
         }
@@ -61,7 +62,10 @@
         private readonly Action<TInput> logInput;
         private readonly Action<TOutput> logOutput;
 
-        public LoggingFuncWork(IExecutableFuncWork<TInput, TOutput> next, Action<TInput> logInput, Action<TOutput> logOutput)
+        public LoggingFuncWork(
+            IExecutableFuncWork<TInput, TOutput> next,
+            Action<TInput> logInput,
+            Action<TOutput> logOutput)
             : base(next)
         {
             this.logInput = logInput;

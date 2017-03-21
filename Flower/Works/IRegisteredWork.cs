@@ -1,7 +1,6 @@
 namespace Flower.Works
 {
     using System;
-    using Flower.Workers;
 
     internal interface IRegisteredWork : IWork
     {

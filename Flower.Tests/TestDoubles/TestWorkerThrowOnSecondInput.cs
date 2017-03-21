@@ -1,7 +1,6 @@
-﻿using System;
-
-namespace Flower.Tests.TestDoubles
+﻿namespace Flower.Tests.TestDoubles
 {
+    using System;
     using System.Threading.Tasks;
 
     internal class TestWorkerThrowOnSecondInput : IWorker

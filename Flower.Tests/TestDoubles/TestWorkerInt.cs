@@ -5,7 +5,7 @@
 
     internal class TestWorkerInt : IWorker<int>
     {
-        readonly List<int> inputs = new List<int>(); 
+        readonly List<int> inputs = new List<int>();
 
         public async Task Execute(int input)
         {
